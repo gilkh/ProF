@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  :root {
+    --background: 30 50% 98%; /* Warm Off-White */
+    --foreground: 20 14% 4%;
+    --card: 30 50% 100%;
+    --card-foreground: 20 14% 4%;
+    --popover: 30 50% 100%;
+    --popover-foreground: 20 14% 4%;
+    --primary: 0 98% 41%; /* #d40202 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 180 85% 96%; /* Light Teal */
+    --secondary-foreground: 180 40% 10%;
+    --muted: 30 50% 95%; /* Gold-Beige tint for muted */
+    --muted-foreground: 30 10% 45%;
+    --accent: 50 100% 85%; /* Soft Champagne Gold */
+    --accent-foreground: 50 40% 20%; /* Dark Gold for text on gold bg */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 50 70% 92%; /* Soft Gold-Beige tint */
+    --input: 50 70% 92%; /* Soft Gold-Beige tint */
+    --ring: 0 98% 41%;
+    --chart-1: 8 85% 60%; /* Warmer, Deeper Coral */
+    --chart-2: 180 70% 35%; /* Rich Teal */
+    --chart-3: 51 100% 50%; /* Gold */
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 20 14% 4%;
+    --foreground: 30 50% 98%;
+    --card: 20 14% 4%;
+    --card-foreground: 30 50% 98%;
+    --popover: 20 14% 4%;
+    --popover-foreground: 30 50% 98%;
+    --primary: 0 98% 45%; /* #d40202, slightly lighter for dark mode */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 180 20% 15%; /* Dark Teal */
+    --secondary-foreground: 30 50% 98%;
+    --muted: 50 20% 15%; /* Dark Gold-Beige tint */
+    --muted-foreground: 50 10% 65%;
+    --accent: 50 100% 85%; /* Soft Champagne Gold */
+    --accent-foreground: 50 40% 20%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 50 20% 20%; /* Dark Gold-Beige tint */
+    --input: 50 20% 20%; /* Dark Gold-Beige tint */
+    --ring: 0 98% 41%;
+    --chart-1: 30 50% 98%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}
