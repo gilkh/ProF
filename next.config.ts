@@ -20,7 +20,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  output: 'export',
   env: {
     NEXT_PUBLIC_FIREBASE_API_KEY: 'AIzaSyCRM1IeOKLecBUl10L4XNPU9lWjuf2_TyA',
     NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: 'tradecraft-5c8mv.firebaseapp.com',

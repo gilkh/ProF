@@ -144,7 +144,7 @@ export function ServiceCard({ service, role, onListingUpdate }: ServiceCardProps
               </div>
           )}
           {role === 'vendor' && (
-              <Badge className={cn("absolute top-3 left-3 z-10 capitalize", statusColors[service.status])}>
+              <Badge className={cn("absolute top-3 left-3 z-10 capitalize text-white", statusColors[service.status])}>
                 {service.status}
               </Badge>
           )}

@@ -38,7 +38,7 @@ export default function ManageServicesPage() {
         }
         setIsLoading(true);
         try {
-            const allItems = await getServicesAndOffers(userId);
+            const allItems = await getServicesAndOffers(userId, { includePending: true });
             setMyListings(allItems);
         } catch (error) {
             console.error("Failed to load listings", error);

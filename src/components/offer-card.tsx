@@ -145,7 +145,7 @@ export function OfferCard({ offer, role, onListingUpdate }: OfferCardProps) {
               </div>
           )}
            {role === 'vendor' ? (
-                <Badge className={cn("absolute top-3 left-3 z-10 capitalize", statusColors[offer.status])}>
+                <Badge className={cn("absolute top-3 left-3 z-10 capitalize text-white", statusColors[offer.status])}>
                     {offer.status}
                 </Badge>
             ) : (
