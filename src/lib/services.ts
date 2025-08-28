@@ -585,40 +585,132 @@ export async function getVendorQuoteRequests(vendorId: string): Promise<QuoteReq
 }
 
 export async function respondToQuote(requestId: string, vendorId: string, clientId: string, total: number, response: string, lineItems: LineItem[]) {
+    console.log("lineItems received in respondToQuote:", JSON.stringify(lineItems, null, 2));
+
+    // fetch vendor profile to include friendly vendor name in the message
+    let vendorProfile = null;
+    try {
+        vendorProfile = await getVendorProfile(vendorId);
+    } catch (e) {
+        console.warn('Could not load vendor profile for message formatting', e);
+    }
+
     const quoteRef = doc(db, 'quoteRequests', requestId);
     const chatId = [clientId, vendorId].sort().join('_');
     const chatRef = doc(db, 'chats', chatId);
 
     
-    await runTransaction(db, async (transaction) => {
-        const quoteSnap = await transaction.get(quoteRef);
-        if (!quoteSnap.exists()) throw new Error("Quote request not found");
-        const quoteData = quoteSnap.data() as QuoteRequest;
+    try {
+        await runTransaction(db, async (transaction) => {
+            const quoteSnap = await transaction.get(quoteRef);
+            if (!quoteSnap.exists()) throw new Error("Quote request not found");
+            const quoteData = quoteSnap.data() as QuoteRequest;
 
-        const responseMessage = formatQuoteResponseMessage(requestId, quoteData.serviceTitle, quoteData.serviceTitle, lineItems, total, response);
+            // Deep sanitize lineItems for message formatting only
+            let safeLineItemsForMessage: LineItem[] = Array.isArray(lineItems) ? lineItems : [];
+            safeLineItemsForMessage = safeLineItemsForMessage
+                .filter(item => item && typeof item.description === 'string' && typeof item.price === 'number')
+                .map(item => ({ description: item.description, price: item.price }));
 
-        transaction.update(quoteRef, {
-            status: 'responded',
-            quotePrice: total,
-            quoteResponse: response,
-            lineItems: lineItems
+            const responseMessage = formatQuoteResponseMessage(requestId, quoteData.serviceTitle, quoteData.serviceTitle, safeLineItemsForMessage, total, response);
+
+            const updatePayload = {
+                status: 'responded',
+                quotePrice: total,
+                quoteResponse: response,
+                // deliberately omit lineItems here to avoid transaction validation issues
+            };
+
+            transaction.update(quoteRef, updatePayload);
+
+            const messagesRef = collection(db, `chats/${chatId}/messages`);
+            // build a richer forwarded item payload including event and client details
+            const forwardedItem = {
+                isForwarded: true,
+                isQuoteRequest: false,
+                isQuoteResponse: true,
+                quoteRequestId: requestId,
+                vendorId: vendorId,
+                vendorName: vendorProfile?.businessName || vendorId,
+                title: `Quote for: ${quoteData.serviceTitle}`,
+                lineItems: safeLineItemsForMessage,
+                total: total,
+                userMessage: response,
+                eventDate: quoteData.eventDate,
+                guestCount: quoteData.guestCount,
+                phone: quoteData.phone,
+                clientName: quoteData.clientName,
+                serviceId: quoteData.serviceId,
+            };
+
+            const newMessage: Omit<ChatMessage, 'id'> = {
+                senderId: vendorId,
+                text: JSON.stringify(forwardedItem),
+                timestamp: new Date()
+            };
+            transaction.set(doc(messagesRef), newMessage);
+
+            transaction.update(chatRef, {
+                lastMessage: responseMessage,
+                lastMessageTimestamp: newMessage.timestamp,
+                lastMessageSenderId: vendorId,
+                [`unreadCount.${clientId}`]: increment(1)
+            });
         });
-        
-        const messagesRef = collection(db, `chats/${chatId}/messages`);
-        const newMessage: Omit<ChatMessage, 'id'> = {
-            senderId: vendorId,
-            text: responseMessage,
-            timestamp: new Date()
-        };
-        transaction.set(doc(messagesRef), newMessage);
-        
-        transaction.update(chatRef, {
-            lastMessage: responseMessage,
-            lastMessageTimestamp: newMessage.timestamp,
-            lastMessageSenderId: vendorId,
-            [`unreadCount.${clientId}`]: increment(1)
-        });
-    });
+    } catch (txErr) {
+        console.warn('Transaction failed, falling back to non-transactional updates:', txErr);
+
+        // Fallback: perform safe non-transactional updates
+        try {
+            const quoteSnap = await getDoc(quoteRef);
+            if (!quoteSnap.exists()) throw new Error('Quote request not found (fallback)');
+
+            const quoteData = quoteSnap.data() as QuoteRequest;
+            let safeLineItemsForMessage: LineItem[] = Array.isArray(lineItems) ? lineItems : [];
+            safeLineItemsForMessage = safeLineItemsForMessage
+                .filter(item => item && typeof item.description === 'string' && typeof item.price === 'number')
+                .map(item => ({ description: item.description, price: item.price }));
+
+            const responseMessage = formatQuoteResponseMessage(requestId, quoteData.serviceTitle, quoteData.serviceTitle, safeLineItemsForMessage, total, response);
+
+            // update quote document (without lineItems yet)
+            await updateDoc(quoteRef, { status: 'responded', quotePrice: total, quoteResponse: response });
+
+            // add message
+            const messagesRef = collection(db, `chats/${chatId}/messages`);
+            const newMessage: Omit<ChatMessage, 'id'> = {
+                senderId: vendorId,
+                text: responseMessage,
+                timestamp: new Date()
+            };
+            await setDoc(doc(messagesRef), newMessage);
+
+            // update chat
+            await updateDoc(chatRef, {
+                lastMessage: responseMessage,
+                lastMessageTimestamp: newMessage.timestamp,
+                lastMessageSenderId: vendorId,
+            });
+
+        } catch (fallbackErr) {
+            console.error('Fallback non-transactional flow failed:', fallbackErr);
+            throw fallbackErr;
+        }
+    }
+
+    // After either transactional or fallback path, persist sanitized lineItems separately
+    try {
+        let finalLineItems: LineItem[] = Array.isArray(lineItems) ? lineItems : [];
+        finalLineItems = finalLineItems
+            .filter(item => item && typeof item.description === 'string' && typeof item.price === 'number')
+            .map(item => ({ description: item.description, price: item.price }));
+
+        // Always write an array (can be empty) to avoid undefined
+        await updateDoc(quoteRef, { lineItems: finalLineItems });
+        console.log('Persisted lineItems after primary operations.');
+    } catch (persistErr) {
+        console.error('Failed to persist lineItems after operations:', persistErr);
+    }
 }
 
 
@@ -1172,10 +1264,11 @@ export function getChatsForUser(userId: string | undefined, callback: (chats: Ch
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
         let chats = querySnapshot.docs.map(doc => {
             const data = doc.data();
+            const lastMessageTimestamp = data.lastMessageTimestamp ? toDate(data.lastMessageTimestamp) : (data.createdAt ? toDate(data.createdAt) : new Date());
             return {
                 id: doc.id,
                 ...data,
-                lastMessageTimestamp: data.lastMessageTimestamp.toDate(),
+                lastMessageTimestamp,
                 participants: data.participants.map((p: any) => ({ ...p, verification: p.verification || 'none' })),
             } as Chat;
         });

@@ -1,6 +1,6 @@
-
-'use client';
+"use client";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+// ...existing code...
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -55,15 +55,35 @@ function RespondToQuoteDialog({ request, onQuoteSent }: { request: QuoteRequest,
     const responseMessage = formData.get('response') as string;
 
     const validLineItems = lineItems.filter(item => item.description && item.price > 0);
+    const sanitizedLineItems = validLineItems.filter(item => item.description && item.price > 0);
 
-    if (validLineItems.length === 0) {
-        toast({ title: "Invalid Quote", description: "Please add at least one line item with a description and price.", variant: "destructive" });
+  alert('Submitting quote! Check the console for details.');
+  console.log('=== DEBUG: Sending to respondToQuote ===');
+  console.log('requestId:', request.id);
+  console.log('vendorId:', request.vendorId);
+  console.log('clientId:', request.clientId);
+  console.log('total:', total);
+  console.log('responseMessage:', responseMessage);
+  console.log('sanitizedLineItems:', sanitizedLineItems);
+
+    // Log the data being sent to respondToQuote
+    console.log('Sending to respondToQuote:', {
+      requestId: request.id,
+      vendorId: request.vendorId,
+      clientId: request.clientId,
+      total,
+      responseMessage,
+      sanitizedLineItems
+    });
+
+    if (sanitizedLineItems.length === 0) {
+        toast({ title: "Invalid Quote", description: "Please add at least one valid line item with a description and price.", variant: "destructive" });
         setIsSending(false);
         return;
     }
 
     try {
-      await respondToQuote(request.id, request.vendorId, request.clientId, total, responseMessage, validLineItems);
+      await respondToQuote(request.id, request.vendorId, request.clientId, total, responseMessage, sanitizedLineItems);
       toast({
         title: 'Quote Sent!',
         description: 'Your response has been sent to the client and added to your chat history.',

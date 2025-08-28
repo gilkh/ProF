@@ -39,7 +39,7 @@ function RespondToQuoteDialog({ request, onQuoteSent }: { request: QuoteRequest,
     const responseMessage = formData.get('response') as string;
 
     try {
-      await respondToQuote(request.id, request.vendorId, request.clientId, price, responseMessage);
+      await respondToQuote(request.id, request.vendorId, request.clientId, price, responseMessage, []);
       toast({
         title: 'Quote Sent!',
         description: 'Your response has been sent to the client and added to your chat history.',

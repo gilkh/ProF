@@ -21,12 +21,12 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
 
-function ForwardedItemBubble({ item }: { item: ForwardedItem }) {
+function ForwardedItemBubble({ item, timestamp }: { item: ForwardedItem, timestamp?: Date }) {
     if (!item.itemId || !item.itemType) {
         return null;
     }
     return (
-        <div className="bg-background border-2 border-primary/30 rounded-lg p-3 max-w-xs w-full shadow-md">
+    <div className="bg-background border-2 border-primary/30 rounded-lg p-3 max-w-xs w-full shadow-md">
             <Link href={`/client/${item.itemType}/${item.itemId}`} className="block">
                 <div className="relative aspect-video rounded-md overflow-hidden mb-2">
                     <Image src={item.image!} alt={item.title} layout="fill" className="object-cover" />
@@ -40,11 +40,14 @@ function ForwardedItemBubble({ item }: { item: ForwardedItem }) {
                 <div className="mt-3 bg-muted rounded-md p-2 border border-primary/20">
                 <p className="text-sm text-foreground">{item.userMessage}</p>
             </div>
+            {timestamp && (
+                <div className="mt-2 text-xs text-muted-foreground text-right">{format(new Date(timestamp), 'p')}</div>
+            )}
         </div>
     )
 }
 
-function QuoteRequestBubble({ item }: { item: ForwardedItem }) {
+function QuoteRequestBubble({ item, timestamp }: { item: ForwardedItem, timestamp?: Date }) {
     return (
     <div className="bg-background border-2 border-primary/40 rounded-lg p-4 max-w-md w-full shadow-lg">
             <div className="flex items-center gap-3 mb-3 border-b pb-3">
@@ -80,12 +83,15 @@ function QuoteRequestBubble({ item }: { item: ForwardedItem }) {
                     Respond to Request
                 </Button>
             </Link>
+            {timestamp && (
+                <div className="mt-3 text-xs text-muted-foreground text-right">{format(new Date(timestamp), 'p')}</div>
+            )}
         </div>
     )
 }
 
 
-function QuoteResponseBubble({ item, isOwnMessage }: { item: ForwardedItem, isOwnMessage: boolean }) {
+function QuoteResponseBubble({ item, isOwnMessage, timestamp }: { item: ForwardedItem, isOwnMessage: boolean, timestamp?: Date }) {
   const { toast } = useToast();
   const [isPaying, setIsPaying] = useState(false);
   const [isApproved, setIsApproved] = useState(false);
@@ -143,6 +149,9 @@ function QuoteResponseBubble({ item, isOwnMessage }: { item: ForwardedItem, isOw
           {isApproved ? 'Approved & Booked' : `Pay & Confirm Booking`}
         </Button>
       )}
+            {timestamp && (
+                <div className="mt-3 text-xs text-muted-foreground text-right">{format(new Date(timestamp), 'p')}</div>
+            )}
     </div>
   );
 }
@@ -160,15 +169,15 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
     if (forwardedItem) {
         if(forwardedItem.isQuoteResponse) {
              return (
-                 <div className="flex justify-start w-full">
-                     <QuoteResponseBubble item={forwardedItem} isOwnMessage={isOwnMessage} />
+                 <div className={cn('flex w-full', isOwnMessage ? 'justify-end' : 'justify-start')}>
+                     <QuoteResponseBubble item={forwardedItem} isOwnMessage={isOwnMessage} timestamp={message.timestamp} />
                 </div>
             )
         }
          if (forwardedItem.isQuoteRequest && !isOwnMessage) {
             return (
                 <div className="flex justify-start w-full">
-                     <QuoteRequestBubble item={forwardedItem} />
+                     <QuoteRequestBubble item={forwardedItem} timestamp={message.timestamp} />
                 </div>
             )
         }
@@ -182,7 +191,7 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
                         </Avatar>
                     </Link>
                 )}
-                <ForwardedItemBubble item={forwardedItem} />
+                <ForwardedItemBubble item={forwardedItem} timestamp={message.timestamp} />
              </div>
         )
     }
@@ -199,11 +208,12 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
             )}
                 <div
                 className={cn(
-                    "max-w-xs rounded-lg p-3 whitespace-pre-wrap border",
+                    "max-w-xs rounded-lg p-3 whitespace-pre-wrap border relative",
                     isOwnMessage ? "bg-primary text-primary-foreground border-primary/40" : "bg-muted border-primary/10"
                 )}
             >
                 <p className="text-sm">{message.text}</p>
+                <div className="mt-1 text-xs text-muted-foreground text-right">{format(new Date(message.timestamp), 'p')}</div>
             </div>
             {isOwnMessage && (
                 <Avatar className="h-8 w-8">
@@ -232,7 +242,7 @@ export function MessagingPanel() {
     if (!userId && !isAdmin) return;
 
     setIsLoading(true);
-    const unsubscribe = getChatsForUser(isAdmin ? undefined : userId, (loadedChats) => {
+    const unsubscribe = getChatsForUser(isAdmin ? undefined : (userId ?? undefined), (loadedChats) => {
         setChats(loadedChats);
         if (!isMobile && !selectedChat && loadedChats.length > 0) {
             handleSelectChat(loadedChats[0]);
@@ -355,8 +365,8 @@ export function MessagingPanel() {
                 ) : chats.length > 0 ? (
                     chats.map((chat) => {
                         const otherParticipant = getOtherParticipant(chat);
-                        const unreadForUser = chat.unreadCount?.[userId || ''] || 0;
-                        const p = Array.isArray(otherParticipant) ? otherParticipant[0] : otherParticipant;
+                        const unreadForUser = chat.unreadCount?.[userId ?? ''] || 0;
+                        const p = otherParticipant && typeof otherParticipant === 'object' && 'p1' in otherParticipant ? otherParticipant.p1 : (otherParticipant as ChatParticipant | undefined);
                         return (
                             <button
                                 key={chat.id}
@@ -374,7 +384,7 @@ export function MessagingPanel() {
                                 <div className="flex-grow overflow-hidden">
                                     <div className="flex justify-between items-center">
                                         <div className="flex items-center gap-1.5 truncate">
-                                            <p className="font-semibold truncate">{Array.isArray(otherParticipant) ? `${otherParticipant.p1.name} & ${otherParticipant.p2.name}` : otherParticipant?.name}</p>
+                                            <p className="font-semibold truncate">{otherParticipant && typeof otherParticipant === 'object' && 'p1' in otherParticipant ? `${otherParticipant.p1.name} & ${otherParticipant.p2.name}` : (otherParticipant as ChatParticipant | undefined)?.name}</p>
                                             {p?.verification === 'verified' && <ShieldCheck className="h-4 w-4 text-green-600 flex-shrink-0" />}
                                             {p?.verification === 'trusted' && <ShieldCheck className="h-4 w-4 text-blue-600 flex-shrink-0" />}
                                         </div>
