@@ -16,6 +16,8 @@ import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useLanguage } from '@/hooks/use-language';
+import { getUserSettings, toggleAutoScrollImages } from '@/lib/services';
+import { useEffect, useState } from 'react';
 
 
 export default function ClientSettingsPage() {
@@ -24,6 +26,45 @@ export default function ClientSettingsPage() {
   const { toast } = useToast();
   const { language, setLanguage, translations } = useLanguage();
   const t = translations.settings;
+  
+  const [autoScrollImages, setAutoScrollImages] = useState(true);
+  const [isLoadingSettings, setIsLoadingSettings] = useState(true);
+  
+  useEffect(() => {
+    const loadUserSettings = async () => {
+      if (userId) {
+        try {
+          const settings = await getUserSettings(userId);
+          setAutoScrollImages(settings?.autoScrollImages ?? true);
+        } catch (error) {
+          console.error('Error loading user settings:', error);
+        } finally {
+          setIsLoadingSettings(false);
+        }
+      }
+    };
+    
+    loadUserSettings();
+  }, [userId]);
+  
+  const handleAutoScrollToggle = async () => {
+    if (!userId) return;
+    
+    try {
+      const newValue = await toggleAutoScrollImages(userId);
+      setAutoScrollImages(newValue);
+      toast({
+        title: 'Settings Updated',
+        description: `Auto-scroll images ${newValue ? 'enabled' : 'disabled'}.`
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update settings. Please try again.',
+        variant: 'destructive'
+      });
+    }
+  };
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
@@ -119,6 +160,29 @@ export default function ClientSettingsPage() {
                             <Label htmlFor="notify-promotions" className="font-normal">{t.clientNotificationSettings.email.promotions}</Label>
                         </div>
                     </div>
+                </div>
+            </CardContent>
+        </Card>
+
+        <Card>
+            <CardHeader>
+                <CardTitle>{t.mediaSettings.title}</CardTitle>
+                <CardDescription>{t.mediaSettings.description}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="flex items-center justify-between space-x-2">
+                    <Label htmlFor="auto-scroll-images" className="flex flex-col space-y-1">
+                        <span>{t.mediaSettings.autoScrollImages.label}</span>
+                        <span className="font-normal leading-snug text-muted-foreground">
+                            {t.mediaSettings.autoScrollImages.description}
+                        </span>
+                    </Label>
+                    <Switch 
+                        id="auto-scroll-images" 
+                        checked={autoScrollImages}
+                        onCheckedChange={handleAutoScrollToggle}
+                        disabled={isLoadingSettings}
+                    />
                 </div>
             </CardContent>
         </Card>

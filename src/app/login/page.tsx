@@ -7,9 +7,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/logo';
-import { Briefcase, CalendarCheck, FileText, Search, ShieldCheck, Sparkles, Loader2, PartyPopper } from 'lucide-react';
+import { Briefcase, CalendarCheck, FileText, Search, ShieldCheck, Sparkles, Loader2, PartyPopper, Heart, Star, Users, Calendar, Camera, Music, Utensils, MapPin, ArrowRight, Play, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { signInUser, signInWithGoogle } from '@/lib/services';
 import { useToast } from '@/hooks/use-toast';
 import { logout } from '@/hooks/use-auth';
@@ -18,6 +18,8 @@ import { cn } from '@/lib/utils';
 import { VendorInquiryDialog } from '@/components/vendor-inquiry-dialog';
 import { useLanguage } from '@/hooks/use-language';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { SignupModal } from '@/components/signup-modal';
 
 function setCookie(name: string, value: string, days: number) {
     let expires = "";
@@ -43,37 +45,110 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
 
 function FeatureCard({ icon, title, description }: { icon: React.ReactNode, title: string, description: string }) {
     return (
-        <div className="flex flex-col items-center p-6 text-center bg-card rounded-xl shadow-md transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
-            <div className="flex items-center justify-center w-16 h-16 mb-4 text-primary bg-primary/10 rounded-full">
-                {icon}
+        <div className="group relative overflow-hidden bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-100 dark:border-gray-700">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <div className="relative z-10">
+                <div className="flex items-center justify-center w-14 h-14 mb-4 text-primary bg-primary/10 rounded-2xl group-hover:scale-110 transition-transform duration-300">
+                    {icon}
+                </div>
+                <h3 className="text-lg font-bold mb-2 text-gray-900 dark:text-white">{title}</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">{description}</p>
             </div>
-            <h3 className="text-xl font-bold mb-2">{title}</h3>
-            <p className="text-muted-foreground">{description}</p>
         </div>
     )
 }
 
+function StatCard({ icon, number, label }: { icon: React.ReactNode, number: string, label: string }) {
+    return (
+        <div className="text-center">
+            <div className="flex items-center justify-center w-12 h-12 mx-auto mb-2 text-primary bg-primary/10 rounded-xl">
+                {icon}
+            </div>
+            <div className="text-2xl font-bold text-white mb-1">{number}</div>
+            <div className="text-white/80 text-sm">{label}</div>
+        </div>
+    )
+}
+
+function EventTypeCard({ icon, title, description, gradient }: { icon: React.ReactNode, title: string, description: string, gradient: string }) {
+    return (
+        <div className={`relative overflow-hidden rounded-2xl p-6 text-white ${gradient} group cursor-pointer hover:scale-105 transition-all duration-300`}>
+            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300"></div>
+            <div className="relative z-10">
+                <div className="flex items-center justify-center w-12 h-12 mb-4 bg-white/20 rounded-xl backdrop-blur-sm">
+                    {icon}
+                </div>
+                <h3 className="text-lg font-bold mb-2">{title}</h3>
+                <p className="text-white/90 text-sm">{description}</p>
+            </div>
+        </div>
+    )
+}
+
+const eventTypes = [
+    { 
+        icon: <Heart className="w-6 h-6" />, 
+        title: 'Weddings', 
+        description: 'Create your perfect day with our wedding specialists',
+        gradient: 'bg-gradient-to-br from-rose-400 to-pink-600'
+    },
+    { 
+        icon: <PartyPopper className="w-6 h-6" />, 
+        title: 'Birthdays', 
+        description: 'Celebrate life with unforgettable birthday parties',
+        gradient: 'bg-gradient-to-br from-purple-400 to-indigo-600'
+    },
+    { 
+        icon: <Briefcase className="w-6 h-6" />, 
+        title: 'Corporate', 
+        description: 'Professional events that make lasting impressions',
+        gradient: 'bg-gradient-to-br from-blue-400 to-cyan-600'
+    },
+    { 
+        icon: <Star className="w-6 h-6" />, 
+        title: 'Special Events', 
+        description: 'Any occasion, perfectly planned and executed',
+        gradient: 'bg-gradient-to-br from-amber-400 to-orange-600'
+    }
+];
+
 const categories = [
-    { name: 'Venues', image: 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?q=80&w=2070&auto=format&fit=crop', hint: 'wedding reception'},
-    { name: 'Catering & Sweets', image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1974&auto=format&fit=crop', hint: 'catering food'},
-    { name: 'Entertainment', image: 'https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?q=80&w=2070&auto=format&fit=crop', hint: 'DJ party'},
-    { name: 'Lighting & Sound', image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1974&auto=format&fit=crop', hint: 'concert stage'},
-    { name: 'Photography & Videography', image: 'https://images.unsplash.com/photo-1504196658116-b9a55a850f39?q=80&w=2070&auto=format&fit=crop', hint: 'birthday photography'},
-    { name: 'Decoration', image: 'https://images.unsplash.com/photo-1522158637959-30385a09e0da?q=80&w=2070&auto=format&fit=crop', hint: 'wedding decor'},
-    { name: 'Beauty & Grooming', image: 'https://images.unsplash.com/photo-1632329583196-9d3635f35e98?q=80&w=2070&auto=format&fit=crop', hint: 'makeup artist'},
-    { name: 'Transportation', image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?q=80&w=2070&auto=format&fit=crop', hint: 'luxury car'},
-    { name: 'Invitations & Printables', image: 'https://images.unsplash.com/photo-1535986934571-6c2d1b4a6212?q=80&w=1974&auto=format&fit=crop', hint: 'wedding invitation'},
-    { name: 'Rentals & Furniture', image: 'https://images.unsplash.com/photo-1594026112273-094239854128?q=80&w=2070&auto=format&fit=crop', hint: 'event furniture'},
-    { name: 'Security and Crowd Control', image: 'https://images.unsplash.com/photo-1569012871812-f38ee64cd54c?q=80&w=2070&auto=format&fit=crop', hint: 'security guard'}
+    { name: 'Venues', image: 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?q=80&w=2070&auto=format&fit=crop', hint: 'wedding reception', icon: <MapPin className="w-5 h-5" /> },
+    { name: 'Catering', image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1974&auto=format&fit=crop', hint: 'catering food', icon: <Utensils className="w-5 h-5" /> },
+    { name: 'Entertainment', image: 'https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?q=80&w=2070&auto=format&fit=crop', hint: 'DJ party', icon: <Music className="w-5 h-5" /> },
+    { name: 'Photography', image: 'https://images.unsplash.com/photo-1504196658116-b9a55a850f39?q=80&w=2070&auto=format&fit=crop', hint: 'birthday photography', icon: <Camera className="w-5 h-5" /> },
+    { name: 'Decoration', image: 'https://images.unsplash.com/photo-1522158637959-30385a09e0da?q=80&w=2070&auto=format&fit=crop', hint: 'wedding decor', icon: <Sparkles className="w-5 h-5" /> }
 ]
 
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isSocialLoading, setIsSocialLoading] = useState<false | 'google'>(false);
+  const [showLoginForm, setShowLoginForm] = useState(false);
+  const [showSignupForm, setShowSignupForm] = useState(false);
+  const [userType, setUserType] = useState<'client' | 'vendor'>('client');
   const { toast } = useToast();
   const { translations } = useLanguage();
   const t = translations.loginPage;
+
+  useEffect(() => {
+    // Add scroll animations
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('animate-fade-in-up');
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    const elements = document.querySelectorAll('.animate-on-scroll');
+    elements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, []);
 
   const onSocialLoginSuccess = (role: 'client' | 'vendor' | 'admin') => {
       toast({
@@ -155,205 +230,362 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="w-full bg-background">
-      {/* Hero Section */}
-      <section className="relative h-[60vh] sm:h-[80vh] flex items-center justify-center text-white">
-        <Image 
-            src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070&auto=format&fit=crop" 
-            alt="Joyful event celebration" 
-            fill
-            className="z-0 object-cover"
-            data-ai-hint="event celebration"
-            priority
-        />
-        <div className="absolute inset-0 bg-black/50 z-10"></div>
-        <div className="relative z-20 container mx-auto px-4 text-center">
-            <div className="flex justify-center items-center gap-4 mb-6">
-                <Logo className="h-16 w-16" />
-                <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter">
-                    {t.mainTitle}
-                </h1>
-            </div>
-          <p className="max-w-3xl mx-auto mt-4 text-lg md:text-xl text-white/90">
-            {t.subtitle}
-          </p>
-          <div className="mt-8 flex flex-col sm:flex-row justify-center items-center gap-4">
-            <Button size="lg" className="text-lg h-12 px-8 w-full sm:w-auto" onClick={() => document.getElementById('login-section')?.scrollIntoView({ behavior: 'smooth' })}>
-                {t.planYourEvent}
-            </Button>
-            <VendorInquiryDialog>
-                <Button size="lg" variant="outline" className="text-lg h-12 px-8 bg-transparent border-white text-white hover:bg-white hover:text-primary w-full sm:w-auto">
-                    {t.becomeAVendor}
-                </Button>
-            </VendorInquiryDialog>
-          </div>
+    <div className="w-full bg-background overflow-x-hidden">
+      {/* Hero Section - Mobile First */}
+      <section className="relative min-h-screen flex flex-col justify-center items-center text-white">
+        {/* Background with multiple layers for depth */}
+        <div className="absolute inset-0 z-0">
+          <Image 
+              src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070&auto=format&fit=crop" 
+              alt="Joyful event celebration" 
+              fill
+              className="object-cover"
+              data-ai-hint="event celebration"
+              priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/70"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent"></div>
         </div>
-      </section>
+        
+        {/* Floating elements for visual interest */}
+        <div className="absolute inset-0 z-10 overflow-hidden">
+          <div className="absolute top-20 left-10 w-2 h-2 bg-white/30 rounded-full animate-pulse"></div>
+          <div className="absolute top-40 right-16 w-1 h-1 bg-white/40 rounded-full animate-pulse delay-1000"></div>
+          <div className="absolute bottom-32 left-20 w-1.5 h-1.5 bg-white/20 rounded-full animate-pulse delay-2000"></div>
+        </div>
 
-      {/* Categories Showcase Section */}
-        <section className="py-20 sm:py-24 bg-muted/50">
-            <div className="container mx-auto px-4">
-                <div className="text-center mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold">{t.findEverything}</h2>
-                    <p className="mt-4 max-w-2xl mx-auto text-muted-foreground">
-                        {t.findEverythingSubtitle}
-                    </p>
-                </div>
+        <div className="relative z-20 container mx-auto px-6 text-center">
+          {/* Logo and Brand */}
+          <div className="flex flex-col items-center mb-8 animate-fade-in">
+            <div className="flex items-center gap-3 mb-4">
+              <Logo className="h-12 w-12 sm:h-16 sm:w-16 text-white drop-shadow-lg" />
+              <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tighter bg-gradient-to-r from-white to-white/80 bg-clip-text">
+                Farhetkoun
+              </h1>
             </div>
-            <div 
-                className="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]"
-            >
-                <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 [&_img]:max-w-none animate-infinite-scroll hover:[animation-play-state:paused]">
-                    {categories.map((category, index) => (
-                        <li key={`${category.name}-${index}`}>
-                            <div className="relative overflow-hidden rounded-2xl w-72 h-96 group">
-                                <Image 
-                                    src={category.image}
-                                    alt={category.name}
-                                    fill
-                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                    data-ai-hint={category.hint}
-                                />
-                                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300"></div>
-                                <h3 className="absolute bottom-4 left-4 text-2xl font-bold text-white drop-shadow-md">{category.name}</h3>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-                 <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 [&_img]:max-w-none animate-infinite-scroll hover:[animation-play-state:paused]" aria-hidden="true">
-                    {categories.map((category, index) => (
-                        <li key={`${category.name}-clone-${index}`}>
-                             <div className="relative overflow-hidden rounded-2xl w-72 h-96 group">
-                                <Image 
-                                    src={category.image}
-                                    alt={category.name}
-                                    fill
-                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                    data-ai-hint={category.hint}
-                                />
-                                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors duration-300"></div>
-                                <h3 className="absolute bottom-4 left-4 text-2xl font-bold text-white drop-shadow-md">{category.name}</h3>
-                            </div>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </section>
+            <Badge variant="secondary" className="bg-white/10 text-white border-white/20 backdrop-blur-sm">
+              ✨ Lebanon's Premier Event Platform
+            </Badge>
+          </div>
 
-      {/* Features Section */}
-      <section id="features-section" className="py-20 sm:py-24 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold">{t.whyChoose}</h2>
-            <p className="mt-4 max-w-2xl mx-auto text-muted-foreground">
-              {t.whyChooseSubtitle}
+          {/* Main Headline */}
+          <div className="mb-8 animate-fade-in-up delay-300">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight">
+              Turn Your <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Dreams</span><br className="sm:hidden" /> Into Reality
+            </h2>
+            <p className="text-lg sm:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
+              From intimate gatherings to grand celebrations, we connect you with Lebanon's finest event professionals
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+          {/* Stats */}
+          <div className="grid grid-cols-3 gap-6 mb-12 animate-fade-in-up delay-500">
+            <StatCard icon={<Users className="w-5 h-5" />} number="500+" label="Vendors" />
+            <StatCard icon={<Calendar className="w-5 h-5" />} number="2K+" label="Events" />
+            <StatCard icon={<Star className="w-5 h-5" />} number="4.9" label="Rating" />
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="space-y-4 animate-fade-in-up delay-700">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button 
+                size="lg" 
+                className="w-full sm:w-auto text-lg h-14 px-8 bg-primary hover:bg-primary/90 shadow-2xl hover:shadow-primary/25 transition-all duration-300 group"
+                onClick={() => {
+                  setUserType('client');
+                  setShowLoginForm(true);
+                }}
+              >
+                <Calendar className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                Plan Your Event
+                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <VendorInquiryDialog>
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className="w-full sm:w-auto text-lg h-14 px-8 bg-white/10 border-white/30 text-white hover:bg-white hover:text-primary backdrop-blur-sm transition-all duration-300 group"
+                >
+                  <Briefcase className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  Join as Vendor
+                </Button>
+              </VendorInquiryDialog>
+            </div>
+            <div className="flex justify-center animate-fade-in-up delay-800">
+              <Button 
+                variant="ghost" 
+                size="lg" 
+                className="text-white/80 hover:text-white hover:bg-white/10 px-6 py-3 text-base font-medium rounded-full backdrop-blur-sm transition-all duration-300"
+                onClick={() => setShowLoginForm(true)}
+              >
+                Already have an account? Sign In
+              </Button>
+            </div>
+          </div>
+
+          {/* Scroll indicator */}
+          <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+            <ChevronDown className="w-6 h-6 text-white/60" />
+          </div>
+        </div>
+      </section>
+
+      {/* Event Types Section */}
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-background to-muted/30">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12 animate-on-scroll">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">What's Your Celebration?</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              Every moment deserves to be special. Choose your event type and let us make it extraordinary.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-on-scroll">
+            {eventTypes.map((event, index) => (
+              <EventTypeCard key={index} {...event} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services Showcase */}
+      <section className="py-16 sm:py-20 bg-muted/50">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-12 animate-on-scroll">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Everything You Need</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              From venues to vendors, we've got every aspect of your event covered.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 animate-on-scroll">
+            {categories.map((category, index) => (
+              <div key={index} className="group cursor-pointer">
+                <div className="relative overflow-hidden rounded-2xl aspect-square mb-3 shadow-lg hover:shadow-xl transition-all duration-300">
+                  <Image 
+                    src={category.image}
+                    alt={category.name}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    data-ai-hint={category.hint}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <div className="flex items-center gap-2 text-white">
+                      {category.icon}
+                      <span className="font-semibold text-sm">{category.name}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-16 sm:py-20 bg-background">
+        <div className="container mx-auto px-6">
+          <div className="text-center mb-16 animate-on-scroll">
+            <h2 className="text-3xl sm:text-4xl font-bold mb-4">Why Choose Farhetkoun?</h2>
+            <p className="text-muted-foreground max-w-3xl mx-auto text-lg leading-relaxed">
+              We're not just another event platform. We're your dedicated partner in creating unforgettable experiences.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 animate-on-scroll">
             <FeatureCard 
-                icon={<Sparkles className="w-8 h-8" />}
-                title={t.features.aiPlanner.title}
-                description={t.features.aiPlanner.description}
+                icon={<Sparkles className="w-7 h-7" />}
+                title="AI-Powered Planning"
+                description="Smart recommendations and automated timeline generation to make planning effortless"
             />
             <FeatureCard 
-                icon={<Search className="w-8 h-8" />}
-                title={t.features.marketplace.title}
-                description={t.features.marketplace.description}
-            />
-             <FeatureCard 
-                icon={<Briefcase className="w-8 h-8" />}
-                title={t.features.showcase.title}
-                description={t.features.showcase.description}
+                icon={<Search className="w-7 h-7" />}
+                title="Curated Marketplace"
+                description="Handpicked vendors and venues, all verified for quality and reliability"
             />
             <FeatureCard 
-                icon={<FileText className="w-8 h-8" />}
-                title={t.features.quoting.title}
-                description={t.features.quoting.description}
+                icon={<ShieldCheck className="w-7 h-7" />}
+                title="Secure & Trusted"
+                description="Protected payments, verified reviews, and guaranteed service quality"
             />
             <FeatureCard 
-                icon={<CalendarCheck className="w-8 h-8" />}
-                title={t.features.booking.title}
-                description={t.features.booking.description}
+                icon={<FileText className="w-7 h-7" />}
+                title="Smart Quoting"
+                description="Get instant quotes and compare prices from multiple vendors effortlessly"
             />
             <FeatureCard 
-                icon={<ShieldCheck className="w-8 h-8" />}
-                title={t.features.verified.title}
-                description={t.features.verified.description}
+                icon={<CalendarCheck className="w-7 h-7" />}
+                title="Seamless Booking"
+                description="Book services, manage timelines, and coordinate everything in one place"
+            />
+            <FeatureCard 
+                icon={<Heart className="w-7 h-7" />}
+                title="Personal Touch"
+                description="Dedicated support team to ensure your event is exactly as you envisioned"
             />
           </div>
         </div>
       </section>
 
-      {/* Login Section */}
-      <section id="login-section" className="py-20 sm:py-24 bg-muted/50">
-        <div className="container mx-auto px-4">
-           <Card className="w-full max-w-md mx-auto shadow-2xl">
-                <CardHeader className="text-center p-4 sm:p-6">
-                    <CardTitle className="text-2xl font-bold">{t.signinTitle}</CardTitle>
-                    <CardDescription>{t.signinSubtitle}</CardDescription>
-                </CardHeader>
-                <CardContent className="p-4 sm:p-6">
-                    <form onSubmit={handleLogin}>
-                        <div className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="email">{t.emailLabel}</Label>
-                                <Input id="email" name="email" type="email" placeholder="m@example.com" required />
-                            </div>
-                            <div className="space-y-2">
-                                <div className="flex items-center justify-between">
-                                    <Label htmlFor="password">{t.passwordLabel}</Label>
-                                    <Link href="/forgot-password" passHref>
-                                        <span className="text-sm text-primary hover:underline cursor-pointer">
-                                            Forgot password?
-                                        </span>
-                                    </Link>
-                                </div>
-                                <Input id="password" name="password" type="password" required />
-                            </div>
-                        </div>
-                        <div className="mt-6">
-                            <Button type="submit" className="w-full" disabled={isLoading || !!isSocialLoading}>
-                                {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                {t.signinButton}
-                            </Button>
-                        </div>
-                    </form>
+      {/* Login/Signup Modal */}
+      {showLoginForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <Card className="w-full max-w-md shadow-2xl animate-scale-in">
+            <CardHeader className="text-center relative">
+              <button 
+                onClick={() => setShowLoginForm(false)}
+                className="absolute right-4 top-4 text-muted-foreground hover:text-foreground transition-colors"
+              >
+                ✕
+              </button>
+              <CardTitle className="text-2xl font-bold">
+                {userType === 'vendor' ? 'Join as Vendor' : 'Welcome Back'}
+              </CardTitle>
+              <CardDescription>
+                {userType === 'vendor' 
+                  ? 'Start growing your event business with us' 
+                  : 'Sign in to plan your perfect event'
+                }
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* User Type Selection */}
+              {!userType && (
+                <div className="space-y-4">
+                  <p className="text-center text-sm text-muted-foreground">I want to...</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button 
+                      variant="outline" 
+                      className="h-20 flex-col gap-2 hover:bg-primary hover:text-primary-foreground transition-all"
+                      onClick={() => setUserType('client')}
+                    >
+                      <Calendar className="w-6 h-6" />
+                      <span className="text-sm font-medium">Plan Event</span>
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="h-20 flex-col gap-2 hover:bg-primary hover:text-primary-foreground transition-all"
+                      onClick={() => setUserType('vendor')}
+                    >
+                      <Briefcase className="w-6 h-6" />
+                      <span className="text-sm font-medium">Offer Services</span>
+                    </Button>
+                  </div>
+                </div>
+              )}
 
-                    <div className="relative my-6">
-                        <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-background px-2 text-muted-foreground">
-                            Or continue with
-                            </span>
-                        </div>
+              {/* Login Form */}
+              {userType && (
+                <>
+                  <form onSubmit={handleLogin} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email</Label>
+                      <Input id="email" name="email" type="email" placeholder="your@email.com" required />
                     </div>
-
-                    <div className="grid grid-cols-1 gap-4">
-                        <Button variant="outline" onClick={() => handleSocialLogin('google')} disabled={!!isSocialLoading}>
-                             {isSocialLoading === 'google' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <GoogleIcon className="mr-2 h-5 w-5" />}
-                            Google
-                        </Button>
-                    </div>
-
-                    <div className="mt-6 text-center text-sm">
-                        {t.noAccount}{' '}
-                        <Link href="/signup" className="underline font-semibold text-primary hover:text-primary/80">
-                            {t.signupNow}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="password">Password</Label>
+                        <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                          Forgot password?
                         </Link>
+                      </div>
+                      <Input id="password" name="password" type="password" required />
                     </div>
-                </CardContent>
-            </Card>
-        </div>
-      </section>
+                    <Button type="submit" className="w-full h-12" disabled={isLoading || !!isSocialLoading}>
+                      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Sign In
+                    </Button>
+                  </form>
 
-       {/* Footer */}
-       <footer className="py-8 bg-background border-t">
-            <div className="container mx-auto px-4 text-center text-muted-foreground">
-                <p>{t.footer.replace('{year}', new Date().getFullYear().toString())}</p>
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                    </div>
+                  </div>
+
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleSocialLogin('google')} 
+                    disabled={!!isSocialLoading}
+                    className="w-full h-12"
+                  >
+                    {isSocialLoading === 'google' ? 
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 
+                      <GoogleIcon className="mr-2 h-5 w-5" />
+                    }
+                    Google
+                  </Button>
+
+                  <div className="text-center text-sm">
+                    Don't have an account?{' '}
+                    <button 
+                      onClick={() => {
+                        setShowLoginForm(false);
+                        setShowSignupForm(true);
+                      }}
+                      className="underline font-semibold text-primary hover:text-primary/80"
+                    >
+                      Sign up now
+                    </button>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Signup Modal */}
+      <SignupModal 
+        isOpen={showSignupForm} 
+        onClose={() => setShowSignupForm(false)}
+        userType={userType}
+      />
+
+      {/* Footer */}
+      <footer className="py-12 bg-gray-900 text-white">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Logo className="h-8 w-8" />
+                <span className="text-xl font-bold">Farhetkoun</span>
+              </div>
+              <p className="text-gray-400 text-sm leading-relaxed">
+                Lebanon's premier event planning platform, connecting you with the best vendors and venues.
+              </p>
             </div>
-       </footer>
+            <div>
+              <h4 className="font-semibold mb-4">For Clients</h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Plan Event</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Browse Vendors</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Get Quotes</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">For Vendors</h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Join Platform</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Manage Services</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Analytics</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Support</h4>
+              <ul className="space-y-2 text-sm text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
+            <p>© {new Date().getFullYear()} Farhetkoun. All rights reserved. Made with ❤️ in Lebanon.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

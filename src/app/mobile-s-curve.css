@@ -1,0 +1,271 @@
+/* Mobile S-Curve Timeline Enhancements */
+
+.mobile-s-curve {
+  /* Smooth curves for mobile timeline */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.s-curve-left {
+  transform-origin: center right;
+}
+
+.s-curve-right {
+  transform-origin: center left;
+}
+
+/* Enhanced mobile timeline dots */
+.mobile-timeline-dot {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  transition: all 0.2s ease-in-out;
+  z-index: 20;
+}
+
+.mobile-timeline-dot:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+/* Timeline line positioning - lower z-index */
+.timeline-line {
+  z-index: 5;
+}
+
+/* Timeline container improvements */
+.timeline-container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Task cards override timeline visibility */
+.task-card-container {
+  position: relative;
+  z-index: 100;
+  background: hsl(var(--background));
+  margin: 0 -4px; /* Extend background beyond card edges */
+  padding: 4px;
+  border-radius: 20px;
+}
+
+/* Add task button positioning */
+.add-task-button {
+  z-index: 30;
+  background: white !important;
+  border-width: 2px;
+  transition: all 0.2s ease-in-out;
+}
+
+.add-task-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile task card enhancements */
+.mobile-task-card {
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  position: relative;
+  overflow: hidden;
+  background: var(--background) !important; /* Ensure solid background */
+  z-index: 50;
+}
+
+.mobile-task-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.mobile-task-card > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Task card background blocking - Enhanced */
+.task-card-background {
+  position: relative;
+  z-index: 50;
+  /* Add a stronger background to fully block timeline */
+  background-color: hsl(var(--background)) !important;
+  /* Let inline styles handle borders with !important */
+}
+
+.task-card-background::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  background: hsl(var(--background));
+  z-index: -1;
+  border-radius: inherit;
+  opacity: 1;
+}
+
+/* Ensure solid background for all task cards */
+@media (prefers-color-scheme: light) {
+  .task-card-background {
+    background-color: white !important;
+    /* Let inline styles handle borders with !important */
+  }
+  .task-card-background::before {
+    background-color: white !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .task-card-background {
+    background-color: hsl(224 71.4% 4.1%) !important;
+    /* Let inline styles handle borders with !important */
+  }
+  .task-card-background::before {
+    background-color: hsl(224 71.4% 4.1%) !important;
+  }
+}
+
+/* Animation for completed tasks */
+@keyframes celebrate {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.05) rotate(1deg); }
+  50% { transform: scale(1.1) rotate(0deg); }
+  75% { transform: scale(1.05) rotate(-1deg); }
+}
+
+.task-completed {
+  animation: celebrate 0.6s ease-in-out;
+}
+
+/* Smooth transitions for mobile */
+@media (max-width: 767px) {
+  .timeline-container {
+    padding: 0 16px;
+  }
+  
+  .s-curve-transition {
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  /* Enhanced mobile spacing */
+  .mobile-timeline-spacing {
+    margin-bottom: 24px;
+    min-height: 140px;
+  }
+  
+  /* Mobile-optimized text */
+  .mobile-text-compact {
+    line-height: 1.3;
+    word-break: break-word;
+  }
+  
+  /* Touch-friendly buttons */
+  .mobile-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Line clamp utilities for mobile descriptions */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+  max-height: calc(1.4em * 2); /* fallback for browsers that don't support line-clamp */
+  word-break: break-word;
+  hyphens: auto;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+  max-height: calc(1.4em * 3); /* fallback for browsers that don't support line-clamp */
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* Show more/less button styling with comprehensive overrides */
+.show-more-button {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 0.75rem !important; /* 12px for mobile */
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  transition: text-decoration 0.2s ease !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  outline: none !important;
+  line-height: 1.2 !important;
+  display: inline !important;
+  vertical-align: baseline !important;
+  text-transform: none !important;
+  letter-spacing: normal !important;
+}
+
+/* Desktop show more/less button */
+@media (min-width: 768px) {
+  .show-more-button {
+    font-size: 0.875rem !important; /* 14px for desktop */
+  }
+}
+
+.show-more-button:hover {
+  text-decoration: underline !important;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.show-more-button:focus {
+  text-decoration: underline !important;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.show-more-button:active {
+  text-decoration: underline !important;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+/* Enhanced hover states for mobile */
+@media (hover: hover) and (pointer: fine) {
+  .mobile-task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .mobile-task-card:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Force border styles to override any Tailwind or other CSS classes */
+.task-card-background {
+  border-color: inherit !important;
+}
+
+/* Ensure border styles are applied correctly */
+.task-card-background[style*="border"] {
+  border-style: solid !important;
+  border-width: 2px !important;
+}

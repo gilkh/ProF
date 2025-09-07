@@ -3,6 +3,7 @@ import { collection, doc, getDoc, setDoc, updateDoc, getDocs, query, where, Docu
 import { db, auth } from './firebase';
 import type { UserProfile, VendorProfile, Service, Offer, QuoteRequest, Booking, SavedTimeline, ServiceOrOffer, VendorCode, Chat, ChatMessage, UpgradeRequest, VendorAnalyticsData, PlatformAnalytics, Review, LineItem, VendorInquiry, AppNotification } from './types';
 import { formatItemForMessage, formatQuoteResponseMessage, parseForwardedMessage } from './utils';
+import { dataCache, cacheKeys } from './cache';
 import { subMonths, format, startOfMonth, addDays, addMonths, startOfDay, subDays } from 'date-fns';
 import { GoogleAuthProvider, signInWithPopup, User as FirebaseUser, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, sendPasswordResetEmail as firebaseSendPasswordResetEmail, confirmPasswordReset } from 'firebase/auth';
 
@@ -449,21 +450,35 @@ export const getServicesAndOffers = async (vendorId?: string, options?: { count?
 export async function getServiceOrOfferById(id: string): Promise<ServiceOrOffer | null> {
     if (!id) return null;
     try {
-        let docRef = doc(db, 'services', id);
-        let docSnap = await getDoc(docRef);
+        // Fetch from both collections in parallel
+        const [serviceDoc, offerDoc] = await Promise.all([
+            getDoc(doc(db, 'services', id)),
+            getDoc(doc(db, 'offers', id))
+        ]);
 
-        if (docSnap.exists()) {
-            return { id: docSnap.id, ...docSnap.data(), type: 'service' } as Service;
-        }
-
-        docRef = doc(db, 'offers', id);
-        docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            return { id: docSnap.id, ...docSnap.data(), type: 'offer' } as Offer;
+        let item: ServiceOrOffer | null = null;
+        
+        if (serviceDoc.exists()) {
+            item = { id: serviceDoc.id, ...serviceDoc.data(), type: 'service' } as Service;
+        } else if (offerDoc.exists()) {
+            item = { id: offerDoc.id, ...offerDoc.data(), type: 'offer' } as Offer;
         }
         
-        return null;
+        if (!item) {
+            return null;
+        }
+        
+        // Fetch vendor data in parallel
+        const vendorDoc = await getDoc(doc(db, 'vendors', item.vendorId));
+        
+        // Enhance item with vendor data if available
+        if (vendorDoc.exists()) {
+            const vendorData = vendorDoc.data();
+            item.vendorVerification = vendorData.verification || 'none';
+            item.vendorAvatar = vendorData.avatar || item.vendorAvatar;
+        }
+        
+        return item;
 
     } catch (e) {
         console.warn(`Firebase error getting item by ID ${id}:`, e);
@@ -897,13 +912,88 @@ export async function createReview(reviewData: Omit<Review, 'id' | 'createdAt'>)
 
 export async function getReviewsForVendor(vendorId: string): Promise<Review[]> {
     if (!vendorId) return [];
+    
+    // Check cache first
+    const cacheKey = cacheKeys.reviews(vendorId);
+    const cachedReviews = dataCache.get<Review[]>(cacheKey);
+    
+    if (cachedReviews) {
+        return cachedReviews;
+    }
+    
     const q = query(collection(db, 'reviews'), where('vendorId', '==', vendorId));
     const reviews = await fetchCollection<Review>('reviews', q, (data: DocumentData) => ({
         id: data.id,
         ...data,
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
     } as Review));
-    return reviews.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    
+    const sortedReviews = reviews.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    
+    // Cache reviews for 10 minutes (reviews don't change frequently)
+    dataCache.set(cacheKey, sortedReviews, 10 * 60 * 1000);
+    
+    return sortedReviews;
+}
+
+// Optimized function to fetch service/offer with reviews in parallel with caching
+export async function getServiceOrOfferWithReviews(id: string): Promise<{ item: ServiceOrOffer | null; reviews: Review[] }> {
+    if (!id) return { item: null, reviews: [] };
+    
+    // Check cache first
+    const cacheKey = cacheKeys.serviceOrOfferWithReviews(id);
+    const cachedData = dataCache.get<{ item: ServiceOrOffer | null; reviews: Review[] }>(cacheKey);
+    
+    if (cachedData) {
+        return cachedData;
+    }
+    
+    try {
+        // First, try to get the item from both collections in parallel
+        const [serviceDoc, offerDoc] = await Promise.all([
+            getDoc(doc(db, 'services', id)),
+            getDoc(doc(db, 'offers', id))
+        ]);
+        
+        let item: ServiceOrOffer | null = null;
+        
+        if (serviceDoc.exists()) {
+            item = { id: serviceDoc.id, ...serviceDoc.data(), type: 'service' } as Service;
+        } else if (offerDoc.exists()) {
+            item = { id: offerDoc.id, ...offerDoc.data(), type: 'offer' } as Offer;
+        }
+        
+        if (!item) {
+            return { item: null, reviews: [] };
+        }
+        
+        // Fetch reviews in parallel with vendor data
+        const [reviews, vendorDoc] = await Promise.all([
+            getReviewsForVendor(item.vendorId),
+            getDoc(doc(db, 'vendors', item.vendorId))
+        ]);
+        
+        // Enhance item with vendor data if available
+        if (vendorDoc.exists()) {
+            const vendorData = vendorDoc.data();
+            item.vendorVerification = vendorData.verification || 'none';
+            item.vendorAvatar = vendorData.avatar || item.vendorAvatar;
+        }
+        
+        const result = { item, reviews };
+        
+        // Cache the result for 3 minutes (shorter cache for dynamic data)
+        dataCache.set(cacheKey, result, 3 * 60 * 1000);
+        
+        return result;
+        
+    } catch (e) {
+        console.warn(`Firebase error getting item with reviews for ID ${id}:`, e);
+        if ((e as any).code === 'unavailable') {
+            return { item: null, reviews: [] };
+        }
+        throw e;
+    }
 }
 
 // Admin Services
@@ -1499,4 +1589,91 @@ export async function updateListingStatus(listingId: string, type: 'service' | '
     }
 
     await batch.commit();
+}
+
+// New function to schedule listing approval
+export async function scheduleListingApproval(listingId: string, type: 'service' | 'offer', decision: 'approved' | 'rejected', delayHours: number, reason?: string) {
+    const scheduledDate = new Date(Date.now() + (delayHours * 60 * 60 * 1000));
+    
+    const scheduledAction = {
+        listingId,
+        type,
+        decision,
+        reason,
+        scheduledFor: scheduledDate,
+        createdAt: new Date(),
+        status: 'pending'
+    };
+    
+    await addDoc(collection(db, 'scheduledActions'), scheduledAction);
+}
+
+// New function to update auto-approval setting
+export async function updateAutoApprovalSetting(enabled: boolean) {
+    const settingsRef = doc(db, 'adminSettings', 'moderation');
+    await setDoc(settingsRef, {
+        autoApprovalEnabled: enabled,
+        autoApprovalHours: 12,
+        updatedAt: serverTimestamp()
+    }, { merge: true });
+}
+
+// New function to get auto-approval setting
+export async function getAutoApprovalSetting(): Promise<boolean> {
+    try {
+        const settingsRef = doc(db, 'adminSettings', 'moderation');
+        const settingsSnap = await getDoc(settingsRef);
+        
+        if (settingsSnap.exists()) {
+            return settingsSnap.data().autoApprovalEnabled || false;
+        }
+        return false;
+    } catch (error) {
+        console.error('Error fetching auto-approval setting:', error);
+        return false;
+    }
+}
+
+// User Settings Management
+export async function updateUserSettings(userId: string, settings: Partial<UserProfile['settings']>) {
+    try {
+        const userRef = doc(db, 'users', userId);
+        await updateDoc(userRef, {
+            settings: settings
+        });
+    } catch (error) {
+        console.error('Error updating user settings:', error);
+        throw error;
+    }
+}
+
+export async function getUserSettings(userId: string): Promise<UserProfile['settings'] | null> {
+    try {
+        const userDoc = await getDoc(doc(db, 'users', userId));
+        if (userDoc.exists()) {
+            const userData = userDoc.data() as UserProfile;
+            return userData.settings || { autoScrollImages: true };
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting user settings:', error);
+        return null;
+    }
+}
+
+export async function toggleAutoScrollImages(userId: string): Promise<boolean> {
+    try {
+        const currentSettings = await getUserSettings(userId);
+        const newAutoScrollValue = !(currentSettings?.autoScrollImages ?? true);
+        
+        await updateUserSettings(userId, {
+            ...currentSettings,
+            autoScrollImages: newAutoScrollValue
+        });
+        
+        return newAutoScrollValue;
+    } catch (error) {
+        console.error('Error toggling auto-scroll images:', error);
+        throw error;
+    }
 }

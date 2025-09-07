@@ -1,0 +1,15 @@
+
+> event-ease@0.1.0 dev
+> next dev --turbopack -p 9002
+
+   ▲ Next.js 15.3.3 (Turbopack)
+   - Local:        http://localhost:9002
+   - Network:      http://26.26.87.44:9002
+
+ ✓ Starting...
+ ✓ Compiled middleware in 101ms
+ ✓ Ready in 1080ms
+ ○ Compiling / ...
+ ✓ Compiled / in 2.2s
+ GET / 200 in 2678ms
+^C^C

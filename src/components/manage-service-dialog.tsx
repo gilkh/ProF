@@ -17,7 +17,7 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useToast } from '@/hooks/use-toast';
-import type { ServiceOrOffer, Service, Offer, VendorProfile, MediaItem, ServiceCategory, Location } from '@/lib/types';
+import type { ServiceOrOffer, Service, Offer, VendorProfile, MediaItem, ServiceCategory, Location, EventType } from '@/lib/types';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { DollarSign, Loader2, ImagePlus, X, Video } from 'lucide-react';
 import { createServiceOrOffer, getVendorProfile, updateServiceOrOffer } from '@/lib/services';
@@ -28,6 +28,7 @@ import { ScrollArea } from './ui/scroll-area';
 import Image from 'next/image';
 import { Separator } from './ui/separator';
 import { locations } from '@/lib/types';
+import { EventTypeSelector } from './event-type-selector';
 
 interface ManageServiceDialogProps {
   children: React.ReactNode;
@@ -84,6 +85,7 @@ export function ManageServiceDialog({ children, service, onListingUpdate }: Mana
   const [vendorProfile, setVendorProfile] = React.useState<VendorProfile | null>(null);
   const [dates, setDates] = React.useState<Date[] | undefined>([]);
   const [media, setMedia] = React.useState<MediaItem[]>([]);
+  const [selectedEventTypes, setSelectedEventTypes] = React.useState<EventType[] | 'any'>('any');
 
 
   React.useEffect(() => {
@@ -98,6 +100,7 @@ export function ManageServiceDialog({ children, service, onListingUpdate }: Mana
         // Reset state when dialog opens based on service prop
         setType(service?.type || 'offer');
         setMedia(service?.media || []);
+        setSelectedEventTypes(service?.eventTypes || 'any');
         if (service?.type === 'offer' && service.availableDates) {
             setDates(service.availableDates.map(d => new Date(d)));
         } else {
@@ -136,6 +139,7 @@ export function ManageServiceDialog({ children, service, onListingUpdate }: Mana
             image: finalMedia.find(m => m.status !== 'rejected' && m.type === 'image')?.url || service?.image || 'https://placehold.co/600x400.png',
             media: finalMedia,
             status: 'pending', // Always set to pending on create/update
+            eventTypes: selectedEventTypes,
         }
 
         if (type === 'offer') {
@@ -299,6 +303,17 @@ export function ManageServiceDialog({ children, service, onListingUpdate }: Mana
                             {locations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
                         </SelectContent>
                     </Select>
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label className="text-right">
+                    Event Types
+                    </Label>
+                    <div className="col-span-3">
+                        <EventTypeSelector
+                            value={selectedEventTypes}
+                            onChange={setSelectedEventTypes}
+                        />
+                    </div>
                 </div>
                 <div className="grid grid-cols-4 items-start gap-4">
                     <Label htmlFor="description" className="text-right pt-2">

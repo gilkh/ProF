@@ -1,0 +1,49 @@
+/* Border Fix - Ensure theme colors override any conflicting styles */
+
+/* Force theme borders to display correctly with highest specificity */
+.timeline-container motion.div[style*="border"],
+.timeline-container .task-card-container motion.div[style*="border"],
+.task-card-container[style*="border"],
+motion.div[style*="border"] {
+  border-style: solid !important;
+  border-width: 2px !important;
+  border-color: inherit !important;
+}
+
+/* Override any Tailwind border classes */
+.timeline-container .border-gray-200,
+.timeline-container .border-slate-200,
+.timeline-container .border-zinc-200,
+.timeline-container .border-neutral-200,
+.timeline-container .border,
+.timeline-container .border-2 {
+  border-color: inherit !important;
+}
+
+/* Specific override for task cards with theme borders */
+.timeline-container motion.div {
+  border-color: inherit !important;
+}
+
+/* Remove any default border colors that might interfere */
+.timeline-container .task-card-container {
+  border-color: transparent !important;
+}
+
+/* Allow inline styles to take precedence with maximum specificity */
+.timeline-container motion.div[style*="border-color"],
+.timeline-container .task-card-container motion.div[style*="border-color"],
+motion.div[style*="border-color"] {
+  border-color: inherit !important;
+}
+
+/* Ensure motion.div respects inline border styles */
+.timeline-container motion.div[style] {
+  border: inherit !important;
+}
+
+/* Force theme color inheritance */
+*[style*="border: 2px solid"] {
+  border-style: solid !important;
+  border-width: 2px !important;
+}

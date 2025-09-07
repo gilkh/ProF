@@ -8,12 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { generateVendorCode, getVendorCodes, resetAllPasswords, getAllUsersAndVendors, updateVendorTier, deleteVendorCode, updateUserStatus, deleteUser, getUpgradeRequests, getPlatformAnalytics, updateUpgradeRequestStatus, updateVendorVerification, getVendorInquiries, updateVendorInquiryStatus, getPendingListings, updateListingStatus, createNotification } from '@/lib/services';
+import { generateVendorCode, getVendorCodes, resetAllPasswords, getAllUsersAndVendors, updateVendorTier, deleteVendorCode, updateUserStatus, deleteUser, getUpgradeRequests, getPlatformAnalytics, updateUpgradeRequestStatus, updateVendorVerification, getVendorInquiries, updateVendorInquiryStatus, getPendingListings, updateListingStatus, createNotification, scheduleListingApproval, updateAutoApprovalSetting, getAutoApprovalSetting } from '@/lib/services';
 import { sendPushNotification } from '@/lib/actions/notifications';
 import type { VendorCode, UserProfile, VendorProfile, UpgradeRequest, PlatformAnalytics, VendorInquiry, ServiceOrOffer } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
-import { KeyRound, RefreshCcw, Copy, Loader2, User, Building, UserCog, Trash2, MoreVertical, Ban, CheckCircle, UserX, ShieldCheck, Gem, Phone, CalendarCheck, Star, MessageSquare, PhoneOff, ThumbsUp, ThumbsDown, Send, Mail, Link as LinkIcon, ListChecks } from 'lucide-react';
+import { KeyRound, RefreshCcw, Copy, Loader2, User, Building, UserCog, Trash2, MoreVertical, Ban, CheckCircle, UserX, ShieldCheck, Gem, Phone, CalendarCheck, Star, MessageSquare, PhoneOff, ThumbsUp, ThumbsDown, Send, Mail, Link as LinkIcon, ListChecks, Clock, Settings } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,10 +37,13 @@ import { ResetPasswordDialog } from '@/components/reset-password-dialog';
 import { AdminAnalyticsChart } from '@/components/admin-analytics-chart';
 import { AdminStatCard } from '@/components/admin-stat-card';
 import { MessagingPanel } from '@/components/messaging-panel';
+import { AdminListingDetailView } from '@/components/admin-listing-detail-view';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -63,6 +66,40 @@ const providerIcons: Record<string, React.ElementType> = {
   'password': Mail,
   'google.com': GoogleIcon
 };
+
+function ApprovalDropdown({ listing, onApprove, isLoading }: { listing: ServiceOrOffer, onApprove: (delayHours?: number) => void, isLoading: boolean }) {
+    return (
+        <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+                <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700" 
+                    disabled={isLoading}
+                >
+                    {isLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                        <>
+                            <ThumbsUp className="h-4 w-4 mr-1" />
+                            Approve
+                        </>
+                    )}
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => onApprove()}>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Approve Now
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => onApprove(12)}>
+                    <Clock className="h-4 w-4 mr-2" />
+                    Approve in 12 hours
+                </DropdownMenuItem>
+            </DropdownMenuContent>
+        </DropdownMenu>
+    );
+}
 
 function RejectListingDialog({ listing, onReject, isLoading }: { listing: ServiceOrOffer, onReject: (reason: string) => void, isLoading: boolean }) {
     const [reason, setReason] = useState('');
@@ -126,11 +163,25 @@ export default function AdminHomePage() {
   const [notificationBody, setNotificationBody] = useState('');
   const [notificationTarget, setNotificationTarget] = useState<'all' | 'clients' | 'vendors'>('all');
   const [isSendingNotification, setIsSendingNotification] = useState(false);
+  
+  // State for automatic approval
+  const [autoApprovalEnabled, setAutoApprovalEnabled] = useState(false);
+  const [isUpdatingAutoApproval, setIsUpdatingAutoApproval] = useState(false);
 
 
   useEffect(() => {
     fetchData();
+    loadAutoApprovalSetting();
   }, []);
+
+  const loadAutoApprovalSetting = async () => {
+    try {
+      const setting = await getAutoApprovalSetting();
+      setAutoApprovalEnabled(setting);
+    } catch (error) {
+      console.error('Failed to load auto-approval setting:', error);
+    }
+  };
 
   const fetchData = async (period: 'monthly' | 'daily' = 'monthly') => {
     if (period !== analyticsTimePeriod) {
@@ -259,32 +310,69 @@ export default function AdminHomePage() {
     }
   };
 
-  const handleListingStatusChange = async (listing: ServiceOrOffer, decision: 'approved' | 'rejected', reason?: string) => {
+  const handleListingStatusChange = async (listing: ServiceOrOffer, decision: 'approved' | 'rejected', reason?: string, delayHours?: number) => {
     setIsModerating(listing.id);
     try {
-      await updateListingStatus(listing.id, listing.type, decision, reason);
-      setPendingListings(prev => prev.filter(l => l.id !== listing.id));
-      
-      const message = decision === 'approved' 
-          ? `Congratulations! Your listing "${listing.title}" has been approved.`
-          : `Your listing "${listing.title}" was rejected. Reason: ${reason}`;
+      if (delayHours && delayHours > 0) {
+        // Schedule approval for later
+        await scheduleListingApproval(listing.id, listing.type, decision, delayHours, reason);
+        toast({
+          title: `Listing ${decision} scheduled`,
+          description: `The listing "${listing.title}" will be ${decision} in ${delayHours} hours.`
+        });
+      } else {
+        // Immediate approval/rejection
+        await updateListingStatus(listing.id, listing.type, decision, reason);
+        setPendingListings(prev => prev.filter(l => l.id !== listing.id));
+        
+        const message = decision === 'approved' 
+            ? `Congratulations! Your listing "${listing.title}" has been approved.`
+            : `Your listing "${listing.title}" was rejected. Reason: ${reason}`;
 
-      await createNotification({
-          userId: listing.vendorId,
-          message: message,
-          link: `/vendor/manage-services`,
-      });
+        await createNotification({
+            userId: listing.vendorId,
+            message: message,
+            link: `/vendor/manage-services`,
+        });
 
-      toast({
-        title: `Listing ${decision}`,
-        description: `The listing "${listing.title}" has been ${decision}.`
-      });
+        toast({
+          title: `Listing ${decision}`,
+          description: `The listing "${listing.title}" has been ${decision}.`
+        });
+      }
     } catch (error) {
       console.error("Listing moderation failed", error);
       toast({ title: "Moderation Failed", description: "Could not update listing status.", variant: "destructive" });
     } finally {
       setIsModerating(null);
     }
+  };
+
+  const handleAutoApprovalToggle = async (enabled: boolean) => {
+    setIsUpdatingAutoApproval(true);
+    try {
+      await updateAutoApprovalSetting(enabled);
+      setAutoApprovalEnabled(enabled);
+      toast({
+        title: "Auto-approval Updated",
+        description: enabled 
+          ? "Listings will now be automatically approved after 12 hours."
+          : "Auto-approval has been disabled. All listings require manual review."
+      });
+    } catch (error) {
+      console.error("Failed to update auto-approval setting", error);
+      toast({ 
+        title: "Update Failed", 
+        description: "Could not update auto-approval setting.", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsUpdatingAutoApproval(false);
+    }
+  };
+
+  const handleScheduledApproval = (listing: ServiceOrOffer, hours: number) => {
+    handleListingStatusChange(listing, 'approved', undefined, hours);
   };
 
 
@@ -538,9 +626,45 @@ export default function AdminHomePage() {
              <Card>
                 <CardHeader>
                     <CardTitle>Listing Approval Queue</CardTitle>
-                    <CardDescription>Review and approve or reject new vendor listings. Approving a listing also approves all its pending media.</CardDescription>
+                    <CardDescription>Review and approve or reject new vendor listings. Click "Review Details" to see full information including media portfolio before making decisions. Approving a listing also approves all its pending media.</CardDescription>
                 </CardHeader>
                 <CardContent>
+                    {/* Auto-Approval Setting */}
+                    <div className="mb-6 p-4 border rounded-lg bg-muted/20">
+                        <div className="flex items-center justify-between">
+                            <div className="space-y-1">
+                                <h3 className="text-sm font-medium flex items-center gap-2">
+                                    <Settings className="h-4 w-4" />
+                                    Auto-Approval Settings
+                                </h3>
+                                <p className="text-xs text-muted-foreground">
+                                    When enabled, listings will be automatically approved after 12 hours unless manually rejected
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-muted-foreground">
+                                    {autoApprovalEnabled ? 'Enabled' : 'Disabled'}
+                                </span>
+                                <Switch
+                                    checked={autoApprovalEnabled}
+                                    onCheckedChange={handleAutoApprovalToggle}
+                                    disabled={isUpdatingAutoApproval}
+                                />
+                                {isUpdatingAutoApproval && <Loader2 className="h-4 w-4 animate-spin" />}
+                            </div>
+                        </div>
+                        {autoApprovalEnabled && (
+                            <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded text-sm text-green-700">
+                                <div className="flex items-center gap-2">
+                                    <Clock className="h-4 w-4" />
+                                    <span className="font-medium">Auto-approval is active</span>
+                                </div>
+                                <p className="mt-1 text-xs">
+                                    New listings will be automatically approved after 12 hours if not manually reviewed
+                                </p>
+                            </div>
+                        )}
+                    </div>
                      <Table>
                         <TableHeader>
                             <TableRow>
@@ -548,6 +672,7 @@ export default function AdminHomePage() {
                                 <TableHead>Vendor</TableHead>
                                 <TableHead>Type</TableHead>
                                 <TableHead>Category</TableHead>
+                                <TableHead>Media Count</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -559,20 +684,76 @@ export default function AdminHomePage() {
                                     <TableCell><Skeleton className="h-6 w-32" /></TableCell>
                                     <TableCell><Skeleton className="h-6 w-20" /></TableCell>
                                     <TableCell><Skeleton className="h-6 w-28" /></TableCell>
+                                    <TableCell><Skeleton className="h-6 w-16" /></TableCell>
                                     <TableCell className="text-right"><Skeleton className="h-8 w-40 ml-auto" /></TableCell>
                                 </TableRow>
                                 ))
                             ) : pendingListings.length > 0 ? pendingListings.map(item => (
                                 <TableRow key={item.id}>
-                                    <TableCell className="font-medium">{item.title}</TableCell>
-                                    <TableCell>{item.vendorName}</TableCell>
+                                    <TableCell>
+                                        <div className="space-y-1">
+                                            <p className="font-medium">{item.title}</p>
+                                            <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>
+                                        <div className="space-y-1">
+                                            <p className="font-medium">{item.vendorName}</p>
+                                            {item.vendorVerification && (
+                                                <Badge variant="outline" className="text-xs">
+                                                    {item.vendorVerification}
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </TableCell>
                                     <TableCell><Badge variant="secondary" className="capitalize">{item.type}</Badge></TableCell>
                                     <TableCell>{item.category}</TableCell>
+                                    <TableCell>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-sm">{item.media?.length || 0}</span>
+                                            {item.media && item.media.length > 0 && (
+                                                <div className="flex gap-1">
+                                                    {item.media.slice(0, 3).map((media, idx) => (
+                                                        <div key={idx} className="w-6 h-6 rounded border overflow-hidden bg-muted">
+                                                            {media.type === 'image' ? (
+                                                                <img 
+                                                                    src={media.url} 
+                                                                    alt="" 
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full bg-black/80 flex items-center justify-center">
+                                                                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                    {item.media.length > 3 && (
+                                                        <div className="w-6 h-6 rounded border bg-muted flex items-center justify-center text-xs">+{item.media.length - 3}</div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex gap-2 justify-end">
-                                            <Button size="sm" variant="outline" className="text-green-600 border-green-600 hover:bg-green-50 hover:text-green-700" onClick={() => handleListingStatusChange(item, 'approved')} disabled={isModerating === item.id}>
-                                                {isModerating === item.id ? <Loader2 className="h-4 w-4 animate-spin"/> : <ThumbsUp className="h-4 w-4"/>}
-                                            </Button>
+                                            <AdminListingDetailView
+                                                listing={item}
+                                                onApprove={() => handleListingStatusChange(item, 'approved')}
+                                                onReject={(reason: string) => handleListingStatusChange(item, 'rejected', reason)}
+                                                isLoading={isModerating === item.id}
+                                            />
+                                            <ApprovalDropdown
+                                                listing={item}
+                                                onApprove={(delayHours) => {
+                                                    if (delayHours) {
+                                                        handleScheduledApproval(item, delayHours);
+                                                    } else {
+                                                        handleListingStatusChange(item, 'approved');
+                                                    }
+                                                }}
+                                                isLoading={isModerating === item.id}
+                                            />
                                             <RejectListingDialog
                                                 listing={item}
                                                 isLoading={isModerating === item.id}
@@ -583,7 +764,7 @@ export default function AdminHomePage() {
                                 </TableRow>
                             )) : (
                                 <TableRow>
-                                    <TableCell colSpan={5} className="text-center text-muted-foreground h-24">No listings pending review.</TableCell>
+                                    <TableCell colSpan={6} className="text-center text-muted-foreground h-24">No listings pending review.</TableCell>
                                 </TableRow>
                             )}
                         </TableBody>

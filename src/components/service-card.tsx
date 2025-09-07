@@ -10,8 +10,8 @@ import { Star, Edit, Heart, HeartCrack, Send, Video, ShieldCheck, MapPin } from 
 import Image from 'next/image';
 import { QuoteRequestDialog } from './quote-request-dialog';
 import { ManageServiceDialog } from './manage-service-dialog';
-import { useEffect, useState } from 'react';
-import { getUserProfile, toggleSavedItem } from '@/lib/services';
+import { useEffect, useState, useRef } from 'react';
+import { getUserProfile, toggleSavedItem, getUserSettings } from '@/lib/services';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
 import Link from 'next/link';
@@ -38,10 +38,14 @@ export function ServiceCard({ service, role, onListingUpdate }: ServiceCardProps
   const t = translations.serviceCard;
   const [isSaved, setIsSaved] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [autoScrollEnabled, setAutoScrollEnabled] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const autoScrollRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
   const approvedMedia = service.media?.filter(m => m.status === 'approved') || [];
   const mediaItems = approvedMedia.length > 0 ? approvedMedia : [{ url: service.image, type: 'image' as const, status: 'approved' as const, isThumbnail: true }];
+  const imageItems = mediaItems.filter(item => item.type === 'image');
 
   const statusColors = {
     pending: 'bg-amber-500',
@@ -65,6 +69,51 @@ export function ServiceCard({ service, role, onListingUpdate }: ServiceCardProps
     checkSavedStatus();
   }, [service.id, role, userId]);
 
+  // Load user settings for auto-scroll
+  useEffect(() => {
+    async function loadUserSettings() {
+      if (userId) {
+        try {
+          const settings = await getUserSettings(userId);
+          setAutoScrollEnabled(settings?.autoScrollImages ?? true);
+        } catch (error) {
+          console.warn('Could not load user settings:', error);
+        }
+      }
+    }
+    loadUserSettings();
+  }, [userId]);
+
+  // Auto-scroll functionality for images only
+  useEffect(() => {
+    if (autoScrollEnabled && imageItems.length > 1) {
+      autoScrollRef.current = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % imageItems.length);
+      }, 3000); // Change slide every 3 seconds
+
+      return () => {
+        if (autoScrollRef.current) {
+          clearInterval(autoScrollRef.current);
+        }
+      };
+    }
+  }, [autoScrollEnabled, imageItems.length]);
+
+  // Clear auto-scroll on hover
+  const handleMouseEnter = () => {
+    if (autoScrollRef.current) {
+      clearInterval(autoScrollRef.current);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (autoScrollEnabled && imageItems.length > 1) {
+      autoScrollRef.current = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % imageItems.length);
+      }, 3000);
+    }
+  };
+
   const handleSaveToggle = async (e: React.MouseEvent) => {
     e.preventDefault(); // prevent navigation
     if (role !== 'client' || !userId) return;
@@ -86,49 +135,87 @@ export function ServiceCard({ service, role, onListingUpdate }: ServiceCardProps
 
 
   return (
-    <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 rounded-xl group">
+    <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 rounded-xl group" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       
         <CardHeader className="p-0 relative overflow-hidden">
-            <Carousel className="w-full">
-                <CarouselContent>
-                    {mediaItems.map((mediaItem, index) => (
-                    <CarouselItem key={index}>
-                        <Link href={`/client/service/${service.id}`}>
-                            <div className="relative h-48 w-full">
-                                {mediaItem.type === 'image' ? (
-                                    <Image
-                                        src={mediaItem.url}
-                                        alt={service.title}
-                                        fill
-                                        className="object-cover"
-                                        data-ai-hint="event service"
-                                    />
-                                ) : (
-                                     <div className="relative w-full h-full">
-                                        <video
-                                            src={mediaItem.url}
-                                            className="w-full h-full object-cover"
-                                            muted
-                                            loop
-                                            playsInline
+            <div className="relative w-full h-48 overflow-hidden">
+                {autoScrollEnabled && imageItems.length > 1 ? (
+                    // Auto-scrolling image display with slide animation
+                    <div className="relative w-full h-full overflow-hidden">
+                        <div 
+                            className="flex transition-transform duration-700 ease-in-out h-full"
+                            style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+                        >
+                            {imageItems.map((item, index) => (
+                                <div key={index} className="w-full h-full flex-shrink-0 relative">
+                                    <Link href={`/client/service/${service.id}`}>
+                                        <Image
+                                            src={item.url || service.image}
+                                            alt={service.title}
+                                            fill
+                                            className="object-cover"
+                                            data-ai-hint="event service"
                                         />
-                                        <div className="absolute bottom-2 right-2 bg-black/50 text-white rounded-full p-1.5">
-                                            <Video className="h-4 w-4" />
-                                        </div>
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                        {/* Slide indicators */}
+                        <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1 z-10">
+                            {imageItems.map((_, index) => (
+                                <div
+                                    key={index}
+                                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                        index === currentSlide ? 'bg-white' : 'bg-white/50'
+                                    }`}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    // Regular carousel for manual control or single image
+                    <Carousel className="w-full">
+                        <CarouselContent>
+                            {mediaItems.map((mediaItem, index) => (
+                            <CarouselItem key={index}>
+                                <Link href={`/client/service/${service.id}`}>
+                                    <div className="relative h-48 w-full">
+                                        {mediaItem.type === 'image' ? (
+                                            <Image
+                                                src={mediaItem.url}
+                                                alt={service.title}
+                                                fill
+                                                className="object-cover"
+                                                data-ai-hint="event service"
+                                            />
+                                        ) : (
+                                             <div className="relative w-full h-full">
+                                                <video
+                                                    src={mediaItem.url}
+                                                    className="w-full h-full object-cover"
+                                                    muted
+                                                    loop
+                                                    playsInline
+                                                />
+                                                <div className="absolute bottom-2 right-2 bg-black/50 text-white rounded-full p-1.5">
+                                                    <Video className="h-4 w-4" />
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
-                            </div>
-                        </Link>
-                    </CarouselItem>
-                    ))}
-                </CarouselContent>
-                 {mediaItems.length > 1 && (
-                    <>
-                        <CarouselPrevious className="absolute left-3 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                        <CarouselNext className="absolute right-3 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </>
+                                </Link>
+                            </CarouselItem>
+                            ))}
+                        </CarouselContent>
+                         {mediaItems.length > 1 && (
+                            <>
+                                <CarouselPrevious className="absolute left-3 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <CarouselNext className="absolute right-3 top-1/2 -translate-y-1/2 z-10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </>
+                        )}
+                    </Carousel>
                 )}
-            </Carousel>
+            </div>
           {role === 'client' && (
               <div className="absolute top-3 right-3 flex gap-2 z-10">
                 <QuoteRequestDialog service={service}>

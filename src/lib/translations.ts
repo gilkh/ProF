@@ -241,6 +241,14 @@ export const translations = {
                 label: "Email Notifications"
             }
         },
+        mediaSettings: {
+            title: "Media Settings",
+            description: "Customize how media content is displayed.",
+            autoScrollImages: {
+                label: "Auto-scroll Images",
+                description: "Automatically scroll through multiple images in service and offer cards."
+            }
+        },
         vendorNotificationSettings: {
              push: {
                 description: "Get real-time updates on your mobile device about client activity."
@@ -511,6 +519,14 @@ export const translations = {
                 label: "Notifications par email"
             }
         },
+        mediaSettings: {
+            title: "Paramètres multimédias",
+            description: "Personnalisez l'affichage du contenu multimédia.",
+            autoScrollImages: {
+                label: "Défilement automatique des images",
+                description: "Faire défiler automatiquement les images multiples dans les cartes de services et d'offres."
+            }
+        },
         vendorNotificationSettings: {
             push: {
                 description: "Recevez des mises à jour en temps réel sur l'activité de vos clients."
@@ -775,10 +791,18 @@ export const translations = {
             description: "اختر كيف تريد أن يتم إعلامك.",
             push: {
                 label: "إشعارات لحظية",
-                description: "احصل على تحديثات في الوقت الفعلي على جهازك المحمول."
+                description: "احصل على تحديثات فورية على جهازك المحمول."
             },
             email: {
                 label: "إشعارات البريد الإلكتروني"
+            }
+        },
+        mediaSettings: {
+            title: "إعدادات الوسائط",
+            description: "تخصيص كيفية عرض محتوى الوسائط.",
+            autoScrollImages: {
+                label: "التمرير التلقائي للصور",
+                description: "التمرير التلقائي عبر الصور المتعددة في بطاقات الخدمات والعروض."
             }
         },
         vendorNotificationSettings: {

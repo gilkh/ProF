@@ -3,8 +3,11 @@
 export type ServiceType = 'service' | 'offer';
 export type ServiceCategory = 'Venues' | 'Catering & Sweets' | 'Entertainment' | 'Lighting & Sound' | 'Photography & Videography' | 'Decoration' | 'Beauty & Grooming' | 'Transportation' | 'Invitations & Printables' | 'Rentals & Furniture' | 'Security and Crowd Control';
 export type Location = 'Beirut' | 'Mount Lebanon' | 'North Lebanon' | 'South Lebanon' | 'Nabatieh' | 'Beqaa' | 'Baalbek-Hermel' | 'Akkar';
+export type EventType = 'Wedding' | 'Birthday Party' | 'Corporate Event' | 'Baby Shower' | 'Graduation' | 'Anniversary' | 'Engagement' | 'Bridal Shower' | 'Holiday Party' | 'Conference' | 'Product Launch' | 'Charity Event' | 'Reunion' | 'Retirement Party' | 'Housewarming' | 'Other';
 
 export const locations: Location[] = ['Beirut', 'Mount Lebanon', 'North Lebanon', 'South Lebanon', 'Nabatieh', 'Beqaa', 'Baalbek-Hermel', 'Akkar'];
+
+export const eventTypes: EventType[] = ['Wedding', 'Birthday Party', 'Corporate Event', 'Baby Shower', 'Graduation', 'Anniversary', 'Engagement', 'Bridal Shower', 'Holiday Party', 'Conference', 'Product Launch', 'Charity Event', 'Reunion', 'Retirement Party', 'Housewarming', 'Other'];
 
 export interface MediaItem {
   url: string;
@@ -65,6 +68,7 @@ export interface BaseService {
   location: Location;
   status: 'pending' | 'approved' | 'rejected';
   rejectionReason?: string;
+  eventTypes?: EventType[] | 'any';
 }
 
 export interface Service extends BaseService {
@@ -196,6 +200,9 @@ export interface UserProfile {
     fcmTokens?: string[];
     provider?: string;
     hasUnreadNotifications?: boolean;
+    settings?: {
+        autoScrollImages?: boolean;
+    };
 }
 
 export interface VendorProfile {

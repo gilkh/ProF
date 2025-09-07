@@ -1,0 +1,17 @@
+========================================
+       ProF FULL DEBUG MODE
+========================================
+This will show EXACTLY what's failing
+and pause at every step.
+========================================
+
+[DEBUG 1] Current directory: C:\Users\Gilbert\Documents\ProF\
+[DEBUG 1] Checking package.json...
+✅ package.json found
+
+[DEBUG 2] Testing Node.js...
+v22.14.0
+✅ Node.js works
+
+[DEBUG 3] Testing npm...
+10.9.2

@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -25,6 +26,9 @@ import { eventTypes, getQuestionsForEventType } from '@/lib/timeline-generator';
 import { getEventTheme } from '@/lib/event-themes';
 import { AnimatedProgress } from '@/components/ui/animated-progress';
 import { CelebrationHeader } from '@/components/ui/celebration-header';
+import { useIsMobile } from '@/hooks/use-mobile';
+import '../../mobile-s-curve.css';
+import '../../border-fix.css';
 
 const formSchema = z.object({
   eventType: z.string().min(1, 'Please select a valid event type'),
@@ -37,6 +41,7 @@ function EventPlannerContent() {
   const { userId } = useAuth();
   const searchParams = useSearchParams();
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   const [timeline, setTimeline] = useState<EventTask[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -46,6 +51,9 @@ function EventPlannerContent() {
   const [editedTaskLabel, setEditedTaskLabel] = useState('');
   const [timelineId, setTimelineId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
+  const [deletedTask, setDeletedTask] = useState<{ task: EventTask; index: number } | null>(null);
+  const [showUndoToast, setShowUndoToast] = useState(false);
 
   // Multi-step form state
   const [step, setStep] = useState(1);
@@ -200,7 +208,56 @@ function EventPlannerContent() {
   };
   
   const handleDeleteTask = (taskId: string) => {
-    setTimeline(prev => prev!.filter(task => task.id !== taskId));
+    const taskIndex = timeline?.findIndex(task => task.id === taskId) ?? -1;
+    const taskToDelete = timeline?.find(task => task.id === taskId);
+    
+    if (taskToDelete && taskIndex !== -1) {
+      // Store deleted task for undo
+      setDeletedTask({ task: taskToDelete, index: taskIndex });
+      setShowUndoToast(true);
+      
+      // Remove task from timeline
+      setTimeline(prev => prev!.filter(task => task.id !== taskId));
+      
+      // Hide undo toast after 10 seconds
+      setTimeout(() => {
+        setShowUndoToast(false);
+        setDeletedTask(null);
+      }, 10000);
+    }
+  };
+  
+  const handleUndoDelete = () => {
+    if (deletedTask && timeline) {
+      const newTimeline = [...timeline];
+      newTimeline.splice(deletedTask.index, 0, deletedTask.task);
+      setTimeline(newTimeline);
+      setDeletedTask(null);
+      setShowUndoToast(false);
+    }
+  };
+  
+  // Helper function to determine if task description needs show more/less
+  const shouldShowToggle = (description: string, isMobile: boolean) => {
+    if (!description) return false;
+    
+    // For mobile: shorter threshold due to smaller screen
+    // For desktop: longer threshold due to more space
+    const threshold = isMobile ? 60 : 120;
+    
+    return description.length > threshold;
+  };
+  
+  const toggleTaskExpansion = (taskId: string) => {
+    setExpandedTasks(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(taskId)) {
+        newSet.delete(taskId);
+      } else {
+        newSet.add(taskId);
+      }
+      return newSet;
+    });
   };
   
   const handleEditTask = (task: EventTask) => {
@@ -554,10 +611,10 @@ function EventPlannerContent() {
             </CardHeader>
             <CardContent>
                 {viewMode === 'tasks' ? (
-                    <div className="relative mt-8">
-            {/* 🎨 THEMED TIMELINE CENTER LINE */}
+                    <div className="relative mt-8 timeline-container">
+            {/* 🎨 THEMED TIMELINE CENTER LINE - Behind tasks */}
                         <div
-                          className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 z-30 pointer-events-none"
+                          className="absolute left-1/2 top-0 bottom-0 -translate-x-1/2 z-5 pointer-events-none timeline-line"
                           style={{
                             width: '4px',
                             background: `linear-gradient(to bottom, ${eventTheme.primaryColor}, ${eventTheme.secondaryColor})`,
@@ -567,23 +624,291 @@ function EventPlannerContent() {
                         ></div>
                         
                         <AnimatePresence>
-                        {timeline.map((task, index) => (
+                        {timeline.map((task, index) => {
+                          // S-curve calculations for mobile
+                          const isLeft = index % 2 === 0;
+                          const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 768;
+                          const amplitude = Math.min(screenWidth * 0.06, 30); // 6% of screen width, max 30px
+                          const baseSpacing = isMobile ? 180 : 220; // Conservative spacing
+                          const yPosition = index * baseSpacing;
+                          
+                          // Enhanced S-curve using sine wave for smooth transitions
+                          const curveIntensity = Math.sin((index + 1) * Math.PI / 4) * amplitude;
+                          const xOffset = isLeft ? -amplitude - curveIntensity : amplitude + curveIntensity;
+                          
+                          // Scale and rotation for depth effect
+                          const scaleVariation = 0.95 + (Math.sin(index * 0.5) * 0.05);
+                          const rotationAngle = isLeft ? -2 + curveIntensity * 0.1 : 2 - curveIntensity * 0.1;
+                          
+                          return (
+                            <React.Fragment key={task.id}>
                            <motion.div 
-                            key={task.id}
                             initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            animate={{ 
+                              opacity: 1, 
+                              y: 0, 
+                              scale: 1,
+                              x: isMobile ? xOffset : 0,
+                              rotate: isMobile ? rotationAngle : 0
+                            }}
                             exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                            whileHover={{ scale: 1.02, y: -2 }}
+                            whileHover={{ 
+                              scale: isMobile ? scaleVariation * 1.02 : 1.02, 
+                              y: -2,
+                              rotate: isMobile ? rotationAngle * 1.1 : 0
+                            }}
                             transition={{ 
-                              duration: 0.3,
+                              duration: 0.4,
                               delay: index * 0.05,
                               type: "spring",
-                              stiffness: 300,
-                              damping: 30
+                              stiffness: 200,
+                              damping: 25
                             }}
                             className="relative mb-8 group"
+                            style={{
+                              minHeight: isMobile ? '120px' : 'auto', // Prevent overlapping
+                              zIndex: 50 + index // Layering for depth - above timeline line
+                            }}
                             >
-                            <div className="grid grid-cols-2 items-start gap-x-8">
+                            {isMobile ? (
+                              // Mobile S-curve layout
+                              <div className="w-full flex justify-center task-card-container">
+                                <div className={cn(
+                                  "w-full max-w-[280px] relative", // Constrained width for mobile
+                                  isLeft ? "mr-8" : "ml-8" // Offset from center line
+                                )}>
+                                  {/* 🎨 THEMED TIMELINE DOT */}
+                                  <div 
+                                    className="absolute w-4 h-4 rounded-full border-4 border-background flex items-center justify-center z-20" 
+                                    style={{ 
+                                      backgroundColor: task.completed ? eventTheme.primaryColor : `${eventTheme.primaryColor}60`,
+                                      left: isLeft ? 'calc(100% + 16px)' : '-32px',
+                                      top: '8px'
+                                    }}
+                                  >
+                                    <div className="w-2 h-2 rounded-full" 
+                                         style={{ 
+                                           backgroundColor: task.completed ? 'white' : eventTheme.primaryColor, 
+                                           animation: task.completed ? 'none' : 'pulse 2s infinite' 
+                                         }}></div>
+                                  </div>
+
+                                  {/* Mobile task card content */}
+                                  <motion.div
+                                      animate={{ 
+                                          background: task.completed 
+                                              ? `linear-gradient(to right, ${eventTheme.secondaryColor}40, transparent)`
+                                              : 'transparent',
+                                          opacity: task.completed ? 0.8 : 1
+                                      }}
+                                      className={cn(
+                                        "rounded-xl shadow-lg p-4 space-y-3 transition-all duration-300 hover:shadow-xl relative z-30 bg-background",
+                                        task.completed && "opacity-75"
+                                      )}
+                                      style={{
+                                        border: `2px solid ${task.completed ? eventTheme.primaryColor : eventTheme.accentColor} !important`,
+                                        boxShadow: task.completed 
+                                          ? `0 6px 25px ${eventTheme.primaryColor}25`
+                                          : `0 4px 15px ${eventTheme.accentColor}20`,
+                                        transform: `scale(${scaleVariation})`,
+                                        backgroundColor: 'hsl(var(--background))',
+                                        position: 'relative',
+                                        zIndex: 100
+                                      }}
+                                  >
+                                    {/* Background blocker */}
+                                    <div className="absolute inset-0 bg-background rounded-xl" style={{ zIndex: -1 }}></div>
+                                    {/* Task completion celebration */}
+                                    <AnimatePresence>
+                                      {task.completed && (
+                                        <motion.div
+                                          initial={{ opacity: 0, scale: 0.8 }}
+                                          animate={{ opacity: 1, scale: 1 }}
+                                          exit={{ opacity: 0, scale: 0.8 }}
+                                          className="absolute top-2 right-2 text-xl z-20"
+                                        >
+                                          {eventTheme.completedIcon}
+                                        </motion.div>
+                                      )}
+                                    </AnimatePresence>
+
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className='flex items-start gap-3 flex-1'>
+                                            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                                                <Checkbox 
+                                                    id={`task-${task.id}`}
+                                                    checked={task.completed}
+                                                    onCheckedChange={() => handleTaskCheck(task.id)}
+                                                    className="h-5 w-5 mt-1 flex-shrink-0"
+                                                    style={{
+                                                        borderColor: eventTheme.primaryColor,
+                                                        backgroundColor: task.completed ? eventTheme.primaryColor : 'transparent'
+                                                    }}
+                                                />
+                                            </motion.div>
+                                            
+                                            <div className="flex-1 min-w-0">
+                                                 {editingTaskId === task.id ? (
+                                                    <Input 
+                                                        value={editedTaskLabel}
+                                                        onChange={(e) => setEditedTaskLabel(e.target.value)}
+                                                        className="text-sm font-semibold"
+                                                        onKeyDown={(e) => e.key === 'Enter' && handleSaveTask(task.id)}
+                                                        autoFocus
+                                                    />
+                                                ) : (
+                                                    <motion.h4 
+                                                        className={cn("text-sm font-semibold leading-tight", task.completed && 'line-through text-muted-foreground')}
+                                                        animate={{ color: task.completed ? '#6b7280' : eventTheme.accentColor }}
+                                                    >
+                                                        <span className="mr-2">{eventTheme.taskIcon}</span>
+                                                        {task.task}
+                                                    </motion.h4>
+                                                )}
+                                                
+                                                {/* Compact deadline */}
+                                                <motion.div 
+                                                    className="text-xs font-medium mt-1 flex items-center gap-1"
+                                                    style={{ color: eventTheme.primaryColor }}
+                                                >
+                                                    📅 {new Date(task.deadline).toLocaleDateString(undefined, {
+                                                        month: 'short', 
+                                                        day: 'numeric'
+                                                    })}
+                                                </motion.div>
+                                                
+                                                {task.description && (
+                                                    <motion.div
+                                                        initial={{ opacity: 0 }}
+                                                        animate={{ opacity: 1 }}
+                                                        transition={{ delay: 0.2 }}
+                                                    >
+                                                        <motion.p 
+                                                            className={cn(
+                                                                "text-xs text-muted-foreground mt-2 leading-relaxed",
+                                                                !expandedTasks.has(task.id) && "line-clamp-2"
+                                                            )}
+                                                        >
+                                                            📝 {task.description}
+                                                        </motion.p>
+                                                        {shouldShowToggle(task.description, true) && (
+                                                            <button
+                                                                onClick={() => toggleTaskExpansion(task.id)}
+                                                                className="text-xs mt-1 font-medium hover:underline show-more-button"
+                                                                style={{ color: eventTheme.primaryColor }}
+                                                            >
+                                                                {expandedTasks.has(task.id) ? 'Show less' : 'Show more'}
+                                                            </button>
+                                                        )}
+                                                    </motion.div>
+                                                )}
+                                                
+                                                {task.suggestedVendorCategory && (
+                                                    <motion.div 
+                                                        className="mt-2"
+                                                        initial={{ opacity: 0, x: -20 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        transition={{ delay: 0.3 }}
+                                                    >
+                                                        <span 
+                                                            className="text-xs px-2 py-1 rounded-full font-medium"
+                                                            style={{ 
+                                                                backgroundColor: `${eventTheme.primaryColor}20`,
+                                                                color: eventTheme.accentColor
+                                                            }}
+                                                        >
+                                                            💡 {task.suggestedVendorCategory}
+                                                        </span>
+                                                    </motion.div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Always visible action buttons on mobile */}
+                                        <div className="flex items-center gap-1 flex-shrink-0">
+                                            {editingTaskId === task.id ? (
+                                                <Button 
+                                                    size="sm" 
+                                                    variant="ghost" 
+                                                    onClick={() => handleSaveTask(task.id)}
+                                                    className="text-green-600 hover:bg-green-100 h-7 w-7 p-0"
+                                                >
+                                                    <Save className="h-3 w-3" />
+                                                </Button>
+                                            ) : (
+                                                <Button 
+                                                    size="sm" 
+                                                    variant="ghost" 
+                                                    onClick={() => handleEditTask(task)}
+                                                    className="h-7 w-7 p-0"
+                                                >
+                                                    <Edit className="h-3 w-3" />
+                                                </Button>
+                                            )}
+                                            <Button 
+                                                size="sm" 
+                                                variant="ghost" 
+                                                onClick={() => handleDeleteTask(task.id)}
+                                                className="text-destructive hover:bg-red-100 h-7 w-7 p-0"
+                                            >
+                                                <Trash2 className="h-3 w-3" />
+                                            </Button>
+                                        </div>
+                                    </div>
+
+                                    {/* Compact cost information for mobile */}
+                                    {showCosts && (
+                                        <motion.div 
+                                            className="grid grid-cols-1 gap-2 p-3 rounded-lg mt-3"
+                                            style={{ backgroundColor: `${eventTheme.secondaryColor}30` }}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.4 }}
+                                        >
+                                            {task.estimatedCost > 0 && (
+                                                <div className="flex items-center justify-between text-xs">
+                                                    <span className="flex items-center gap-1">
+                                                        <DollarSign className="h-3 w-3" style={{ color: eventTheme.primaryColor }} />
+                                                        <span className="font-medium">Est:</span>
+                                                    </span>
+                                                    <span>${task.estimatedCost.toLocaleString()}</span>
+                                                </div>
+                                            )}
+                                            
+                                            {task.recommendedCost && (
+                                                <div className="flex items-center justify-between text-xs">
+                                                    <span className="flex items-center gap-1">
+                                                        <DollarSign className="h-3 w-3" style={{ color: eventTheme.accentColor }} />
+                                                        <span className="font-medium">Rec:</span>
+                                                    </span>
+                                                    <span>${task.recommendedCost.toLocaleString()}</span>
+                                                </div>
+                                            )}
+                                            
+                                            <div className="flex items-center justify-between">
+                                                <Label htmlFor={`actual-cost-${task.id}`} className="text-xs font-medium">
+                                                    💰 Actual
+                                                </Label>
+                                                <div className="relative w-20">
+                                                    <Input
+                                                        id={`actual-cost-${task.id}`}
+                                                        type="number"
+                                                        placeholder="0"
+                                                        value={task.actualCost ?? ''}
+                                                        onChange={(e) => handleActualCostChange(task.id, e.target.value)}
+                                                        className="pl-4 h-6 text-xs w-full"
+                                                    />
+                                                    <DollarSign className="absolute left-1 top-1/2 transform -translate-y-1/2 h-2 w-2 text-muted-foreground" />
+                                                </div>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                  </motion.div>
+                                </div>
+                              </div>
+                            ) : (
+                              // Desktop layout (existing)
+                              <div className="grid grid-cols-2 items-start gap-x-8 task-card-container">
                                 <div className={cn(
                                     "text-right",
                                     index % 2 === 0 ? "text-right" : "col-start-2 text-left"
@@ -591,8 +916,8 @@ function EventPlannerContent() {
                                 </div>
 
                                 {/* 🎨 THEMED TIMELINE DOT */}
-            <div className="absolute top-1 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full border-4 border-background flex items-center justify-center z-40" 
-              style={{ backgroundColor: task.completed ? eventTheme.primaryColor : `${eventTheme.primaryColor}60` }}>
+                                <div className="absolute top-1 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full border-4 border-background flex items-center justify-center z-20" 
+                                  style={{ backgroundColor: task.completed ? eventTheme.primaryColor : `${eventTheme.primaryColor}60` }}>
                                     <div className="w-2 h-2 rounded-full" 
                                          style={{ 
                                            backgroundColor: task.completed ? 'white' : eventTheme.primaryColor, 
@@ -612,17 +937,21 @@ function EventPlannerContent() {
                                             opacity: task.completed ? 0.8 : 1
                                         }}
                     className={cn(
-                      "border-2 rounded-xl shadow-sm p-6 space-y-3 transition-all duration-300 hover:shadow-lg relative",
-                      eventTheme.cardStyle,
+                      "rounded-xl shadow-sm p-6 space-y-3 transition-all duration-300 hover:shadow-lg relative z-30 bg-background",
                       task.completed && "opacity-75"
                     )}
                     style={{
-                      borderColor: task.completed ? eventTheme.primaryColor : eventTheme.accentColor,
+                      border: `2px solid ${task.completed ? eventTheme.primaryColor : eventTheme.accentColor} !important`,
                       boxShadow: task.completed 
                         ? `0 4px 20px ${eventTheme.primaryColor}20`
-                        : `0 2px 10px ${eventTheme.accentColor}20`
+                        : `0 2px 10px ${eventTheme.accentColor}20`,
+                      backgroundColor: 'hsl(var(--background))',
+                      position: 'relative',
+                      zIndex: 100
                     }}
                                     >
+                                        {/* Background blocker */}
+                                        <div className="absolute inset-0 bg-background rounded-xl" style={{ zIndex: -1 }}></div>
                                         {/* 🎉 TASK COMPLETION CELEBRATION */}
                                         <AnimatePresence>
                                           {task.completed && (
@@ -686,14 +1015,29 @@ function EventPlannerContent() {
                                                     </div>
                                                     
                                                     {task.description && (
-                                                        <motion.p 
-                                                            className="text-sm text-muted-foreground mt-3 leading-relaxed"
+                                                        <motion.div
                                                             initial={{ opacity: 0 }}
                                                             animate={{ opacity: 1 }}
                                                             transition={{ delay: 0.2 }}
                                                         >
-                                                            📝 {task.description}
-                                                        </motion.p>
+                                                            <motion.p 
+                                                                className={cn(
+                                                                    "text-sm text-muted-foreground mt-3 leading-relaxed",
+                                                                    !expandedTasks.has(task.id) && "line-clamp-3"
+                                                                )}
+                                                            >
+                                                                📝 {task.description}
+                                                            </motion.p>
+                                                            {shouldShowToggle(task.description, false) && (
+                                                                <button
+                                                                    onClick={() => toggleTaskExpansion(task.id)}
+                                                                    className="text-sm mt-2 font-medium hover:underline show-more-button"
+                                                                    style={{ color: eventTheme.primaryColor }}
+                                                                >
+                                                                    {expandedTasks.has(task.id) ? 'Show less' : 'Show more'}
+                                                                </button>
+                                                            )}
+                                                        </motion.div>
                                                     )}
                                                     
                                                     {task.suggestedVendorCategory && (
@@ -793,30 +1137,39 @@ function EventPlannerContent() {
                                         )}
                                     </motion.div>
                                 </div>
-                            </div>
+                              </div>
+                            )}
                             
-                            {/* Add task button between timeline items */}
-              <motion.div 
-                className="relative flex justify-center -my-2 z-40"
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleAddTask(index + 1)}
-                  className="rounded-full h-8 w-8 p-0 bg-white shadow-md hover:shadow-lg transition-all duration-200"
-                  style={{ 
-                    borderColor: eventTheme.primaryColor,
-                    color: eventTheme.primaryColor
-                  }}
-                >
-                  <PlusCircle className="h-4 w-4" />
-                </Button>
-              </motion.div>
                            </motion.div>
-                        ))}
+                           
+                           {/* Add task button between timeline items - centered on line */}
+                           <motion.div 
+                             className="relative flex justify-center z-30 my-4"
+                             initial={{ opacity: 1 }}
+                             animate={{ opacity: 1 }}
+                             transition={{ duration: 0.2 }}
+                           >
+                             <Button
+                               size="sm"
+                               variant="outline"
+                               onClick={() => handleAddTask(index + 1)}
+                               className={cn(
+                                 "rounded-full h-8 w-8 p-0 shadow-md hover:shadow-lg transition-all duration-200 add-task-button",
+                                 isMobile ? "border-2" : ""
+                               )}
+                               style={{ 
+                                 borderColor: eventTheme.primaryColor,
+                                 color: eventTheme.primaryColor,
+                                 backgroundColor: 'white'
+                               }}
+                             >
+                               <PlusCircle className="h-4 w-4" />
+                             </Button>
+                           </motion.div>
+                           </React.Fragment>
+                          );
+                        })
+                        }
                         </AnimatePresence>
                     </div>
                 ) : (
@@ -883,6 +1236,35 @@ function EventPlannerContent() {
                 )}
             </CardContent>
         </Card>
+      
+        {/* Undo Delete Toast */}
+        <AnimatePresence>
+          {showUndoToast && deletedTask && (
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 50 }}
+              className="fixed bottom-6 right-6 z-[9999]"
+            >
+              <div className="bg-background border rounded-lg shadow-lg p-4 flex items-center gap-3 min-w-[280px]">
+                <div className="flex-1">
+                  <p className="text-sm font-medium">Task deleted</p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {deletedTask.task.task}
+                  </p>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleUndoDelete}
+                  className="text-xs"
+                >
+                  Undo
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </>
       )}
     </div>

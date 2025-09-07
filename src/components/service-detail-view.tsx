@@ -1,13 +1,15 @@
 
 
 'use client';
-import { getServiceOrOfferById } from '@/lib/services';
+import { getServiceOrOfferWithReviews } from '@/lib/services';
 import type { Service, MediaItem, Review } from '@/lib/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ErrorBoundary } from '@/components/error-boundary';
 import { Star, MessageSquare, ArrowLeft, Send, Video } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -20,7 +22,6 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel"
-import { getReviewsForVendor } from '@/lib/services';
 import { useLanguage } from '@/hooks/use-language';
 
 
@@ -29,26 +30,112 @@ export function ServiceDetailView({ service: initialService, id }: { service: Se
     const [service, setService] = useState(initialService);
     const [reviews, setReviews] = useState<Review[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [isDataLoading, setIsDataLoading] = useState(true);
     const { translations } = useLanguage();
     const t = translations.serviceDetail;
 
     useEffect(() => {
-        async function fetchService() {
-            if(!initialService) {
-                const foundService = (await getServiceOrOfferById(id)) as Service | null;
-                setService(foundService ?? null);
-                if (foundService) {
-                    const vendorReviews = await getReviewsForVendor(foundService.vendorId);
-                    setReviews(vendorReviews);
+        const fetchData = async () => {
+            try {
+                setIsDataLoading(true);
+                if(!initialService) {
+                    const { item, reviews } = await getServiceOrOfferWithReviews(id);
+                    setService(item as Service | null);
+                    setReviews(reviews);
+                } else {
+                    const { reviews } = await getServiceOrOfferWithReviews(id);
+                    setReviews(reviews);
                 }
-            } else {
-                 const vendorReviews = await getReviewsForVendor(initialService.vendorId);
-                 setReviews(vendorReviews);
+            } catch (error) {
+                console.error('Error fetching service data:', error);
+            } finally {
+                setIsLoading(false);
+                setIsDataLoading(false);
             }
-            setIsLoading(false);
-        }
-        fetchService();
+        };
+        fetchData();
     }, [initialService, id]);
+
+  if (isLoading || isDataLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="mb-6">
+          <Skeleton className="h-10 w-32 mb-4" />
+        </div>
+        
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="space-y-6">
+            <Skeleton className="h-64 w-full rounded-lg" />
+            <div className="grid grid-cols-3 gap-2">
+              <Skeleton className="h-20 w-full rounded" />
+              <Skeleton className="h-20 w-full rounded" />
+              <Skeleton className="h-20 w-full rounded" />
+            </div>
+          </div>
+          
+          <div className="space-y-6">
+            <div>
+              <Skeleton className="h-8 w-3/4 mb-2" />
+              <Skeleton className="h-4 w-1/2 mb-4" />
+              <div className="flex items-center gap-2 mb-4">
+                <Skeleton className="h-6 w-6 rounded-full" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-16" />
+              </div>
+              <Skeleton className="h-6 w-32 mb-4" />
+            </div>
+            
+            <div className="space-y-4">
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </div>
+            
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-20" />
+              <div className="flex flex-wrap gap-2">
+                <Skeleton className="h-6 w-16 rounded-full" />
+                <Skeleton className="h-6 w-20 rounded-full" />
+                <Skeleton className="h-6 w-18 rounded-full" />
+              </div>
+            </div>
+            
+            <div className="flex gap-4">
+              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-10 w-28" />
+            </div>
+          </div>
+        </div>
+        
+        <div className="mt-12">
+          <Skeleton className="h-6 w-32 mb-6" />
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <Card key={i}>
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <Skeleton className="h-4 w-24" />
+                        <div className="flex gap-1">
+                          {[...Array(5)].map((_, j) => (
+                            <Skeleton key={j} className="h-4 w-4" />
+                          ))}
+                        </div>
+                      </div>
+                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-3/4" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!service) {
     return (
@@ -66,11 +153,12 @@ export function ServiceDetailView({ service: initialService, id }: { service: Se
 
 
   return (
-    <div className="space-y-8">
-       <Link href="/client/explore" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
-            <ArrowLeft className="h-4 w-4" />
-            {t.backLink}
-        </Link>
+    <ErrorBoundary>
+      <div className="space-y-8">
+         <Link href="/client/explore" className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary">
+              <ArrowLeft className="h-4 w-4" />
+              {t.backLink}
+          </Link>
 
         <div className="relative">
              <Carousel className="w-full overflow-hidden rounded-xl">
@@ -209,6 +297,7 @@ export function ServiceDetailView({ service: initialService, id }: { service: Se
                 </Card>
             </div>
         </div>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

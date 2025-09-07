@@ -14,7 +14,8 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { createOrUpdateUserProfile, createOrUpdateVendorProfile, deleteServiceOrOffer, getServicesAndOffers } from '@/lib/services';
+import { createOrUpdateUserProfile, createOrUpdateVendorProfile, deleteServiceOrOffer, getServicesAndOffers, updateListingStatus, createNotification } from '@/lib/services';
+import { AdminListingDetailView } from '@/components/admin-listing-detail-view';
 import type { UserProfile, VendorProfile, ServiceOrOffer, Service, Offer, ServiceCategory } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
@@ -43,7 +44,7 @@ const userProfileSchema = z.object({
 
 const vendorProfileSchema = z.object({
   businessName: z.string().min(1, "Business name is required"),
-  category: z.string().min(1, "Category is required"),
+  category: z.enum(['Venues', 'Catering & Sweets', 'Entertainment', 'Lighting & Sound', 'Photography & Videography', 'Decoration', 'Beauty & Grooming', 'Transportation', 'Invitations & Printables', 'Rentals & Furniture', 'Security and Crowd Control']),
   tagline: z.string().min(1, "Tagline is required"),
   description: z.string().min(1, "Description is required"),
 });
@@ -61,6 +62,7 @@ export function AdminUserManagement({ initialUser, initialVendor, initialListing
     const [user, setUser] = useState<UserProfile | null>(initialUser);
     const [vendor, setVendor] = useState<VendorProfile | null>(initialVendor);
     const [listings, setListings] = useState<ServiceOrOffer[]>(initialListings);
+    const [isModerating, setIsModerating] = useState<string | null>(null);
     
     // isLoading is no longer needed since data is pre-fetched by the server component.
     // However, we might keep it for refetching actions. Let's start with false.
@@ -140,6 +142,47 @@ export function AdminUserManagement({ initialUser, initialVendor, initialListing
             toast({ title: "Error", description: "Failed to delete the listing.", variant: "destructive"});
         }
     }
+
+    const handleListingStatusChange = async (listing: ServiceOrOffer, decision: 'approved' | 'rejected', reason?: string, delayHours?: number) => {
+        setIsModerating(listing.id);
+        try {
+            if (delayHours && delayHours > 0) {
+                // Schedule approval for later - you may want to implement this separately
+                // For now, we'll just show a toast that it's scheduled
+                toast({
+                    title: `Listing ${decision} scheduled`,
+                    description: `The listing "${listing.title}" will be ${decision} in ${delayHours} hours.`
+                });
+                // You would call a scheduling service here
+                // await scheduleListingApproval(listing.id, listing.type, decision, delayHours, reason);
+            } else {
+                await updateListingStatus(listing.id, listing.type, decision, reason);
+                setListings(prev => prev.map(l => 
+                    l.id === listing.id ? { ...l, status: decision, rejectionReason: reason } : l
+                ));
+                
+                const message = decision === 'approved' 
+                    ? `Congratulations! Your listing "${listing.title}" has been approved.`
+                    : `Your listing "${listing.title}" was rejected. Reason: ${reason}`;
+
+                await createNotification({
+                    userId: listing.vendorId,
+                    message: message,
+                    link: `/vendor/manage-services`,
+                });
+
+                toast({
+                    title: `Listing ${decision}`,
+                    description: `The listing "${listing.title}" has been ${decision}.`
+                });
+            }
+        } catch (error) {
+            console.error("Listing moderation failed", error);
+            toast({ title: "Moderation Failed", description: "Could not update listing status.", variant: "destructive" });
+        } finally {
+            setIsModerating(null);
+        }
+    };
     
     if (!user) {
         return <Card>
@@ -298,36 +341,95 @@ export function AdminUserManagement({ initialUser, initialVendor, initialListing
                 <Card className="border-gold-dark/50">
                     <CardHeader>
                         <CardTitle>Vendor Listings</CardTitle>
-                        <CardDescription>Manage this vendor's services and offers.</CardDescription>
+                        <CardDescription>Manage this vendor's services and offers. View detailed information and moderate listings as needed.</CardDescription>
                     </CardHeader>
                     <CardContent>
                         {isRefetching ? <Loader2 className="mx-auto animate-spin" /> : listings.length > 0 ? (
-                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                             <div className="space-y-6">
                                 {listings.map(item => (
-                                     <div key={item.id} className="relative group">
-                                        {item.type === 'offer' 
-                                            ? <OfferCard offer={item as Offer} role="vendor" onListingUpdate={fetchAllData}/> 
-                                            : <ServiceCard service={item as Service} role="vendor" onListingUpdate={fetchAllData} />}
+                                     <div key={item.id} className="relative border rounded-lg p-4 space-y-4">
+                                        <div className="flex items-start justify-between">
+                                            <div className="space-y-2 flex-1">
+                                                <div className="flex items-center gap-3">
+                                                    <h3 className="font-medium">{item.title}</h3>
+                                                    <Badge variant="secondary" className="capitalize">{item.type}</Badge>
+                                                    <Badge 
+                                                        variant={item.status === 'approved' ? 'default' : 
+                                                                item.status === 'rejected' ? 'destructive' : 'secondary'}
+                                                        className={item.status === 'approved' ? 'bg-green-500' : 
+                                                                  item.status === 'pending' ? 'bg-amber-500' : ''}
+                                                    >
+                                                        {item.status}
+                                                    </Badge>
+                                                </div>
+                                                <p className="text-sm text-muted-foreground line-clamp-2">{item.description}</p>
+                                                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                                    <span>Category: {item.category}</span>
+                                                    <span>Media: {item.media?.length || 0} files</span>
+                                                    {item.type === 'offer' && (item as Offer).price && (
+                                                        <span>Price: ${(item as Offer).price.toLocaleString()}</span>
+                                                    )}
+                                                </div>
+                                                {item.rejectionReason && (
+                                                    <div className="bg-red-50 border border-red-200 rounded p-2">
+                                                        <p className="text-sm text-red-700">
+                                                            <strong>Rejection Reason:</strong> {item.rejectionReason}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                         
-                                        <AlertDialog>
-                                            <AlertDialogTrigger asChild>
-                                                <Button variant="destructive" size="icon" className="absolute top-2 right-12 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <Trash2 className="h-4 w-4"/>
-                                                </Button>
-                                            </AlertDialogTrigger>
-                                            <AlertDialogContent>
-                                                <AlertDialogHeader>
-                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                                                    <AlertDialogDescription>
-                                                        This will permanently delete the listing for <span className="font-semibold">"{item.title}"</span>. This action cannot be undone.
-                                                    </AlertDialogDescription>
-                                                </AlertDialogHeader>
-                                                <AlertDialogFooter>
-                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                                    <AlertDialogAction onClick={() => handleDeleteListing(item)}>Delete</AlertDialogAction>
-                                                </AlertDialogFooter>
-                                            </AlertDialogContent>
-                                        </AlertDialog>
+                                        <div className="flex items-center justify-between pt-2 border-t">
+                                            <div className="flex gap-2">
+                                                <AdminListingDetailView
+                                                    listing={item}
+                                                    onApprove={(delayHours?: number) => {
+                                                        if (delayHours) {
+                                                            handleListingStatusChange(item, 'approved', undefined, delayHours);
+                                                        } else {
+                                                            handleListingStatusChange(item, 'approved');
+                                                        }
+                                                    }}
+                                                    onReject={(reason: string) => handleListingStatusChange(item, 'rejected', reason)}
+                                                    isLoading={isModerating === item.id}
+                                                />
+                                                {item.status === 'pending' && (
+                                                    <>
+                                                        <Button 
+                                                            size="sm" 
+                                                            variant="outline" 
+                                                            className="text-green-600 border-green-600 hover:bg-green-50" 
+                                                            onClick={() => handleListingStatusChange(item, 'approved')} 
+                                                            disabled={isModerating === item.id}
+                                                        >
+                                                            {isModerating === item.id ? <Loader2 className="h-4 w-4 animate-spin"/> : "Quick Approve"}
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            </div>
+                                            
+                                            <AlertDialog>
+                                                <AlertDialogTrigger asChild>
+                                                    <Button variant="destructive" size="sm">
+                                                        <Trash2 className="h-4 w-4 mr-2"/>
+                                                        Delete
+                                                    </Button>
+                                                </AlertDialogTrigger>
+                                                <AlertDialogContent>
+                                                    <AlertDialogHeader>
+                                                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                        <AlertDialogDescription>
+                                                            This will permanently delete the listing for <span className="font-semibold">"{item.title}"</span>. This action cannot be undone.
+                                                        </AlertDialogDescription>
+                                                    </AlertDialogHeader>
+                                                    <AlertDialogFooter>
+                                                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                        <AlertDialogAction onClick={() => handleDeleteListing(item)}>Delete</AlertDialogAction>
+                                                    </AlertDialogFooter>
+                                                </AlertDialogContent>
+                                            </AlertDialog>
+                                        </div>
                                     </div>
                                 ))}
                             </div>

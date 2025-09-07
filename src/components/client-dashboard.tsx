@@ -11,13 +11,14 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useEffect, useState, useMemo } from 'react';
-import type { ServiceOrOffer, Service, Offer, ServiceCategory, ServiceInclusions, Location } from '@/lib/types';
+import type { ServiceOrOffer, Service, Offer, ServiceCategory, ServiceInclusions, Location, EventType } from '@/lib/types';
 import { getServicesAndOffers } from '@/lib/services';
 import { Skeleton } from './ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { locations } from '@/lib/types';
+import { locations, eventTypes } from '@/lib/types';
+import { Badge } from '@/components/ui/badge';
 
 
 const categories: (ServiceCategory | 'All Categories')[] = ['All Categories', 'Venues', 'Catering & Sweets', 'Entertainment', 'Lighting & Sound', 'Photography & Videography', 'Decoration', 'Beauty & Grooming', 'Transportation', 'Invitations & Printables', 'Rentals & Furniture', 'Security and Crowd Control'];
@@ -66,6 +67,7 @@ export function ClientDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory | 'All Categories'>('All Categories');
   const [selectedLocation, setSelectedLocation] = useState<Location | 'All Locations'>('All Locations');
+  const [selectedEventType, setSelectedEventType] = useState<EventType | 'All Event Types'>('All Event Types');
   const [activeFilters, setActiveFilters] = useState<Partial<ServiceInclusions>>({});
   const [isFilterDialogOpen, setIsFilterDialogOpen] = useState(false);
 
@@ -93,6 +95,14 @@ export function ClientDashboard() {
       .filter(item =>
         selectedLocation === 'All Locations' || item.location === selectedLocation
       )
+      .filter(item => {
+        if (selectedEventType === 'All Event Types') return true;
+        if (item.eventTypes === 'any') return true;
+        if (Array.isArray(item.eventTypes)) {
+          return item.eventTypes.includes(selectedEventType);
+        }
+        return false;
+      })
       .filter(item => 
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -117,6 +127,10 @@ export function ClientDashboard() {
   
   const handleLocationChange = (value: string) => {
     setSelectedLocation(value as Location | 'All Locations');
+  };
+
+  const handleEventTypeChange = (value: string) => {
+    setSelectedEventType(value as EventType | 'All Event Types');
   };
 
   const handleApplyFilters = (newFilters: Partial<ServiceInclusions>) => {
@@ -228,6 +242,17 @@ export function ClientDashboard() {
                     <SelectItem value="All Locations">All Locations</SelectItem>
                     {locations.map((loc) => (
                         <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+            <Select value={selectedEventType} onValueChange={handleEventTypeChange}>
+                <SelectTrigger className="w-full sm:w-[220px] h-12 text-base">
+                    <SelectValue placeholder="Filter by event type" />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="All Event Types">All Event Types</SelectItem>
+                    {eventTypes.map((eventType) => (
+                        <SelectItem key={eventType} value={eventType}>{eventType}</SelectItem>
                     ))}
                 </SelectContent>
             </Select>
