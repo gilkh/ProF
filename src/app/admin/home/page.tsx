@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { generateVendorCode, getVendorCodes, resetAllPasswords, getAllUsersAndVendors, updateVendorTier, deleteVendorCode, updateUserStatus, deleteUser, getUpgradeRequests, getPlatformAnalytics, updateUpgradeRequestStatus, updateVendorVerification, getVendorInquiries, updateVendorInquiryStatus, getPendingListings, updateListingStatus, createNotification, scheduleListingApproval, updateAutoApprovalSetting, getAutoApprovalSetting } from '@/lib/services';
-import { sendPushNotification } from '@/lib/actions/notifications';
+import { sendPushNotificationServerAction } from '@/app/admin/actions';
 import type { VendorCode, UserProfile, VendorProfile, UpgradeRequest, PlatformAnalytics, VendorInquiry, ServiceOrOffer } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
@@ -38,6 +38,7 @@ import { AdminAnalyticsChart } from '@/components/admin-analytics-chart';
 import { AdminStatCard } from '@/components/admin-stat-card';
 import { MessagingPanel } from '@/components/messaging-panel';
 import { AdminListingDetailView } from '@/components/admin-listing-detail-view';
+import AdminEmailVerification from '@/components/admin/admin-email-verification';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Label } from '@/components/ui/label';
@@ -384,7 +385,7 @@ export default function AdminHomePage() {
     }
     setIsSendingNotification(true);
     try {
-        await sendPushNotification(notificationTarget, notificationTitle, notificationBody);
+        await sendPushNotificationServerAction(notificationTarget, notificationTitle, notificationBody);
         toast({ title: "Notifications Sent", description: "Your message has been sent to the target audience." });
         setNotificationTitle('');
         setNotificationBody('');
@@ -414,24 +415,25 @@ export default function AdminHomePage() {
 
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-full grid-cols-4 sm:flex sm:w-auto flex-wrap h-auto">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="moderation">
-                Moderation
-                {totalPendingModeration > 0 && <Badge className="ml-2 bg-red-500">{totalPendingModeration}</Badge>}
-            </TabsTrigger>
-            <TabsTrigger value="messages">Messages</TabsTrigger>
-             <TabsTrigger value="inquiries">
-                Inquiries
-                {vendorInquiries.filter(r => r.status === 'pending').length > 0 && <Badge className="ml-2">{vendorInquiries.filter(r => r.status === 'pending').length}</Badge>}
-            </TabsTrigger>
-            <TabsTrigger value="upgrades">
-                Upgrades
-                {upgradeRequests.filter(r => r.status === 'pending').length > 0 && <Badge className="ml-2">{upgradeRequests.filter(r => r.status === 'pending').length}</Badge>}
-            </TabsTrigger>
-            <TabsTrigger value="notifications">Push Notifications</TabsTrigger>
-            <TabsTrigger value="codes">Codes</TabsTrigger>
-            <TabsTrigger value="danger">Danger Zone</TabsTrigger>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsTrigger value="email-verification">Email Verification</TabsTrigger>
+          <TabsTrigger value="moderation">
+            Moderation
+            {pendingListings.length > 0 && <Badge className="ml-1 text-xs">{pendingListings.length}</Badge>}
+          </TabsTrigger>
+          <TabsTrigger value="messages">Messages</TabsTrigger>
+          <TabsTrigger value="inquiries">
+            Inquiries
+            {vendorInquiries.filter(i => i.status === 'pending').length > 0 && <Badge className="ml-1 text-xs">{vendorInquiries.filter(i => i.status === 'pending').length}</Badge>}
+          </TabsTrigger>
+          <TabsTrigger value="upgrades">
+            Upgrades
+            {upgradeRequests.filter(r => r.status === 'pending').length > 0 && <Badge className="ml-1 text-xs">{upgradeRequests.filter(r => r.status === 'pending').length}</Badge>}
+          </TabsTrigger>
+          <TabsTrigger value="notifications">Push Notifications</TabsTrigger>
+          <TabsTrigger value="codes">Codes</TabsTrigger>
+          <TabsTrigger value="danger">Danger Zone</TabsTrigger>
         </TabsList>
         
         <TabsContent value="overview" className="mt-4">
@@ -620,6 +622,10 @@ export default function AdminHomePage() {
                      </Table>
                 </CardContent>
             </Card>
+        </TabsContent>
+
+        <TabsContent value="email-verification" className="mt-4">
+          <AdminEmailVerification />
         </TabsContent>
 
         <TabsContent value="moderation" className="mt-4">

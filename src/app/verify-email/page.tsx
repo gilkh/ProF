@@ -28,6 +28,20 @@ function VerifyEmailStatus() {
     async function verify() {
       try {
         await applyActionCode(auth, oobCode as string);
+        
+        // After successful verification, complete the user profile creation
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          try {
+            // Import the completion function
+            const { completeEmailVerification } = await import('@/lib/services');
+            await completeEmailVerification(currentUser.uid);
+          } catch (profileError) {
+            console.error('Error completing profile after verification:', profileError);
+            // Don't fail the verification if profile completion fails
+          }
+        }
+        
         setStatus('success');
         setMessage('Your email has been successfully verified. You can now log in.');
         toast({
@@ -35,11 +49,37 @@ function VerifyEmailStatus() {
           description: 'You can now log in to your account.',
         });
       } catch (error: any) {
+        console.error('Email verification error:', error);
         setStatus('error');
         let errorMessage = 'An unknown error occurred during verification.';
-        if (error.code === 'auth/invalid-action-code') {
+        
+        // Handle different Firebase Auth error codes
+        switch (error.code) {
+          case 'auth/invalid-action-code':
             errorMessage = 'The verification link is invalid or has expired. Please try signing up again or request a new link.';
+            break;
+          case 'auth/expired-action-code':
+            errorMessage = 'The verification link has expired. Please request a new verification email.';
+            break;
+          case 'auth/user-disabled':
+            errorMessage = 'This user account has been disabled. Please contact support.';
+            break;
+          case 'auth/user-not-found':
+            errorMessage = 'No user account found for this verification link. Please try signing up again.';
+            break;
+          case 'auth/weak-password':
+            errorMessage = 'The password is too weak. Please choose a stronger password.';
+            break;
+          case 'auth/network-request-failed':
+            errorMessage = 'Network error. Please check your internet connection and try again.';
+            break;
+          case 'auth/too-many-requests':
+            errorMessage = 'Too many requests. Please wait a moment and try again.';
+            break;
+          default:
+            errorMessage = `Verification failed: ${error.message || 'Unknown error'}`;
         }
+        
         setMessage(errorMessage);
         toast({
           title: 'Verification Failed',
@@ -57,10 +97,30 @@ function VerifyEmailStatus() {
       {status === 'success' && <CheckCircle className="h-12 w-12 text-green-500" />}
       {status === 'error' && <XCircle className="h-12 w-12 text-destructive" />}
       <p className="text-center text-muted-foreground">{message}</p>
-      {status !== 'loading' && (
+      
+      {status === 'error' && message.includes('expired') && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+          <p className="text-sm text-yellow-800">
+            Your verification link has expired. Please sign up again to receive a new verification email.
+          </p>
+        </div>
+      )}
+      
+      {status === 'success' && (
         <Button asChild>
           <Link href="/login">Proceed to Login</Link>
         </Button>
+      )}
+      
+      {status === 'error' && (
+        <div className="space-y-3">
+          <Button asChild className="w-full">
+            <Link href="/signup">Sign Up Again</Link>
+          </Button>
+          <Button asChild variant="outline" className="w-full">
+            <Link href="/login">Back to Login</Link>
+          </Button>
+        </div>
       )}
     </div>
   );

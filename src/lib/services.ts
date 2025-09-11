@@ -40,9 +40,14 @@ export async function createNewUser(data: {
         throw new Error("Could not create user account in Firebase Authentication.");
     }
     
-    // Step 2: Send verification email ONLY for clients
+    // Step 2: Send verification email ONLY for clients (if verification is enabled)
+    let verificationSent = false;
     if (accountType === 'client') {
-        await sendEmailVerification(firebaseUser);
+        const emailVerificationRequired = await getEmailVerificationSetting();
+        if (emailVerificationRequired) {
+            await sendCustomVerificationEmail(firebaseUser, data.firstName);
+            verificationSent = true;
+        }
     }
     
     // Step 3: For vendors, validate the code and mark it as "reserved" for this user
@@ -68,15 +73,33 @@ export async function createNewUser(data: {
 
     } else {
         // Store temporary client info
-        const tempClientData = {
-             ...data,
-            id: firebaseUser.uid,
-            isPendingVerification: true,
-        };
-        await setDoc(doc(db, 'pendingClients', firebaseUser.uid), tempClientData);
+        const emailVerificationRequired = await getEmailVerificationSetting();
+        if (emailVerificationRequired) {
+            const tempClientData = {
+                 ...data,
+                id: firebaseUser.uid,
+                isPendingVerification: true,
+            };
+            await setDoc(doc(db, 'pendingClients', firebaseUser.uid), tempClientData);
+        } else {
+            // Create client profile immediately if verification is disabled
+            const userProfile: Omit<UserProfile, 'id'> = {
+                firstName: data.firstName,
+                lastName: data.lastName,
+                email: data.email,
+                phone: data.phone,
+                createdAt: new Date(),
+                savedItemIds: [],
+                status: 'active',
+                avatar: data.avatar || '',
+                emailVerified: true, // Skip verification
+                provider: 'password',
+            };
+            await setDoc(doc(db, 'users', firebaseUser.uid), userProfile);
+        }
     }
     
-    return { success: true, userId: firebaseUser.uid, role: accountType, verificationSent: accountType === 'client' };
+    return { success: true, userId: firebaseUser.uid, role: accountType, verificationSent };
 }
 
 
@@ -99,9 +122,33 @@ export async function signInUser(email: string, password?: string): Promise<{ su
         const vendorProfileSnap = await getDoc(doc(db, 'vendors', user.uid));
         const isVendor = pendingVendorSnap.exists() || vendorProfileSnap.exists();
         
-        // Only enforce email verification for clients
-        if (!isVendor && !user.emailVerified) {
-            return { success: false, message: 'Please verify your email before logging in. Check your inbox for a verification link.'};
+        // Check if user is in pending clients (awaiting email verification)
+        const pendingClientDoc = await getDoc(doc(db, 'pendingClients', user.uid));
+        if (pendingClientDoc.exists()) {
+            const emailVerificationRequired = await getEmailVerificationSetting();
+            if (emailVerificationRequired && !user.emailVerified) {
+                return { success: false, message: 'Please verify your email before logging in. Check your inbox for a verification link.' };
+            }
+            // If verification is disabled or user is verified, complete their profile
+            if (!emailVerificationRequired || user.emailVerified) {
+                await completeEmailVerification(user.uid);
+            }
+        }
+        
+        // Check existing user's email verification status (check both Firebase Auth and Firestore)
+        if (!isVendor) {
+            const existingUserDoc = await getDoc(doc(db, 'users', user.uid));
+            const firestoreEmailVerified = existingUserDoc.exists() ? existingUserDoc.data().emailVerified : false;
+            
+            // User is considered verified if either Firebase Auth or Firestore says so
+            const isEmailVerified = user.emailVerified || firestoreEmailVerified;
+            
+            if (!isEmailVerified) {
+                const emailVerificationRequired = await getEmailVerificationSetting();
+                if (emailVerificationRequired) {
+                    return { success: false, message: 'Please verify your email before logging in. Check your inbox for a verification link.'};
+                }
+            }
         }
         
         let userProfileDoc = await getDoc(doc(db, 'users', user.uid));
@@ -1453,8 +1500,207 @@ export async function sendPasswordResetEmail(email: string) {
     await firebaseSendPasswordResetEmail(auth, email);
 }
 
+// Custom email verification with styled template
+export async function sendCustomVerificationEmail(user: FirebaseUser, firstName: string) {
+    try {
+        // Generate custom verification link
+        const actionCodeSettings = {
+            url: `${window.location.origin}/verify-email`,
+            handleCodeInApp: true,
+        };
+        
+        // For now, we'll use Firebase's default verification email
+        // In production, you might want to use a custom email service like SendGrid, Mailgun, etc.
+        // with the generateVerificationEmailHTML function from the email template
+        await sendEmailVerification(user, actionCodeSettings);
+        
+        // TODO: Implement custom email service integration
+        // const { generateVerificationEmailHTML } = await import('../components/email-templates/verification-email');
+        // const emailHTML = generateVerificationEmailHTML({
+        //   firstName,
+        //   verificationUrl: actionCodeSettings.url,
+        //   companyName: 'TradeCraft'
+        // });
+        // await customEmailService.send({
+        //   to: user.email,
+        //   subject: 'Verify Your Email Address - TradeCraft',
+        //   html: emailHTML
+        // });
+    } catch (error) {
+        console.error('Error sending custom verification email:', error);
+        throw error;
+    }
+}
+
+// Get pending accounts awaiting email verification
+export async function getPendingVerificationAccounts(): Promise<Array<{id: string, email: string, firstName: string, lastName: string, createdAt: Date, accountType: 'client' | 'vendor'}>> {
+    try {
+        const pendingClients = await getDocs(collection(db, 'pendingClients'));
+        const pendingVendors = await getDocs(collection(db, 'pendingVendors'));
+        
+        const accounts = [];
+        
+        // Add pending clients
+        pendingClients.docs.forEach(doc => {
+            const data = doc.data();
+            if (data.isPendingVerification) {
+                accounts.push({
+                    id: doc.id,
+                    email: data.email,
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    createdAt: toDate(data.createdAt || new Date()),
+                    accountType: 'client' as const
+                });
+            }
+        });
+        
+        return accounts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    } catch (error) {
+        console.error('Error fetching pending verification accounts:', error);
+        return [];
+    }
+}
+
+// Admin verification moved to server action in /app/admin/actions.ts
+
+// Get/Set email verification requirement setting
+export async function getEmailVerificationSetting(): Promise<boolean> {
+    try {
+        const settingsRef = doc(db, 'adminSettings', 'emailVerification');
+        const settingsSnap = await getDoc(settingsRef);
+        
+        if (settingsSnap.exists()) {
+            return settingsSnap.data().required || true; // Default to true
+        }
+        return true;
+    } catch (error) {
+        console.error('Error fetching email verification setting:', error);
+        return true;
+    }
+}
+
+export async function updateEmailVerificationSetting(required: boolean): Promise<void> {
+    try {
+        const settingsRef = doc(db, 'adminSettings', 'emailVerification');
+        await setDoc(settingsRef, {
+            required: required,
+            updatedAt: serverTimestamp()
+        }, { merge: true });
+        
+        // If verification is being disabled, activate all pending clients
+        if (!required) {
+            const pendingClientsSnapshot = await getDocs(collection(db, 'pendingClients'));
+            const batch = writeBatch(db);
+            
+            pendingClientsSnapshot.docs.forEach(pendingDoc => {
+                const clientData = pendingDoc.data();
+                const userProfile: Omit<UserProfile, 'id'> = {
+                    firstName: clientData.firstName,
+                    lastName: clientData.lastName,
+                    email: clientData.email,
+                    phone: clientData.phone || '',
+                    createdAt: new Date(),
+                    savedItemIds: [],
+                    status: 'active',
+                    avatar: clientData.avatar || '',
+                    emailVerified: true, // Skip verification since it's disabled
+                    provider: 'password',
+                };
+                
+                batch.set(doc(db, 'users', pendingDoc.id), userProfile);
+                batch.delete(doc(db, 'pendingClients', pendingDoc.id));
+            });
+            
+            if (pendingClientsSnapshot.docs.length > 0) {
+                await batch.commit();
+                console.log(`Activated ${pendingClientsSnapshot.docs.length} pending clients after disabling email verification`);
+            }
+        }
+    } catch (error) {
+        console.error('Error updating email verification setting:', error);
+        throw error;
+    }
+}
+
+// Complete email verification by moving user from pending to active
+export async function completeEmailVerification(userId: string): Promise<void> {
+    try {
+        // Check if user is in pending clients
+        const pendingClientDoc = await getDoc(doc(db, 'pendingClients', userId));
+        
+        if (pendingClientDoc.exists()) {
+            const clientData = pendingClientDoc.data();
+            
+            // Create user profile
+            const userProfile: Omit<UserProfile, 'id'> = {
+                firstName: clientData.firstName,
+                lastName: clientData.lastName,
+                email: clientData.email,
+                phone: clientData.phone || '',
+                createdAt: new Date(),
+                savedItemIds: [],
+                status: 'active',
+                avatar: clientData.avatar || '',
+                emailVerified: true,
+                provider: 'password',
+            };
+            
+            // Use batch to ensure atomicity
+            const batch = writeBatch(db);
+            batch.set(doc(db, 'users', userId), userProfile);
+            batch.delete(doc(db, 'pendingClients', userId));
+            await batch.commit();
+            
+            console.log('Successfully completed email verification for client:', userId);
+        } else {
+            // Check if user already exists (might have been manually verified)
+            const userDoc = await getDoc(doc(db, 'users', userId));
+            if (userDoc.exists()) {
+                // Update emailVerified status if not already set
+                if (!userDoc.data().emailVerified) {
+                    await updateDoc(doc(db, 'users', userId), {
+                        emailVerified: true
+                    });
+                }
+            } else {
+                console.warn('No pending client or existing user found for verification:', userId);
+            }
+        }
+    } catch (error) {
+        console.error('Error completing email verification:', error);
+        throw error;
+    }
+}
+
 export async function resetPasswordWithToken(token: string, newPassword: string): Promise<void> {
-   await confirmPasswordReset(auth, token, newPassword);
+    await confirmPasswordReset(auth, token, newPassword);
+}
+
+// Resend verification email for existing user
+export async function resendVerificationEmail(email: string): Promise<{ success: boolean; message: string }> {
+    try {
+        // Check if user exists in pending clients
+        const pendingQuery = query(collection(db, 'pendingClients'), where('email', '==', email));
+        const pendingSnapshot = await getDocs(pendingQuery);
+        
+        if (!pendingSnapshot.empty) {
+            const pendingDoc = pendingSnapshot.docs[0];
+            const userData = pendingDoc.data();
+            
+            // For resending, we need to use Firebase Admin SDK or handle this server-side
+            // For now, return a message indicating they should contact support or try signing up again
+            return { 
+                success: false, 
+                message: 'To resend verification email, please try signing up again with the same email address.' 
+            };
+        }
+        
+        return { success: false, message: 'No pending verification found for this email address.' };
+    } catch (error: any) {
+        console.error('Error resending verification email:', error);
+        return { success: false, message: 'Failed to check verification status. Please try again.' };
+    }
 }
 
 

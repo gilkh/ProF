@@ -20,6 +20,33 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Exclude Firebase Admin SDK from client-side bundle
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+        http2: false,
+        stream: false,
+        url: false,
+        zlib: false,
+        https: false,
+        http: false,
+      };
+      
+      config.externals = config.externals || [];
+      config.externals.push({
+        'firebase-admin': 'firebase-admin',
+        'firebase-admin/auth': 'firebase-admin/auth',
+        'firebase-admin/firestore': 'firebase-admin/firestore',
+        'firebase-admin/messaging': 'firebase-admin/messaging',
+      });
+    }
+    return config;
+  },
   env: {
     NEXT_PUBLIC_FIREBASE_API_KEY: 'AIzaSyCRM1IeOKLecBUl10L4XNPU9lWjuf2_TyA',
     NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: 'tradecraft-5c8mv.firebaseapp.com',

@@ -286,7 +286,7 @@ export default function LoginPage() {
           </div>
 
           {/* CTA Buttons */}
-          <div className="space-y-4 animate-fade-in-up delay-700">
+          <div className="space-y-6 animate-fade-in-up delay-700">
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button 
                 size="lg" 
@@ -297,7 +297,7 @@ export default function LoginPage() {
                 }}
               >
                 <Calendar className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
-                Plan Your Event
+                Client Login
                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </Button>
               <VendorInquiryDialog>
@@ -310,16 +310,23 @@ export default function LoginPage() {
                   Join as Vendor
                 </Button>
               </VendorInquiryDialog>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="w-full sm:w-auto text-lg h-14 px-8 bg-white/10 border-white/30 text-white hover:bg-white hover:text-primary backdrop-blur-sm transition-all duration-300 group"
+                onClick={() => {
+                  setUserType('vendor');
+                  setShowLoginForm(true);
+                }}
+              >
+                <Briefcase className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                Vendor Login
+              </Button>
             </div>
             <div className="flex justify-center animate-fade-in-up delay-800">
-              <Button 
-                variant="ghost" 
-                size="lg" 
-                className="text-white/80 hover:text-white hover:bg-white/10 px-6 py-3 text-base font-medium rounded-full backdrop-blur-sm transition-all duration-300"
-                onClick={() => setShowLoginForm(true)}
-              >
-                Already have an account? Sign In
-              </Button>
+              <p className="text-white/80 text-base font-medium">
+                New to Farhetkoun? Choose your path above to get started
+              </p>
             </div>
           </div>
 

@@ -164,11 +164,19 @@ export function SignupModal({ isOpen, onClose, userType = 'client' }: SignupModa
         const result = await createNewUser({...values, phone: completePhoneNumber});
 
         if (result.success) {
-            toast({
-                title: "Account Created! Please Verify Your Email",
-                description: "We've sent a verification link to your email address. Please check your inbox to continue.",
-                duration: 10000,
-            });
+            if (result.verificationSent) {
+                toast({
+                    title: "Account Created! Please Verify Your Email",
+                    description: "We've sent a verification link to your email address. Please check your inbox to continue.",
+                    duration: 10000,
+                });
+            } else {
+                toast({
+                    title: "Account Created Successfully!",
+                    description: "Your account has been created and you can now log in.",
+                    duration: 5000,
+                });
+            }
             onClose();
             router.push('/login'); 
         }

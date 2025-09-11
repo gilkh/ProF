@@ -21,7 +21,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { adminUpdateUserPassword } from '@/lib/actions/notifications';
+import { adminUpdateUserPasswordServerAction } from '@/app/admin/actions';
 import type { UserProfile } from '@/lib/types';
 
 
@@ -56,7 +56,7 @@ export function ResetPasswordDialog({ user, children, disabled = false }: ResetP
 
   const handleSubmit = async (values: z.infer<typeof passwordFormSchema>) => {
     try {
-      await adminUpdateUserPassword(user.id, values.newPassword);
+      await adminUpdateUserPasswordServerAction(user.id, values.newPassword);
       toast({
         title: 'Password Updated',
         description: `The password for ${user.email} has been changed successfully.`,
