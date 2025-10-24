@@ -7,6 +7,64 @@
    - Network:      http://26.26.87.44:9002
 
  ✓ Starting...
- ✓ Compiled middleware in 156ms
- ✓ Ready in 1641ms
+ ✓ Compiled middleware in 152ms
+ ✓ Ready in 1657ms
+ ⚠ Webpack is configured while Turbopack is not, which may cause problems.
+ ⚠ See instructions if you need to configure Turbopack:
+  https://nextjs.org/docs/app/api-reference/next-config-js/turbo
+
+ ○ Compiling /vendor/bookings ...
+ ✓ Compiled /vendor/bookings in 3.4s
+ ⨯ ./src/components/vendor-availability-calendar.tsx:37:1
+Module not found: Can't resolve 'sonner'
+[0m [90m 35 |[39m } [36mfrom[39m [32m'@/lib/types'[39m[33m;[39m[0m
+[0m [90m 36 |[39m [36mimport[39m { [33mClock[39m[33m,[39m [33mEye[39m[33m,[39m [33mEyeOff[39m[33m,[39m [33mPlus[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mSettings[39m[33m,[39m [33mCalendar[39m [36mas[39m [33mCalendarIcon[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 37 |[39m [36mimport[39m { toast } [36mfrom[39m [32m'sonner'[39m[33m;[39m[0m
+[0m [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 38 |[39m[0m
+[0m [90m 39 |[39m [36mconst[39m [33mCalendar[39m [33m=[39m dynamic(() [33m=>[39m [36mimport[39m([32m'@/components/ui/calendar'[39m)[33m.[39mthen(mod [33m=>[39m mod[33m.[39m[33mCalendar[39m)[33m,[39m {[0m
+[0m [90m 40 |[39m   loading[33m:[39m () [33m=>[39m [33m<[39m[33mSkeleton[39m className[33m=[39m[32m"h-[250px] w-[280px]"[39m [33m/[39m[33m>[39m[33m,[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ⨯ ./src/components/vendor-availability-calendar.tsx:37:1
+Module not found: Can't resolve 'sonner'
+[0m [90m 35 |[39m } [36mfrom[39m [32m'@/lib/types'[39m[33m;[39m[0m
+[0m [90m 36 |[39m [36mimport[39m { [33mClock[39m[33m,[39m [33mEye[39m[33m,[39m [33mEyeOff[39m[33m,[39m [33mPlus[39m[33m,[39m [33mTrash2[39m[33m,[39m [33mSettings[39m[33m,[39m [33mCalendar[39m [36mas[39m [33mCalendarIcon[39m } [36mfrom[39m [32m'lucide-react'[39m[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 37 |[39m [36mimport[39m { toast } [36mfrom[39m [32m'sonner'[39m[33m;[39m[0m
+[0m [90m    |[39m [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 38 |[39m[0m
+[0m [90m 39 |[39m [36mconst[39m [33mCalendar[39m [33m=[39m dynamic(() [33m=>[39m [36mimport[39m([32m'@/components/ui/calendar'[39m)[33m.[39mthen(mod [33m=>[39m mod[33m.[39m[33mCalendar[39m)[33m,[39m {[0m
+[0m [90m 40 |[39m   loading[33m:[39m () [33m=>[39m [33m<[39m[33mSkeleton[39m className[33m=[39m[32m"h-[250px] w-[280px]"[39m [33m/[39m[33m>[39m[33m,[39m[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 764ms
+ GET /vendor/bookings 500 in 3405ms
+ GET /vendor/bookings 500 in 4402ms
+ ✓ Compiled /favicon.ico in 341ms
+ GET /favicon.ico 500 in 366ms
+ ✓ Compiled in 986ms
+ ✓ Compiled /vendor/bookings in 41ms
+ GET /vendor/bookings 200 in 501ms
+ GET /favicon.ico?favicon.56766c03.ico 200 in 324ms
+ ○ Compiling /_not-found/page ...
+ ✓ Compiled /_not-found/page in 707ms
+ GET /firebase-messaging-sw.js 404 in 794ms
+ GET /vendor/bookings 200 in 105ms
+ GET /favicon.ico?favicon.56766c03.ico 200 in 275ms
+ GET /firebase-messaging-sw.js 404 in 76ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1173ms
+ GET /?ide_webview_request_time=1761328690656 200 in 1385ms
+ GET /@vite/client 404 in 111ms
+ GET /?ide_webview_request_time=1761328690656 200 in 219ms
+ GET /@vite/client 404 in 87ms
 ^C^C
