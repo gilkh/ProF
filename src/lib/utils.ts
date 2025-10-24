@@ -1,7 +1,7 @@
 
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import type { ServiceOrOffer, ForwardedItem, QuoteRequest, LineItem } from "./types";
+import type { ServiceOrOffer, ForwardedItem, QuoteRequest, LineItem, QuestionTemplateMessage } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -48,6 +48,49 @@ export function parseForwardedMessage(text: string): ForwardedItem | null {
     const data = JSON.parse(text);
     if (data && data.isForwarded === true) {
       return data as ForwardedItem;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+export function formatQuestionTemplateMessage(templateMessage: QuestionTemplateMessage): string {
+  return JSON.stringify({
+    ...templateMessage,
+    isQuestionTemplate: true
+  });
+}
+
+export function parseQuestionTemplateMessage(text: string): QuestionTemplateMessage | null {
+  try {
+    const data = JSON.parse(text);
+    if (data && data.isQuestionTemplate === true) {
+      return data as QuestionTemplateMessage;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+export function formatTemplateResponseMessage(responseId: string, templateTitle: string, clientName: string, responseCount: number, submittedAt: Date): string {
+  return JSON.stringify({
+    type: 'template_response',
+    responseId,
+    templateTitle,
+    clientName,
+    responseCount,
+    submittedAt,
+    isTemplateResponse: true
+  });
+}
+
+export function parseTemplateResponseMessage(text: string): any | null {
+  try {
+    const data = JSON.parse(text);
+    if (data && data.isTemplateResponse === true) {
+      return data;
     }
     return null;
   } catch (e) {

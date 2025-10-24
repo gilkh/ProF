@@ -5,15 +5,19 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { 
   getPendingVerificationAccounts, 
   getEmailVerificationSetting, 
-  updateEmailVerificationSetting 
+  updateEmailVerificationSetting,
+  completeEmailVerification,
+  resendVerificationEmail 
 } from '@/lib/services';
 import { adminVerifyAccountServerAction } from '@/app/admin/actions';
-import { CheckCircle, XCircle, Mail, User, Calendar, Settings } from 'lucide-react';
+import { CheckCircle, XCircle, Mail, User, Calendar, Settings, RefreshCw } from 'lucide-react';
 import { format } from 'date-fns';
+import { Label } from '@/components/ui/label';
 
 interface PendingAccount {
   id: string;

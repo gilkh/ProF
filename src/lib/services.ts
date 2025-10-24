@@ -1,7 +1,7 @@
 
 import { collection, doc, getDoc, setDoc, updateDoc, getDocs, query, where, DocumentData, deleteDoc, addDoc, serverTimestamp, orderBy, onSnapshot, limit, increment, writeBatch, runTransaction, arrayUnion, arrayRemove, getCountFromServer, deleteField } from 'firebase/firestore';
 import { db, auth } from './firebase';
-import type { UserProfile, VendorProfile, Service, Offer, QuoteRequest, Booking, SavedTimeline, ServiceOrOffer, VendorCode, Chat, ChatMessage, UpgradeRequest, VendorAnalyticsData, PlatformAnalytics, Review, LineItem, VendorInquiry, AppNotification } from './types';
+import type { UserProfile, VendorProfile, Service, Offer, QuoteRequest, Booking, SavedTimeline, ServiceOrOffer, VendorCode, Chat, ChatMessage, UpgradeRequest, VendorAnalyticsData, PlatformAnalytics, Review, LineItem, VendorInquiry, AppNotification, QuestionTemplate, TemplateResponse, QuestionTemplateMessage, TimeSlot, DayAvailability, ServiceAvailability, VendorAvailability, AvailabilitySlot } from './types';
 import { formatItemForMessage, formatQuoteResponseMessage, parseForwardedMessage } from './utils';
 import { dataCache, cacheKeys } from './cache';
 import { subMonths, format, startOfMonth, addDays, addMonths, startOfDay, subDays } from 'date-fns';
@@ -105,11 +105,21 @@ export async function createNewUser(data: {
 
 export async function signInUser(email: string, password?: string): Promise<{ success: boolean, role?: 'client' | 'vendor' | 'admin'; userId?: string; message?: string }> {
     
+    // Handle admin sign-in through Firebase Auth
     if (email.toLowerCase() === 'admin@tradecraft.com') {
-        if (password === 'admin@tradecraft.com') {
-            return { success: true, role: 'admin', userId: 'admin-user' };
-        } else {
-            return { success: false, message: "Invalid admin credentials." };
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password!);
+            const user = userCredential.user;
+            return { success: true, role: 'admin', userId: user.uid };
+        } catch (e: any) {
+            console.error("Admin Firebase Auth sign in error:", e);
+            if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
+                return { success: false, message: 'Invalid admin credentials.' };
+            }
+            if (e.code === 'auth/too-many-requests') {
+                return { success: false, message: 'Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.' };
+            }
+            return { success: false, message: 'An unknown error occurred during admin sign-in.'};
         }
     }
     
@@ -1922,4 +1932,394 @@ export async function toggleAutoScrollImages(userId: string): Promise<boolean> {
         console.error('Error toggling auto-scroll images:', error);
         throw error;
     }
+}
+
+// Question Template Functions
+
+export async function createQuestionTemplate(template: Omit<QuestionTemplate, 'id' | 'createdAt' | 'updatedAt' | 'usageCount'>): Promise<string> {
+    const templateData = {
+        ...template,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        usageCount: 0,
+    };
+    
+    const docRef = await addDoc(collection(db, 'questionTemplates'), templateData);
+    return docRef.id;
+}
+
+export async function getQuestionTemplates(vendorId: string): Promise<QuestionTemplate[]> {
+    const q = query(
+        collection(db, 'questionTemplates'),
+        where('vendorId', '==', vendorId),
+        orderBy('updatedAt', 'desc')
+    );
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        createdAt: toDate(doc.data().createdAt),
+        updatedAt: toDate(doc.data().updatedAt),
+    })) as QuestionTemplate[];
+}
+
+export async function updateQuestionTemplate(templateId: string, updates: Partial<Omit<QuestionTemplate, 'id' | 'createdAt' | 'vendorId' | 'usageCount'>>): Promise<void> {
+    const templateRef = doc(db, 'questionTemplates', templateId);
+    await updateDoc(templateRef, {
+        ...updates,
+        updatedAt: serverTimestamp(),
+    });
+}
+
+export async function deleteQuestionTemplate(templateId: string): Promise<void> {
+    await deleteDoc(doc(db, 'questionTemplates', templateId));
+}
+
+export async function duplicateQuestionTemplate(templateId: string, newTitle: string): Promise<string> {
+    const templateDoc = await getDoc(doc(db, 'questionTemplates', templateId));
+    if (!templateDoc.exists()) {
+        throw new Error('Template not found');
+    }
+    
+    const templateData = templateDoc.data() as QuestionTemplate;
+    const duplicatedTemplate = {
+        ...templateData,
+        title: newTitle,
+        isActive: false, // New duplicated templates start as inactive
+    };
+    
+    // Remove fields that shouldn't be copied
+    delete (duplicatedTemplate as any).id;
+    delete (duplicatedTemplate as any).createdAt;
+    delete (duplicatedTemplate as any).updatedAt;
+    delete (duplicatedTemplate as any).usageCount;
+    
+    return await createQuestionTemplate(duplicatedTemplate);
+}
+
+export async function sendQuestionTemplate(templateId: string, chatId: string, vendorId: string, clientId: string): Promise<void> {
+    const templateDoc = await getDoc(doc(db, 'questionTemplates', templateId));
+    if (!templateDoc.exists()) {
+        throw new Error('Template not found');
+    }
+    
+    const template = { id: templateId, ...templateDoc.data() } as QuestionTemplate;
+    
+    // Get vendor profile for name
+    const vendorProfile = await getVendorProfile(vendorId);
+    if (!vendorProfile) {
+        throw new Error('Vendor not found');
+    }
+    
+    const templateMessage: QuestionTemplateMessage = {
+        type: 'question_template',
+        templateId: templateId,
+        templateTitle: template.title,
+        vendorId: vendorId,
+        vendorName: vendorProfile.businessName || `${vendorProfile.firstName} ${vendorProfile.lastName}`,
+        questions: template.questions,
+        sentAt: new Date(),
+        isQuestionTemplate: true, // Add this flag for proper parsing
+    };
+    
+    await runTransaction(db, async (transaction) => {
+        const chatRef = doc(db, 'chats', chatId);
+        const messageRef = doc(collection(db, 'chats', chatId, 'messages'));
+        const templateRef = doc(db, 'questionTemplates', templateId);
+        
+        // Add message to chat
+        transaction.set(messageRef, {
+            senderId: vendorId,
+            text: JSON.stringify(templateMessage),
+            timestamp: serverTimestamp(),
+        });
+        
+        // Update chat last message
+        transaction.update(chatRef, {
+            lastMessage: `📋 Question Template: ${template.title}`,
+            lastMessageSenderId: vendorId,
+            lastMessageTimestamp: serverTimestamp(),
+            [`unreadCount.${clientId}`]: increment(1),
+        });
+        
+        // Increment template usage count
+        transaction.update(templateRef, {
+            usageCount: increment(1),
+        });
+    });
+}
+
+export async function submitTemplateResponse(responseData: {
+    templateId: string;
+    chatId: string;
+    clientId: string;
+    vendorId: string;
+    responses: Array<{ questionId: string; answer: any }>;
+}): Promise<void> {
+    const { templateId, chatId, clientId, vendorId, responses } = responseData;
+    
+    // Get template and client profile for response message
+    const [templateDoc, clientProfile] = await Promise.all([
+        getDoc(doc(db, 'questionTemplates', templateId)),
+        getUserProfile(clientId),
+    ]);
+    
+    if (!templateDoc.exists()) {
+        throw new Error('Template not found');
+    }
+    if (!clientProfile) {
+        throw new Error('Client not found');
+    }
+    
+    const template = { id: templateId, ...templateDoc.data() } as QuestionTemplate;
+    
+    const templateResponse: TemplateResponse = {
+        templateId,
+        templateTitle: template.title,
+        clientId,
+        clientName: `${clientProfile.firstName} ${clientProfile.lastName}`,
+        vendorId,
+        responses,
+        submittedAt: new Date(),
+    };
+    
+    await runTransaction(db, async (transaction) => {
+        const chatRef = doc(db, 'chats', chatId);
+        const messageRef = doc(collection(db, 'chats', chatId, 'messages'));
+        const responseRef = doc(collection(db, 'templateResponses'));
+        
+        // Store the response
+        transaction.set(responseRef, {
+            ...templateResponse,
+            submittedAt: serverTimestamp(),
+        });
+        
+        // Add response message to chat
+        transaction.set(messageRef, {
+            senderId: clientId,
+            text: JSON.stringify({
+                type: 'template_response',
+                responseId: responseRef.id,
+                templateTitle: template.title,
+                clientName: `${clientProfile.firstName} ${clientProfile.lastName}`,
+                responseCount: responses.length,
+                submittedAt: new Date(),
+                questions: template.questions,
+                responses: responses,
+                isTemplateResponse: true, // Add this flag for proper parsing
+            }),
+            timestamp: serverTimestamp(),
+        });
+        
+        // Update chat last message
+        transaction.update(chatRef, {
+            lastMessage: `✅ Completed: ${template.title}`,
+            lastMessageSenderId: clientId,
+            lastMessageTimestamp: serverTimestamp(),
+            [`unreadCount.${vendorId}`]: increment(1),
+        });
+    });
+}
+
+export async function getTemplateResponses(vendorId: string): Promise<TemplateResponse[]> {
+    const q = query(
+        collection(db, 'templateResponses'),
+        where('vendorId', '==', vendorId),
+        orderBy('submittedAt', 'desc')
+    );
+    
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        submittedAt: toDate(doc.data().submittedAt),
+    })) as TemplateResponse[];
+}
+
+export async function getTemplateResponse(responseId: string): Promise<TemplateResponse | null> {
+    const responseDoc = await getDoc(doc(db, 'templateResponses', responseId));
+    if (!responseDoc.exists()) {
+        return null;
+    }
+    
+    return {
+        id: responseDoc.id,
+        ...responseDoc.data(),
+        submittedAt: toDate(responseDoc.data().submittedAt),
+    } as TemplateResponse;
+}
+
+// Vendor Availability Management Functions
+
+export async function getVendorAvailability(vendorId: string): Promise<VendorAvailability | null> {
+    const availabilityDoc = await getDoc(doc(db, 'vendorAvailability', vendorId));
+    if (!availabilityDoc.exists()) {
+        return null;
+    }
+    
+    const data = availabilityDoc.data();
+    return {
+        id: availabilityDoc.id,
+        vendorId: data.vendorId,
+        services: data.services || {},
+        updatedAt: toDate(data.updatedAt),
+    } as VendorAvailability;
+}
+
+export async function updateVendorAvailability(vendorId: string, availability: Partial<VendorAvailability>): Promise<void> {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await setDoc(availabilityRef, {
+        ...availability,
+        vendorId,
+        updatedAt: serverTimestamp(),
+    }, { merge: true });
+}
+
+export async function updateServiceAvailability(vendorId: string, serviceId: string, availability: ServiceAvailability): Promise<void> {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await updateDoc(availabilityRef, {
+        [`services.${serviceId}`]: availability,
+        updatedAt: serverTimestamp(),
+    });
+}
+
+export async function toggleServiceVisibility(vendorId: string, serviceId: string, visible: boolean): Promise<void> {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await updateDoc(availabilityRef, {
+        [`services.${serviceId}.visible`]: visible,
+        updatedAt: serverTimestamp(),
+    });
+}
+
+export async function setDayAvailability(vendorId: string, serviceId: string, date: string, dayAvailability: DayAvailability): Promise<void> {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await updateDoc(availabilityRef, {
+        [`services.${serviceId}.dates.${date}`]: dayAvailability,
+        updatedAt: serverTimestamp(),
+    });
+}
+
+export async function addTimeSlot(vendorId: string, serviceId: string, date: string, timeSlot: TimeSlot): Promise<void> {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await updateDoc(availabilityRef, {
+        [`services.${serviceId}.dates.${date}.timeSlots`]: arrayUnion(timeSlot),
+        updatedAt: serverTimestamp(),
+    });
+}
+
+export async function removeTimeSlot(vendorId: string, serviceId: string, date: string, timeSlot: TimeSlot): Promise<void> {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await updateDoc(availabilityRef, {
+        [`services.${serviceId}.dates.${date}.timeSlots`]: arrayRemove(timeSlot),
+        updatedAt: serverTimestamp(),
+    });
+}
+
+export async function getAvailableSlots(vendorId: string, serviceId: string, date: string): Promise<AvailabilitySlot[]> {
+    const availability = await getVendorAvailability(vendorId);
+    if (!availability || !availability.services[serviceId]) {
+        return [];
+    }
+
+    const serviceAvailability = availability.services[serviceId];
+    if (!serviceAvailability.visible) {
+        return [];
+    }
+
+    const dayAvailability = serviceAvailability.dates[date];
+    if (!dayAvailability || dayAvailability.fullyBooked) {
+        return [];
+    }
+
+    // Get existing bookings for this date and service
+    const bookingsQuery = query(
+        collection(db, 'bookings'),
+        where('vendorId', '==', vendorId),
+        where('serviceId', '==', serviceId),
+        where('date', '==', date)
+    );
+    const bookingsSnapshot = await getDocs(bookingsQuery);
+    const bookedTimes = bookingsSnapshot.docs.map(doc => doc.data().time);
+
+    // Filter out booked time slots
+    const availableSlots: AvailabilitySlot[] = dayAvailability.timeSlots
+        .filter(slot => !bookedTimes.includes(slot.startTime))
+        .map(slot => ({
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+            available: true,
+            price: slot.price,
+        }));
+
+    return availableSlots;
+}
+
+export async function bookTimeSlot(vendorId: string, serviceId: string, date: string, time: string, userId: string): Promise<boolean> {
+    try {
+        // Check if slot is still available
+        const availableSlots = await getAvailableSlots(vendorId, serviceId, date);
+        const slotAvailable = availableSlots.some(slot => slot.startTime === time);
+        
+        if (!slotAvailable) {
+            return false;
+        }
+
+        // Create the booking
+        await createBooking({
+            userId,
+            vendorId,
+            serviceId,
+            date,
+            time,
+            status: 'confirmed',
+            title: 'Service Booking',
+            description: 'Booking confirmed',
+        });
+
+        return true;
+    } catch (error) {
+        console.error('Error booking time slot:', error);
+        return false;
+    }
+}
+
+export function subscribeToVendorAvailability(vendorId: string, callback: (availability: VendorAvailability | null) => void): () => void {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    
+    return onSnapshot(availabilityRef, (doc) => {
+        if (doc.exists()) {
+            const data = doc.data();
+            callback({
+                id: doc.id,
+                vendorId: data.vendorId,
+                services: data.services || {},
+                updatedAt: toDate(data.updatedAt),
+            } as VendorAvailability);
+        } else {
+            callback(null);
+        }
+    });
+}
+
+export function subscribeToServiceAvailability(vendorId: string, serviceId: string, callback: (slots: AvailabilitySlot[]) => void): () => void {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    
+    return onSnapshot(availabilityRef, async (doc) => {
+        if (doc.exists()) {
+            const data = doc.data();
+            const serviceAvailability = data.services?.[serviceId];
+            
+            if (serviceAvailability && serviceAvailability.visible) {
+                // Get current date's availability
+                const today = format(new Date(), 'yyyy-MM-dd');
+                const slots = await getAvailableSlots(vendorId, serviceId, today);
+                callback(slots);
+            } else {
+                callback([]);
+            }
+        } else {
+            callback([]);
+        }
+    });
 }

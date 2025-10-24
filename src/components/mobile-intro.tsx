@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/logo';
 import { ChevronDown, Sparkles, Users, Calendar, Star, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import Image from 'next/image';
 
 interface MobileIntroProps {
   onComplete: () => void;
@@ -21,7 +20,6 @@ export function MobileIntro({ onComplete }: MobileIntroProps) {
       title: "Welcome to Farhetkoun",
       subtitle: "Lebanon's Premier Event Platform",
       description: "Turn your dreams into unforgettable celebrations with Lebanon's finest event professionals",
-      image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2070&auto=format&fit=crop",
       gradient: "from-purple-600 via-pink-600 to-red-600"
     },
     {
@@ -29,7 +27,6 @@ export function MobileIntro({ onComplete }: MobileIntroProps) {
       title: "Everything You Need",
       subtitle: "All in One Place",
       description: "From venues to vendors, photography to catering - we connect you with verified professionals for every aspect of your event",
-      image: "https://images.unsplash.com/photo-1527529482837-4698179dc6ce?q=80&w=2070&auto=format&fit=crop",
       gradient: "from-blue-600 via-purple-600 to-pink-600"
     }
   ];
@@ -58,19 +55,12 @@ export function MobileIntro({ onComplete }: MobileIntroProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black overflow-hidden">
+    <div className="fixed inset-0 z-50 bg-black overflow-hidden min-h-screen">
       {/* Current Slide */}
-      <div className="relative h-full w-full transition-transform duration-500 ease-in-out">
+      <div className="relative h-full w-full min-h-screen transition-transform duration-500 ease-in-out">
         <div className="absolute inset-0">
-          <Image 
-            src={slides[currentSlide].image}
-            alt="Event celebration"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className={`absolute inset-0 bg-gradient-to-br ${slides[currentSlide].gradient} opacity-80`}></div>
-          <div className="absolute inset-0 bg-black/30"></div>
+          <div className={`absolute inset-0 bg-gradient-to-br ${slides[currentSlide].gradient}`}></div>
+          <div className="absolute inset-0 bg-black/20"></div>
         </div>
 
         {/* Content */}

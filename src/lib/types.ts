@@ -324,3 +324,116 @@ export interface AppNotification {
     read: boolean;
     createdAt: Date;
 }
+
+// Question Template Types
+export type QuestionType = 'text' | 'number' | 'select' | 'multiselect' | 'date' | 'boolean';
+
+export interface QuestionOption {
+    id: string;
+    label: string;
+    value: string;
+}
+
+export interface TemplateQuestion {
+    id: string;
+    question: string;
+    type: QuestionType;
+    required: boolean;
+    options?: QuestionOption[]; // For select/multiselect questions
+    placeholder?: string;
+    helpText?: string;
+}
+
+export interface QuestionTemplate {
+    id: string;
+    vendorId: string;
+    title: string;
+    description: string;
+    questions: TemplateQuestion[];
+    createdAt: Date;
+    updatedAt: Date;
+    isActive: boolean;
+    usageCount: number;
+}
+
+export interface QuestionResponse {
+    questionId: string;
+    answer: string | number | boolean | string[];
+}
+
+export interface TemplateResponse {
+    id: string;
+    templateId: string;
+    chatId: string;
+    clientId: string;
+    vendorId: string;
+    responses: QuestionResponse[];
+    submittedAt: Date;
+    status: 'pending' | 'submitted' | 'viewed';
+}
+
+export interface QuestionTemplateMessage {
+    isQuestionTemplate: true;
+    templateId: string;
+    templateTitle: string;
+    vendorId: string;
+    vendorName: string;
+    questions: TemplateQuestion[];
+    responseId?: string; // Set when client submits response
+}
+
+// Availability Management Types
+export interface TimeSlot {
+    id: string;
+    startTime: string; // Format: "HH:mm" (e.g., "09:00")
+    endTime: string;   // Format: "HH:mm" (e.g., "17:00")
+    isAvailable: boolean;
+    maxBookings?: number; // For services that can handle multiple bookings per slot
+    currentBookings?: number;
+}
+
+export interface DayAvailability {
+    date: string; // Format: "yyyy-MM-dd"
+    isFullyBooked: boolean;
+    isAvailable: boolean; // Vendor can mark entire day as unavailable
+    timeSlots: TimeSlot[];
+    notes?: string; // Optional notes for the day
+}
+
+export interface ServiceAvailability {
+    serviceId: string;
+    serviceTitle: string;
+    serviceType: ServiceType;
+    isVisible: boolean; // Toggle visibility to users
+    isActive: boolean;  // Whether accepting bookings
+    defaultTimeSlots: TimeSlot[]; // Default time slots for this service
+    customAvailability: DayAvailability[]; // Custom availability overrides
+    advanceBookingDays: number; // How many days in advance bookings are allowed
+    bufferTime: number; // Minutes between bookings
+    maxDailyBookings?: number; // Maximum bookings per day for this service
+}
+
+export interface VendorAvailability {
+    id: string;
+    vendorId: string;
+    serviceAvailabilities: ServiceAvailability[];
+    globalSettings: {
+        timezone: string;
+        workingDays: number[]; // 0-6 (Sunday-Saturday)
+        defaultWorkingHours: {
+            start: string; // "HH:mm"
+            end: string;   // "HH:mm"
+        };
+        holidayDates: string[]; // Array of "yyyy-MM-dd" dates
+        emergencyContact?: string;
+    };
+    lastUpdated: Date;
+}
+
+export interface AvailabilitySlot {
+    date: string;
+    timeSlot: TimeSlot;
+    serviceId: string;
+    isBookable: boolean;
+    conflictReason?: string; // Why it's not bookable if applicable
+}

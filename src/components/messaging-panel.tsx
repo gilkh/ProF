@@ -7,19 +7,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { Search, SendHorizonal, Loader2, FileQuestion, ArrowLeft, Calendar, Users, Phone, PencilRuler, Check, CreditCard, ShieldCheck } from 'lucide-react';
+import { Search, SendHorizonal, Loader2, FileQuestion, ArrowLeft, Calendar, Users, Phone, PencilRuler, Check, CreditCard, ShieldCheck, FileText } from 'lucide-react';
 import React, { useEffect, useState, useRef } from 'react';
-import type { Chat, ChatMessage, ForwardedItem, LineItem, QuoteRequest, ChatParticipant } from '@/lib/types';
+import type { Chat, ChatMessage, ForwardedItem, LineItem, QuoteRequest, ChatParticipant, QuestionTemplateMessage } from '@/lib/types';
 import { getChatsForUser, getMessagesForChat, sendMessage, markChatAsRead, approveQuote } from '@/lib/services';
 import { useAuth } from '@/hooks/use-auth';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Skeleton } from './ui/skeleton';
-import { parseForwardedMessage } from '@/lib/utils';
+import { parseForwardedMessage, parseQuestionTemplateMessage, parseTemplateResponseMessage } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
+import { QuestionTemplateBubble, TemplateResponseBubble } from './question-template-bubble';
+import { QuestionTemplateSelector } from './question-template-selector';
 
 function ForwardedItemBubble({ item, timestamp }: { item: ForwardedItem, timestamp?: Date }) {
     if (!item.itemId || !item.itemType) {
@@ -163,6 +165,38 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
     const sender = chat?.participants.find(p => p.id === message.senderId);
     const otherParticipant = chat?.participants.find(p => p.id !== (role === 'admin' ? sender?.id : userId));
 
+    // Check for question template message
+    const templateMessage = parseQuestionTemplateMessage(message.text);
+    if (templateMessage) {
+        return (
+            <div className={cn('flex w-full', isOwnMessage ? 'justify-end' : 'justify-start')}>
+                <QuestionTemplateBubble 
+                    templateMessage={templateMessage}
+                    chatId={chat?.id || ''}
+                    isOwnMessage={isOwnMessage}
+                    timestamp={message.timestamp}
+                    onResponseSubmitted={() => {
+                        // Messages will update automatically via real-time listener
+                        // No need to refresh the page
+                    }}
+                />
+            </div>
+        );
+    }
+
+    // Check for template response message
+    const responseMessage = parseTemplateResponseMessage(message.text);
+    if (responseMessage) {
+        return (
+            <div className={cn('flex w-full', isOwnMessage ? 'justify-end' : 'justify-start')}>
+                <TemplateResponseBubble 
+                    responseData={responseMessage}
+                    isOwnMessage={isOwnMessage}
+                    timestamp={message.timestamp}
+                />
+            </div>
+        );
+    }
 
     const forwardedItem = parseForwardedMessage(message.text);
 
@@ -267,7 +301,10 @@ export function MessagingPanel() {
   // Auto-scroll to bottom of messages
   useEffect(() => {
     if (scrollAreaRef.current) {
-      scrollAreaRef.current.scrollTo({ top: scrollAreaRef.current.scrollHeight, behavior: 'smooth' });
+      const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
+      if (scrollElement) {
+        scrollElement.scrollTo({ top: scrollElement.scrollHeight, behavior: 'smooth' });
+      }
     }
   }, [messages]);
 
@@ -444,17 +481,36 @@ export function MessagingPanel() {
                     {isAdmin ? (
                          <div className="text-center text-sm text-muted-foreground">Admin view is read-only</div>
                     ) : (
-                        <form onSubmit={handleSendMessage} className="relative">
-                            <Input 
-                                placeholder="Type a message..." 
-                                className="pr-12"
-                                value={newMessage}
-                                onChange={(e) => setNewMessage(e.target.value)}
-                            />
-                            <Button type="submit" size="icon" className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2">
-                                <SendHorizonal className="h-4 w-4" />
-                            </Button>
-                        </form>
+                        <div className="space-y-3">
+                            {role === 'vendor' && (
+                                <div className="flex justify-between items-center">
+                                    <Link href="/vendor/templates">
+                                        <Button variant="outline" size="sm">
+                                            <FileText className="h-4 w-4 mr-2" />
+                                            Manage Templates
+                                        </Button>
+                                    </Link>
+                                    <QuestionTemplateSelector 
+                                        chatId={selectedChat.id}
+                                        clientId={getOtherParticipant(selectedChat)?.id}
+                                        onTemplateSent={() => {
+                                            // Refresh messages to show the sent template
+                                        }}
+                                    />
+                                </div>
+                            )}
+                            <form onSubmit={handleSendMessage} className="relative">
+                                <Input 
+                                    placeholder="Type a message..." 
+                                    className="pr-12"
+                                    value={newMessage}
+                                    onChange={(e) => setNewMessage(e.target.value)}
+                                />
+                                <Button type="submit" size="icon" className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2">
+                                    <SendHorizonal className="h-4 w-4" />
+                                </Button>
+                            </form>
+                        </div>
                     )}
                 </div>
                 </>

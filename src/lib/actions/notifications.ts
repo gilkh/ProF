@@ -55,12 +55,39 @@ export async function sendPushNotification(target: 'all' | 'clients' | 'vendors'
 
 
 export async function adminUpdateUserPassword(userId: string, newPassword: string): Promise<void> {
+    console.log(`🔍 adminUpdateUserPassword called with userId: "${userId}"`);
+    console.log(`🔍 Password length: ${newPassword.length} characters`);
+    
     try {
+        // First, let's verify the user exists in Firebase Auth
+        const userRecord = await adminAuth.getUser(userId);
+        console.log(`✅ Firebase Auth user found:`, {
+            uid: userRecord.uid,
+            email: userRecord.email,
+            emailVerified: userRecord.emailVerified,
+            disabled: userRecord.disabled,
+            providerData: userRecord.providerData.map(p => ({ providerId: p.providerId, uid: p.uid }))
+        });
+        
+        // Now update the password
         await adminAuth.updateUser(userId, {
             password: newPassword,
         });
-    } catch(error) {
-        console.error(`Failed to update password for user ${userId}`, error);
-        throw new Error("Could not update the user's password via Admin SDK.");
+        console.log(`✅ Successfully updated password for Firebase Auth user ${userId} (${userRecord.email})`);
+    } catch (error: any) {
+        console.error(`❌ Failed to update password for user ${userId}:`, error);
+        
+        // Provide more specific error messages based on the error type
+        if (error.code === 'auth/user-not-found') {
+            throw new Error(`User not found in Firebase Auth. The user ID "${userId}" may be incorrect or the user may have been deleted.`);
+        } else if (error.code === 'auth/insufficient-permission') {
+            throw new Error("Insufficient permissions. Please check Firebase Admin SDK configuration and IAM roles.");
+        } else if (error.message?.includes('PERMISSION_DENIED')) {
+            throw new Error("Permission denied. Please ensure the Firebase service account has the required IAM roles: Service Usage Consumer, Firebase Admin SDK Administrator Service Agent.");
+        } else if (error.message?.includes('serviceusage.services.use')) {
+            throw new Error("Missing Service Usage Consumer role. Please add 'roles/serviceusage.serviceUsageConsumer' to your Firebase service account in Google Cloud Console IAM.");
+        }
+        
+        throw new Error(`Could not update the user's password: ${error.message || 'Unknown error'}`);
     }
 }

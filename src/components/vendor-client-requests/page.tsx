@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { getVendorQuoteRequests, respondToQuote } from '@/lib/services';
 import type { QuoteRequest } from '@/lib/types';
-import { Check, Edit, Loader2, PlusCircle, Trash2 } from 'lucide-react';
+import { Check, Edit, FileText, Loader2, PlusCircle, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
@@ -151,12 +151,20 @@ function RespondToQuoteDialog({ request, onQuoteSent }: { request: QuoteRequest,
             <Textarea id="response" name="response" rows={3} placeholder="Add a personal message or terms..." />
           </div>
         </form>
-        <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button type="submit" form={`respond-form-${request.id}`} disabled={isSending}>
-            {isSending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Send Quote
+        <DialogFooter className="flex justify-between">
+          <Button variant="outline" asChild>
+            <a href="/vendor/templates" target="_blank" rel="noopener noreferrer">
+              <FileText className="mr-2 h-4 w-4" />
+              Use Templates
+            </a>
           </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button type="submit" form={`respond-form-${request.id}`} disabled={isSending}>
+              {isSending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Send Quote
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -56,7 +56,7 @@ export function ResetPasswordDialog({ user, children, disabled = false }: ResetP
 
   const handleSubmit = async (values: z.infer<typeof passwordFormSchema>) => {
     try {
-      await adminUpdateUserPasswordServerAction(user.id, values.newPassword);
+      const result = await adminUpdateUserPasswordServerAction(user.id, values.newPassword);
       toast({
         title: 'Password Updated',
         description: `The password for ${user.email} has been changed successfully.`,

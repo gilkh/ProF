@@ -7,9 +7,14 @@ import { getMessaging } from 'firebase-admin/messaging';
 // Check if admin is already initialized to prevent re-initialization errors
 if (!admin.apps.length) {
   try {
+    // Initialize Firebase Admin with service account credentials
     admin.initializeApp({
-      // In a real production environment, you would use service account credentials.
-      // For this environment, we can rely on Application Default Credentials.
+      credential: admin.credential.cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      }),
+      projectId: process.env.FIREBASE_PROJECT_ID,
     });
   } catch (error) {
     console.error('Firebase Admin Initialization Error:', error);
