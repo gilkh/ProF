@@ -40,6 +40,7 @@ auth = getAuth(app);
 // For this environment, we will ensure we are connecting to the production services.
 // This specifically resolves the auth/configuration-not-found error.
 if (typeof window !== 'undefined') {
+  console.log('[firebase] client bundle loaded, setting persistence');
   window.firebaseAuth = auth;
 
   // Ensure auth state persists across app restarts (especially in embedded webviews)
