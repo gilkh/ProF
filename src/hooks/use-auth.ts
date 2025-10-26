@@ -29,7 +29,10 @@ export function useAuth(): AuthInfo {
         user: null,
     });
 
-    useEffect(() => {
+useEffect(() => {
+       if (typeof window !== 'undefined') {
+           (window as typeof window & { firebaseAuth?: typeof auth }).firebaseAuth = auth;
+       }
        const unsubscribe = onAuthStateChanged(auth, (user) => {
            if (user) {
                 // Prioritize localStorage immediately after login, fallback to cookie
