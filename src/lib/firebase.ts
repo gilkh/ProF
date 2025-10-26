@@ -20,6 +20,12 @@ let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
 
+declare global {
+  interface Window {
+    firebaseAuth?: Auth;
+  }
+}
+
 // Initialize Firebase only once
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
@@ -34,6 +40,8 @@ auth = getAuth(app);
 // For this environment, we will ensure we are connecting to the production services.
 // This specifically resolves the auth/configuration-not-found error.
 if (typeof window !== 'undefined') {
+  window.firebaseAuth = auth;
+
   // Ensure auth state persists across app restarts (especially in embedded webviews)
   void setPersistence(auth, browserLocalPersistence).catch((error) => {
     console.warn('Failed to set Firebase auth persistence', error);
