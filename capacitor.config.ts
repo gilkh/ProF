@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   appName: 'Farhetkoun',
   webDir: 'out',
   server: {
-    url: 'https://pro-f-git-feat-test-gilbertgilbertkhoueiry-gmailcoms-projects.vercel.app',
+    url: 'https://pro-f-ecru.vercel.app',
     cleartext: false
   },
 };
