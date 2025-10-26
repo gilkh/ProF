@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { signInUser, signInWithGoogle } from '@/lib/services';
 import { useToast } from '@/hooks/use-toast';
-import { logout } from '@/hooks/use-auth';
+import { useAuth, logout } from '@/hooks/use-auth';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { VendorInquiryDialog } from '@/components/vendor-inquiry-dialog';
@@ -130,6 +130,19 @@ export default function LoginPage() {
   const { toast } = useToast();
   const { translations } = useLanguage();
   const t = translations.loginPage;
+  const { userId, role, isLoading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && userId) {
+      if (role === 'client') {
+        router.replace('/client/home');
+      } else if (role === 'vendor') {
+        router.replace('/vendor/home');
+      } else if (role === 'admin') {
+        router.replace('/admin/home');
+      }
+    }
+  }, [authLoading, userId, role, router]);
 
   useEffect(() => {
     // Add scroll animations
