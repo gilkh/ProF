@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/logo';
-import { Briefcase, CalendarCheck, FileText, Search, ShieldCheck, Sparkles, Loader2, PartyPopper, Heart, Star, Users, Calendar, Camera, Music, Utensils, MapPin, ArrowRight, Play, ChevronDown } from 'lucide-react';
+import { Briefcase, CalendarCheck, FileText, Search, ShieldCheck, Sparkles, Loader2, PartyPopper, Heart, Star, Users, Calendar, Camera, Music, Utensils, MapPin, ArrowRight, Play, ChevronDown, Phone, Mail, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { signInUser, signInWithGoogle, getLoginButtonSettings } from '@/lib/services';
@@ -368,7 +368,35 @@ export default function LoginPage() {
                 Vendor Login
               </Button>
             </div>
-            <div className="flex justify-center animate-fade-in-up delay-800">
+
+            {/* Minimalist Contact Section */}
+            <div className="flex justify-center animate-fade-in-up delay-700 mt-6">
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 text-white/70 text-sm">
+                <span className="font-medium">Contact Us:</span>
+                <div className="flex items-center gap-6">
+                  <a 
+                    href="https://wa.me/96171574162" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 hover:text-white transition-colors group"
+                  >
+                    <Phone className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span>+961 71 574 162</span>
+                  </a>
+                  <a 
+                    href="https://wa.me/96170686933" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 hover:text-white transition-colors group"
+                  >
+                    <Phone className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span>+961 70 686 933</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-center animate-fade-in-up delay-800 mt-3">
               <p className="text-white/80 text-base font-medium">
                 New to Farhetkoun? Choose your path above to get started
               </p>
@@ -624,12 +652,69 @@ export default function LoginPage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              </ul>
+              <h4 className="font-semibold mb-4">Contact Us</h4>
+              <div className="space-y-4">
+                {/* First Number - Both Call and WhatsApp */}
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-400 font-medium">+961 71 574 162</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 group">
+                      <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                        <Phone className="w-4 h-4 text-primary" />
+                      </div>
+                      <a href="tel:+96171574162" className="text-white hover:text-primary transition-colors text-sm">
+                        Call
+                      </a>
+                    </div>
+                    <span className="text-gray-600">|</span>
+                    <div className="flex items-center gap-2 group">
+                      <div className="flex items-center justify-center w-8 h-8 bg-green-500/10 rounded-lg group-hover:bg-green-500/20 transition-colors">
+                        <MessageCircle className="w-4 h-4 text-green-500" />
+                      </div>
+                      <a href="https://wa.me/96171574162" target="_blank" rel="noopener noreferrer" className="text-white hover:text-green-500 transition-colors text-sm">
+                        WhatsApp
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Second Number - Both Call and WhatsApp */}
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-400 font-medium">+961 70 686 933</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 group">
+                      <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                        <Phone className="w-4 h-4 text-primary" />
+                      </div>
+                      <a href="tel:+96170686933" className="text-white hover:text-primary transition-colors text-sm">
+                        Call
+                      </a>
+                    </div>
+                    <span className="text-gray-600">|</span>
+                    <div className="flex items-center gap-2 group">
+                      <div className="flex items-center justify-center w-8 h-8 bg-green-500/10 rounded-lg group-hover:bg-green-500/20 transition-colors">
+                        <MessageCircle className="w-4 h-4 text-green-500" />
+                      </div>
+                      <a href="https://wa.me/96170686933" target="_blank" rel="noopener noreferrer" className="text-white hover:text-green-500 transition-colors text-sm">
+                        WhatsApp
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Email */}
+                <div className="flex items-center gap-3 group">
+                  <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                    <Mail className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400">Email</p>
+                    <a href="mailto:support@farhetkoun.com" className="text-white hover:text-primary transition-colors font-medium">
+                      support@farhetkoun.com
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">
