@@ -116,7 +116,7 @@ const categories = [
     { name: 'Venues', image: 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?q=80&w=2070&auto=format&fit=crop', hint: 'wedding reception', icon: <MapPin className="w-5 h-5" /> },
     { name: 'Catering', image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1974&auto=format&fit=crop', hint: 'catering food', icon: <Utensils className="w-5 h-5" /> },
     { name: 'Entertainment', image: 'https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?q=80&w=2070&auto=format&fit=crop', hint: 'DJ party', icon: <Music className="w-5 h-5" /> },
-    { name: 'Photography', image: 'https://images.unsplash.com/photo-1504196658116-b9a55a850f39?q=80&w=2070&auto=format&fit=crop', hint: 'birthday photography', icon: <Camera className="w-5 h-5" /> },
+    { name: 'Photography', image: '/Event-Photography.jpg', hint: 'birthday photography', icon: <Camera className="w-5 h-5" /> },
     { name: 'Decoration', image: 'https://images.unsplash.com/photo-1522158637959-30385a09e0da?q=80&w=2070&auto=format&fit=crop', hint: 'wedding decor', icon: <Sparkles className="w-5 h-5" /> }
 ]
 
@@ -271,10 +271,7 @@ export default function LoginPage() {
           {/* Logo and Brand */}
           <div className="flex flex-col items-center mb-8 animate-fade-in">
             <div className="flex items-center gap-3 mb-4">
-              <Logo className="h-12 w-12 sm:h-16 sm:w-16 text-white drop-shadow-lg" />
-              <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tighter bg-gradient-to-r from-white to-white/80 bg-clip-text">
-                Farhetkoun
-              </h1>
+              <Logo className="text-white drop-shadow-lg" />
             </div>
             <Badge variant="secondary" className="bg-white/10 text-white border-white/20 backdrop-blur-sm">
               ✨ Lebanon's Premier Event Platform
@@ -569,8 +566,7 @@ export default function LoginPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Logo className="h-8 w-8" />
-                <span className="text-xl font-bold">Farhetkoun</span>
+                <Logo />
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Lebanon's premier event planning platform, connecting you with the best vendors and venues.
