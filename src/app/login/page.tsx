@@ -10,7 +10,7 @@ import { Logo } from '@/components/logo';
 import { Briefcase, CalendarCheck, FileText, Search, ShieldCheck, Sparkles, Loader2, PartyPopper, Heart, Star, Users, Calendar, Camera, Music, Utensils, MapPin, ArrowRight, Play, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { signInUser, signInWithGoogle } from '@/lib/services';
+import { signInUser, signInWithGoogle, getLoginButtonSettings } from '@/lib/services';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth, logout } from '@/hooks/use-auth';
 import Image from 'next/image';
@@ -127,6 +127,8 @@ export default function LoginPage() {
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showSignupForm, setShowSignupForm] = useState(false);
   const [userType, setUserType] = useState<'client' | 'vendor'>('client');
+  const [clientLoginEnabled, setClientLoginEnabled] = useState(true);
+  const [vendorLoginEnabled, setVendorLoginEnabled] = useState(true);
   const { toast } = useToast();
   const { translations } = useLanguage();
   const t = translations.loginPage;
@@ -143,6 +145,21 @@ export default function LoginPage() {
       }
     }
   }, [authLoading, userId, role, router]);
+
+  useEffect(() => {
+    loadLoginButtonSettings();
+  }, []);
+
+  const loadLoginButtonSettings = async () => {
+    try {
+      const settings = await getLoginButtonSettings();
+      setClientLoginEnabled(settings.clientLoginEnabled);
+      setVendorLoginEnabled(settings.vendorLoginEnabled);
+    } catch (error) {
+      console.error('Failed to load login button settings:', error);
+      // Keep default values (true) if loading fails
+    }
+  };
 
   useEffect(() => {
     // Add scroll animations
@@ -300,36 +317,54 @@ export default function LoginPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button 
                 size="lg" 
-                className="w-full sm:w-auto text-lg h-14 px-8 bg-primary hover:bg-primary/90 shadow-2xl hover:shadow-primary/25 transition-all duration-300 group"
+                disabled={!clientLoginEnabled}
+                className={`w-full sm:w-auto text-lg h-14 px-8 shadow-2xl transition-all duration-300 group ${
+                  clientLoginEnabled 
+                    ? 'bg-primary hover:bg-primary/90 hover:shadow-primary/25' 
+                    : 'bg-gray-400 cursor-not-allowed opacity-50'
+                }`}
                 onClick={() => {
-                  setUserType('client');
-                  setShowLoginForm(true);
+                  if (clientLoginEnabled) {
+                    setUserType('client');
+                    setShowLoginForm(true);
+                  }
                 }}
               >
-                <Calendar className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                <Calendar className={`w-5 h-5 mr-2 transition-transform ${clientLoginEnabled ? 'group-hover:scale-110' : ''}`} />
                 Client Login
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className={`w-4 h-4 ml-2 transition-transform ${clientLoginEnabled ? 'group-hover:translate-x-1' : ''}`} />
               </Button>
               <VendorInquiryDialog>
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="w-full sm:w-auto text-lg h-14 px-8 bg-white/10 border-white/30 text-white hover:bg-white hover:text-primary backdrop-blur-sm transition-all duration-300 group"
+                  className={`w-full sm:w-auto text-lg h-14 px-8 backdrop-blur-sm transition-all duration-300 group ${
+                    (!clientLoginEnabled && !vendorLoginEnabled)
+                      ? 'bg-primary hover:bg-primary/90 text-white border-primary shadow-2xl hover:shadow-primary/25'
+                      : 'bg-white/10 border-white/30 text-white hover:bg-white hover:text-primary'
+                  }`}
                 >
-                  <Briefcase className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  <Briefcase className={`w-5 h-5 mr-2 transition-transform group-hover:scale-110`} />
                   Join as Vendor
                 </Button>
               </VendorInquiryDialog>
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="w-full sm:w-auto text-lg h-14 px-8 bg-white/10 border-white/30 text-white hover:bg-white hover:text-primary backdrop-blur-sm transition-all duration-300 group"
+                disabled={!vendorLoginEnabled}
+                className={`w-full sm:w-auto text-lg h-14 px-8 backdrop-blur-sm transition-all duration-300 group ${
+                  vendorLoginEnabled 
+                    ? 'bg-white/10 border-white/30 text-white hover:bg-white hover:text-primary' 
+                    : 'bg-gray-400/20 border-gray-400/30 text-gray-400 cursor-not-allowed opacity-50'
+                }`}
                 onClick={() => {
-                  setUserType('vendor');
-                  setShowLoginForm(true);
+                  if (vendorLoginEnabled) {
+                    setUserType('vendor');
+                    setShowLoginForm(true);
+                  }
                 }}
               >
-                <Briefcase className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                <Briefcase className={`w-5 h-5 mr-2 transition-transform ${vendorLoginEnabled ? 'group-hover:scale-110' : ''}`} />
                 Vendor Login
               </Button>
             </div>

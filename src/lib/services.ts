@@ -1890,6 +1890,63 @@ export async function getAutoApprovalSetting(): Promise<boolean> {
     }
 }
 
+// Login button toggle functions
+export async function updateLoginButtonSettings(clientLoginEnabled: boolean, vendorLoginEnabled: boolean) {
+    const settingsRef = doc(db, 'adminSettings', 'loginButtons');
+    await setDoc(settingsRef, {
+        clientLoginEnabled: clientLoginEnabled,
+        vendorLoginEnabled: vendorLoginEnabled,
+        updatedAt: serverTimestamp()
+    }, { merge: true });
+}
+
+export async function getLoginButtonSettings(): Promise<{ clientLoginEnabled: boolean; vendorLoginEnabled: boolean }> {
+    try {
+        const settingsRef = doc(db, 'adminSettings', 'loginButtons');
+        const settingsSnap = await getDoc(settingsRef);
+        
+        if (settingsSnap.exists()) {
+            const data = settingsSnap.data();
+            return {
+                clientLoginEnabled: data.clientLoginEnabled ?? true,
+                vendorLoginEnabled: data.vendorLoginEnabled ?? true
+            };
+        }
+        return { clientLoginEnabled: true, vendorLoginEnabled: true };
+    } catch (error) {
+        console.error('Error fetching login button settings:', error);
+        return { clientLoginEnabled: true, vendorLoginEnabled: true };
+    }
+}
+
+// Mobile Intro Settings Management
+export async function updateMobileIntroSetting(enabled: boolean) {
+    try {
+        const settingsRef = doc(db, 'adminSettings', 'mobileIntro');
+        await setDoc(settingsRef, { enabled }, { merge: true });
+    } catch (error) {
+        console.error('Error updating mobile intro setting:', error);
+        throw error;
+    }
+}
+
+export async function getMobileIntroSetting(): Promise<boolean> {
+    try {
+        const settingsRef = doc(db, 'adminSettings', 'mobileIntro');
+        const settingsSnap = await getDoc(settingsRef);
+        
+        if (settingsSnap.exists()) {
+            const data = settingsSnap.data();
+            return data.enabled ?? true;
+        }
+        
+        return true; // Default to enabled
+    } catch (error) {
+        console.error('Error fetching mobile intro setting:', error);
+        return true; // Default to enabled on error
+    }
+}
+
 // User Settings Management
 export async function updateUserSettings(userId: string, settings: Partial<UserProfile['settings']>) {
     try {

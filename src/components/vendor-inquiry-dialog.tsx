@@ -59,7 +59,9 @@ export function VendorInquiryDialog({ children }: VendorInquiryDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger asChild>
+        {children}
+      </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Become a Farhetkoun Vendor</DialogTitle>
