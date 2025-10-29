@@ -298,7 +298,7 @@ export default function LoginPage() {
           {/* Main Headline */}
           <div className="mb-8 animate-fade-in-up delay-300">
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight">
-              Turn Your <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Dreams</span><br className="sm:hidden" /> Into Reality
+              Hearts match,<span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"> sure.</span><br className="sm:hidden" /> But so do our plans.
             </h2>
             <p className="text-lg sm:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
               From intimate gatherings to grand celebrations, we connect you with Lebanon's finest event professionals
@@ -307,7 +307,7 @@ export default function LoginPage() {
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-6 mb-12 animate-fade-in-up delay-500">
-            <StatCard icon={<Users className="w-5 h-5" />} number="500+" label="Vendors" />
+            <StatCard icon={<Users className="w-5 h-5" />} number="50+" label="Vendors" />
             <StatCard icon={<Calendar className="w-5 h-5" />} number="2K+" label="Events" />
             <StatCard icon={<Star className="w-5 h-5" />} number="4.9" label="Rating" />
           </div>
@@ -473,7 +473,7 @@ export default function LoginPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 animate-on-scroll">
             <FeatureCard 
                 icon={<Sparkles className="w-7 h-7" />}
-                title="AI-Powered Planning"
+                title="Powered Planning"
                 description="Smart recommendations and automated timeline generation to make planning effortless"
             />
             <FeatureCard 
