@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/logo';
-import { Briefcase, CalendarCheck, FileText, Search, ShieldCheck, Sparkles, Loader2, PartyPopper, Heart, Star, Users, Calendar, Camera, Music, Utensils, MapPin, ArrowRight, Play, ChevronDown, Phone, Mail, MessageCircle } from 'lucide-react';
+import { Briefcase, CalendarCheck, FileText, Search, ShieldCheck, Sparkles, Loader2, PartyPopper, Heart, Star, Users, Calendar, Camera, Music, Utensils, MapPin, ArrowRight, Play, ChevronDown, Phone, Mail, MessageCircle, Gem, Crown, Car, Plane } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { signInUser, signInWithGoogle, getLoginButtonSettings } from '@/lib/services';
@@ -114,10 +114,13 @@ const eventTypes = [
 
 const categories = [
     { name: 'Venues', image: 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?q=80&w=2070&auto=format&fit=crop', hint: 'wedding reception', icon: <MapPin className="w-5 h-5" /> },
-    { name: 'Catering', image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1974&auto=format&fit=crop', hint: 'catering food', icon: <Utensils className="w-5 h-5" /> },
+    { name: 'Catering', image: '/catering.jpg', hint: 'catering food', icon: <Utensils className="w-5 h-5" /> },
     { name: 'Entertainment', image: 'https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?q=80&w=2070&auto=format&fit=crop', hint: 'DJ party', icon: <Music className="w-5 h-5" /> },
     { name: 'Photography', image: '/Event-Photography.jpg', hint: 'birthday photography', icon: <Camera className="w-5 h-5" /> },
-    { name: 'Decoration', image: 'https://images.unsplash.com/photo-1522158637959-30385a09e0da?q=80&w=2070&auto=format&fit=crop', hint: 'wedding decor', icon: <Sparkles className="w-5 h-5" /> }
+    { name: 'Decoration', image: '/decoration.jpg', hint: 'wedding decor', icon: <Sparkles className="w-5 h-5" /> },
+    { name: 'Jewelry', image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop', hint: 'wedding jewelry', icon: <Gem className="w-5 h-5" /> },
+    { name: 'Formal Wear', image: '/form.webp', hint: 'Premium formal attire and elegant dresses for special occasions', icon: <Crown className="w-5 h-5" /> },
+    { name: 'Transportation', image: '/transp.jpg', hint: 'Luxury cars and premium transportation for events', icon: <Car className="w-5 h-5" /> }
 ]
 
 export default function LoginPage() {
