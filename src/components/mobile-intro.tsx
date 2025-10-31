@@ -17,7 +17,7 @@ export function MobileIntro({ onComplete }: MobileIntroProps) {
   const slides = [
     {
       id: 1,
-      title: "Welcome to Farhetkoun",
+      title: "Welcome to Our Platform",
       subtitle: "Lebanon's Premier Event Platform",
       description: "Turn your dreams into unforgettable celebrations with Lebanon's finest event professionals",
       gradient: "from-purple-600 via-pink-600 to-red-600"
@@ -68,7 +68,7 @@ export function MobileIntro({ onComplete }: MobileIntroProps) {
           {/* Header */}
           <div className="flex justify-between items-center pt-4">
             <div className="flex items-center gap-2">
-              <Logo className="h-8 w-8 text-white" />
+              <Logo className="text-white" />
               <span className="text-lg font-bold">Farhetkoun</span>
             </div>
             <Button 

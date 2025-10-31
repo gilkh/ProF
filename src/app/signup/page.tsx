@@ -267,10 +267,7 @@ export default function SignupPage() {
      <div className="w-full min-h-screen bg-background flex items-center justify-center p-4">
         <div className="w-full max-w-md space-y-6">
              <Link href="/login" className="flex justify-center items-center gap-4 mb-6">
-                <Logo className="h-12 w-12 text-primary" />
-                <h1 className="text-4xl font-extrabold tracking-tighter text-foreground">
-                    Farhetkoun
-                </h1>
+                <Logo className="text-primary" />
             </Link>
            <Card className="shadow-2xl">
                 <CardHeader className="text-center">

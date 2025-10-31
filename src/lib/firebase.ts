@@ -1,7 +1,7 @@
 
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 import { getFirestore, Firestore } from 'firebase/firestore';
-import { getAuth, Auth, connectAuthEmulator } from 'firebase/auth';
+import { getAuth, Auth, connectAuthEmulator, setPersistence, browserLocalPersistence } from 'firebase/auth';
 // REMOVED: import admin from 'firebase-admin';
 
 // Check if admin is already initialized to prevent re-initialization errors
@@ -20,6 +20,12 @@ let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
 
+declare global {
+  interface Window {
+    firebaseAuth?: Auth;
+  }
+}
+
 // Initialize Firebase only once
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
@@ -33,6 +39,16 @@ auth = getAuth(app);
 // In a real development environment, you might connect to emulators.
 // For this environment, we will ensure we are connecting to the production services.
 // This specifically resolves the auth/configuration-not-found error.
+if (typeof window !== 'undefined') {
+  console.log('[firebase] client bundle loaded, setting persistence');
+  window.firebaseAuth = auth;
+
+  // Ensure auth state persists across app restarts (especially in embedded webviews)
+  void setPersistence(auth, browserLocalPersistence).catch((error) => {
+    console.warn('Failed to set Firebase auth persistence', error);
+  });
+}
+
 if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
     // This is a check to make sure we're not in a local emulator environment.
     // By providing the production auth object without connecting to an emulator,

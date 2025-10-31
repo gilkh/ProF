@@ -136,11 +136,10 @@ export function AppHeader() {
   );
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+    <header className="sticky top-0 z-40 flex h-24 items-center gap-4 border-b bg-background px-4 md:px-6">
       <div className="flex items-center gap-6">
-        <Link href={isVendor ? "/vendor/home" : "/client/home"} className="flex items-center gap-2 font-semibold">
-            <Logo className="h-6 w-6 text-primary" />
-            <span className="hidden sm:inline-block">Farhetkoun</span>
+        <Link href={isVendor ? "/vendor/home" : "/client/home"} className="flex items-center gap-2 font-semibold text-lg">
+            <Logo className="text-primary" width={350} height={350} src="/logo1.png" />
         </Link>
         
         {/* Desktop Navigation */}
@@ -150,7 +149,7 @@ export function AppHeader() {
                 key={href}
                 href={href}
                 className={cn(
-                'flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary',
+                'flex items-center gap-2 text-lg font-medium transition-colors hover:text-primary',
                 pathname === href ? 'text-primary' : 'text-muted-foreground'
                 )}
                 {...props}

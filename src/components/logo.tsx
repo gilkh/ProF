@@ -1,8 +1,24 @@
-import { PartyPopper } from 'lucide-react';
-import type { SVGProps } from 'react';
+import Image from 'next/image';
+import type { HTMLAttributes } from 'react';
 
-export function Logo(props: SVGProps<SVGSVGElement>) {
+interface LogoProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className'> {
+  className?: string;
+  width?: number;
+  height?: number;
+  src?: string;
+}
+
+export function Logo({ className, width = 600, height = 600, src = "/logo.png", ...props }: LogoProps) {
   return (
-    <PartyPopper {...props} />
+    <div className={className} {...props}>
+      <Image
+        src={src}
+        alt="Company Logo"
+        width={width}
+        height={height}
+        className="object-contain"
+        priority
+      />
+    </div>
   );
 }

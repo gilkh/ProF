@@ -7,12 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
 import { Logo } from '@/components/logo';
-import { Briefcase, CalendarCheck, FileText, Search, ShieldCheck, Sparkles, Loader2, PartyPopper, Heart, Star, Users, Calendar, Camera, Music, Utensils, MapPin, ArrowRight, Play, ChevronDown } from 'lucide-react';
+import { Briefcase, CalendarCheck, FileText, Search, ShieldCheck, Sparkles, Loader2, PartyPopper, Heart, Star, Users, Calendar, Camera, Music, Utensils, MapPin, ArrowRight, Play, ChevronDown, Phone, Mail, MessageCircle, Gem, Crown, Car, Plane } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { signInUser, signInWithGoogle } from '@/lib/services';
+import { signInUser, signInWithGoogle, getLoginButtonSettings } from '@/lib/services';
 import { useToast } from '@/hooks/use-toast';
-import { logout } from '@/hooks/use-auth';
+import { useAuth, logout } from '@/hooks/use-auth';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { VendorInquiryDialog } from '@/components/vendor-inquiry-dialog';
@@ -114,10 +114,13 @@ const eventTypes = [
 
 const categories = [
     { name: 'Venues', image: 'https://images.unsplash.com/photo-1527529482837-4698179dc6ce?q=80&w=2070&auto=format&fit=crop', hint: 'wedding reception', icon: <MapPin className="w-5 h-5" /> },
-    { name: 'Catering', image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1974&auto=format&fit=crop', hint: 'catering food', icon: <Utensils className="w-5 h-5" /> },
+    { name: 'Catering', image: '/catering.jpg', hint: 'catering food', icon: <Utensils className="w-5 h-5" /> },
     { name: 'Entertainment', image: 'https://images.unsplash.com/photo-1524368535928-5b5e00ddc76b?q=80&w=2070&auto=format&fit=crop', hint: 'DJ party', icon: <Music className="w-5 h-5" /> },
-    { name: 'Photography', image: 'https://images.unsplash.com/photo-1504196658116-b9a55a850f39?q=80&w=2070&auto=format&fit=crop', hint: 'birthday photography', icon: <Camera className="w-5 h-5" /> },
-    { name: 'Decoration', image: 'https://images.unsplash.com/photo-1522158637959-30385a09e0da?q=80&w=2070&auto=format&fit=crop', hint: 'wedding decor', icon: <Sparkles className="w-5 h-5" /> }
+    { name: 'Photography', image: '/Event-Photography.jpg', hint: 'birthday photography', icon: <Camera className="w-5 h-5" /> },
+    { name: 'Decoration', image: '/decoration.jpg', hint: 'wedding decor', icon: <Sparkles className="w-5 h-5" /> },
+    { name: 'Jewelry', image: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?q=80&w=2070&auto=format&fit=crop', hint: 'wedding jewelry', icon: <Gem className="w-5 h-5" /> },
+    { name: 'Formal Wear', image: '/form.webp', hint: 'Premium formal attire and elegant dresses for special occasions', icon: <Crown className="w-5 h-5" /> },
+    { name: 'Transportation', image: '/transp.jpg', hint: 'Luxury cars and premium transportation for events', icon: <Car className="w-5 h-5" /> }
 ]
 
 export default function LoginPage() {
@@ -127,9 +130,42 @@ export default function LoginPage() {
   const [showLoginForm, setShowLoginForm] = useState(false);
   const [showSignupForm, setShowSignupForm] = useState(false);
   const [userType, setUserType] = useState<'client' | 'vendor'>('client');
+  const [clientLoginEnabled, setClientLoginEnabled] = useState(true);
+  const [vendorLoginEnabled, setVendorLoginEnabled] = useState(true);
+  const [isLoginSettingsLoading, setIsLoginSettingsLoading] = useState(true);
   const { toast } = useToast();
   const { translations } = useLanguage();
   const t = translations.loginPage;
+  const { userId, role, isLoading: authLoading } = useAuth();
+
+  useEffect(() => {
+    if (!authLoading && userId) {
+      if (role === 'client') {
+        router.replace('/client/home');
+      } else if (role === 'vendor') {
+        router.replace('/vendor/home');
+      } else if (role === 'admin') {
+        router.replace('/admin/home');
+      }
+    }
+  }, [authLoading, userId, role, router]);
+
+  useEffect(() => {
+    loadLoginButtonSettings();
+  }, []);
+
+  const loadLoginButtonSettings = async () => {
+    try {
+      const settings = await getLoginButtonSettings();
+      setClientLoginEnabled(settings.clientLoginEnabled);
+      setVendorLoginEnabled(settings.vendorLoginEnabled);
+      setIsLoginSettingsLoading(false);
+    } catch (error) {
+      console.error('Failed to load login button settings:', error);
+      // Keep default values (true) if loading fails
+      setIsLoginSettingsLoading(false);
+    }
+  };
 
   useEffect(() => {
     // Add scroll animations
@@ -159,8 +195,6 @@ export default function LoginPage() {
           router.push('/client/home');
       } else if (role === 'vendor') {
           router.push('/vendor/home');
-      } else if (role === 'admin') {
-          router.push('/admin/home');
       }
   };
 
@@ -170,6 +204,17 @@ export default function LoginPage() {
       try {
           const result = await signInWithGoogle();
           if (result.success) {
+            // Block admin sessions on the normal login page
+            if (result.role === 'admin') {
+              toast({
+                title: 'Admin Login Restricted',
+                description: 'Please use your dedicated admin login URL.',
+                variant: 'destructive',
+              });
+              // Ensure no session is established
+              logout();
+              return;
+            }
             localStorage.setItem('userId', result.userId);
             localStorage.setItem('role', result.role);
             setCookie('role', result.role, 7);
@@ -201,6 +246,17 @@ export default function LoginPage() {
         const result = await signInUser(email, password);
 
         if (result.success) {
+            // Block admin sessions on the normal login page
+            if (result.role === 'admin') {
+                toast({
+                    title: 'Admin Login Restricted',
+                    description: 'Please use your dedicated admin login URL.',
+                    variant: 'destructive',
+                });
+                // Ensure no session is established
+                logout();
+                return;
+            }
             // Save user info to localStorage to simulate a session
             localStorage.setItem('userId', result.userId);
             localStorage.setItem('role', result.role);
@@ -258,10 +314,7 @@ export default function LoginPage() {
           {/* Logo and Brand */}
           <div className="flex flex-col items-center mb-8 animate-fade-in">
             <div className="flex items-center gap-3 mb-4">
-              <Logo className="h-12 w-12 sm:h-16 sm:w-16 text-white drop-shadow-lg" />
-              <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tighter bg-gradient-to-r from-white to-white/80 bg-clip-text">
-                Farhetkoun
-              </h1>
+              <Logo className="text-white drop-shadow-lg" />
             </div>
             <Badge variant="secondary" className="bg-white/10 text-white border-white/20 backdrop-blur-sm">
               ✨ Lebanon's Premier Event Platform
@@ -271,7 +324,7 @@ export default function LoginPage() {
           {/* Main Headline */}
           <div className="mb-8 animate-fade-in-up delay-300">
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight">
-              Turn Your <span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">Dreams</span><br className="sm:hidden" /> Into Reality
+              Hearts match,<span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"> sure.</span><br className="sm:hidden" /> But so do our plans.
             </h2>
             <p className="text-lg sm:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
               From intimate gatherings to grand celebrations, we connect you with Lebanon's finest event professionals
@@ -280,7 +333,7 @@ export default function LoginPage() {
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-6 mb-12 animate-fade-in-up delay-500">
-            <StatCard icon={<Users className="w-5 h-5" />} number="500+" label="Vendors" />
+            <StatCard icon={<Users className="w-5 h-5" />} number="50+" label="Vendors" />
             <StatCard icon={<Calendar className="w-5 h-5" />} number="2K+" label="Events" />
             <StatCard icon={<Star className="w-5 h-5" />} number="4.9" label="Rating" />
           </div>
@@ -290,40 +343,86 @@ export default function LoginPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button 
                 size="lg" 
-                className="w-full sm:w-auto text-lg h-14 px-8 bg-primary hover:bg-primary/90 shadow-2xl hover:shadow-primary/25 transition-all duration-300 group"
+                disabled={isLoginSettingsLoading || !clientLoginEnabled}
+                className={`w-full sm:w-auto text-lg h-14 px-8 shadow-2xl transition-all duration-300 group ${
+                  (!isLoginSettingsLoading && clientLoginEnabled)
+                    ? 'bg-primary hover:bg-primary/90 hover:shadow-primary/25' 
+                    : 'bg-gray-400 cursor-not-allowed opacity-50'
+                }`}
                 onClick={() => {
-                  setUserType('client');
-                  setShowLoginForm(true);
+                  if (!isLoginSettingsLoading && clientLoginEnabled) {
+                    setUserType('client');
+                    setShowLoginForm(true);
+                  }
                 }}
               >
-                <Calendar className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                <Calendar className={`w-5 h-5 mr-2 transition-transform ${clientLoginEnabled ? 'group-hover:scale-110' : ''}`} />
                 Client Login
-                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className={`w-4 h-4 ml-2 transition-transform ${clientLoginEnabled ? 'group-hover:translate-x-1' : ''}`} />
               </Button>
               <VendorInquiryDialog>
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="w-full sm:w-auto text-lg h-14 px-8 bg-white/10 border-white/30 text-white hover:bg-white hover:text-primary backdrop-blur-sm transition-all duration-300 group"
+                  className={`w-full sm:w-auto text-lg h-14 px-8 backdrop-blur-sm transition-all duration-300 group ${
+                    (!clientLoginEnabled && !vendorLoginEnabled)
+                      ? 'bg-primary hover:bg-primary/90 text-white border-primary shadow-2xl hover:shadow-primary/25'
+                      : 'bg-white/10 border-white/30 text-white hover:bg-white hover:text-primary'
+                  }`}
                 >
-                  <Briefcase className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                  <Briefcase className={`w-5 h-5 mr-2 transition-transform group-hover:scale-110`} />
                   Join as Vendor
                 </Button>
               </VendorInquiryDialog>
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="w-full sm:w-auto text-lg h-14 px-8 bg-white/10 border-white/30 text-white hover:bg-white hover:text-primary backdrop-blur-sm transition-all duration-300 group"
+                disabled={isLoginSettingsLoading || !vendorLoginEnabled}
+                className={`w-full sm:w-auto text-lg h-14 px-8 backdrop-blur-sm transition-all duration-300 group ${
+                  (!isLoginSettingsLoading && vendorLoginEnabled)
+                    ? 'bg-white/10 border-white/30 text-white hover:bg-white hover:text-primary' 
+                    : 'bg-gray-400/20 border-gray-400/30 text-gray-400 cursor-not-allowed opacity-50'
+                }`}
                 onClick={() => {
-                  setUserType('vendor');
-                  setShowLoginForm(true);
+                  if (!isLoginSettingsLoading && vendorLoginEnabled) {
+                    setUserType('vendor');
+                    setShowLoginForm(true);
+                  }
                 }}
               >
-                <Briefcase className="w-5 h-5 mr-2 group-hover:scale-110 transition-transform" />
+                <Briefcase className={`w-5 h-5 mr-2 transition-transform ${vendorLoginEnabled ? 'group-hover:scale-110' : ''}`} />
                 Vendor Login
               </Button>
             </div>
-            <div className="flex justify-center animate-fade-in-up delay-800">
+
+            {/* Minimalist Contact Section */}
+            <div className="flex justify-center animate-fade-in-up delay-700 mt-6">
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 text-white/70 text-sm">
+                <span className="font-medium">Contact Us:</span>
+                <div className="flex items-center gap-6">
+                  <a 
+                    href="https://wa.me/96171574162" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 hover:text-white transition-colors group"
+                  >
+                    <Phone className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span>+961 71 574 162</span>
+                  </a>
+                  <a 
+                    href="https://wa.me/96170686933" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 hover:text-white transition-colors group"
+                  >
+                    <Phone className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                    <span>+961 70 686 933</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-center animate-fade-in-up delay-800 mt-3">
               <p className="text-white/80 text-base font-medium">
                 New to Farhetkoun? Choose your path above to get started
               </p>
@@ -400,7 +499,7 @@ export default function LoginPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 animate-on-scroll">
             <FeatureCard 
                 icon={<Sparkles className="w-7 h-7" />}
-                title="AI-Powered Planning"
+                title="Powered Planning"
                 description="Smart recommendations and automated timeline generation to make planning effortless"
             />
             <FeatureCard 
@@ -556,8 +655,7 @@ export default function LoginPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Logo className="h-8 w-8" />
-                <span className="text-xl font-bold">Farhetkoun</span>
+                <Logo />
               </div>
               <p className="text-gray-400 text-sm leading-relaxed">
                 Lebanon's premier event planning platform, connecting you with the best vendors and venues.
@@ -580,12 +678,69 @@ export default function LoginPage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              </ul>
+              <h4 className="font-semibold mb-4">Contact Us</h4>
+              <div className="space-y-4">
+                {/* First Number - Both Call and WhatsApp */}
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-400 font-medium">+961 71 574 162</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 group">
+                      <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                        <Phone className="w-4 h-4 text-primary" />
+                      </div>
+                      <a href="tel:+96171574162" className="text-white hover:text-primary transition-colors text-sm">
+                        Call
+                      </a>
+                    </div>
+                    <span className="text-gray-600">|</span>
+                    <div className="flex items-center gap-2 group">
+                      <div className="flex items-center justify-center w-8 h-8 bg-green-500/10 rounded-lg group-hover:bg-green-500/20 transition-colors">
+                        <MessageCircle className="w-4 h-4 text-green-500" />
+                      </div>
+                      <a href="https://wa.me/96171574162" target="_blank" rel="noopener noreferrer" className="text-white hover:text-green-500 transition-colors text-sm">
+                        WhatsApp
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Second Number - Both Call and WhatsApp */}
+                <div className="space-y-2">
+                  <p className="text-sm text-gray-400 font-medium">+961 70 686 933</p>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 group">
+                      <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                        <Phone className="w-4 h-4 text-primary" />
+                      </div>
+                      <a href="tel:+96170686933" className="text-white hover:text-primary transition-colors text-sm">
+                        Call
+                      </a>
+                    </div>
+                    <span className="text-gray-600">|</span>
+                    <div className="flex items-center gap-2 group">
+                      <div className="flex items-center justify-center w-8 h-8 bg-green-500/10 rounded-lg group-hover:bg-green-500/20 transition-colors">
+                        <MessageCircle className="w-4 h-4 text-green-500" />
+                      </div>
+                      <a href="https://wa.me/96170686933" target="_blank" rel="noopener noreferrer" className="text-white hover:text-green-500 transition-colors text-sm">
+                        WhatsApp
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Email */}
+                <div className="flex items-center gap-3 group">
+                  <div className="flex items-center justify-center w-8 h-8 bg-primary/10 rounded-lg group-hover:bg-primary/20 transition-colors">
+                    <Mail className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400">Email</p>
+                    <a href="mailto:support@farhetkoun.com" className="text-white hover:text-primary transition-colors font-medium">
+                      support@farhetkoun.com
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
           <div className="border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">

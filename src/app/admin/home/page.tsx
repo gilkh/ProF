@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { generateVendorCode, getVendorCodes, resetAllPasswords, getAllUsersAndVendors, updateVendorTier, deleteVendorCode, updateUserStatus, deleteUser, getUpgradeRequests, getPlatformAnalytics, updateUpgradeRequestStatus, updateVendorVerification, getVendorInquiries, updateVendorInquiryStatus, getPendingListings, updateListingStatus, createNotification, scheduleListingApproval, updateAutoApprovalSetting, getAutoApprovalSetting } from '@/lib/services';
+import { generateVendorCode, getVendorCodes, resetAllPasswords, getAllUsersAndVendors, updateVendorTier, deleteVendorCode, updateUserStatus, deleteUser, getUpgradeRequests, getPlatformAnalytics, updateUpgradeRequestStatus, updateVendorVerification, getVendorInquiries, updateVendorInquiryStatus, getPendingListings, updateListingStatus, createNotification, scheduleListingApproval, updateAutoApprovalSetting, getAutoApprovalSetting, updateLoginButtonSettings, getLoginButtonSettings, updateMobileIntroSetting, getMobileIntroSetting } from '@/lib/services';
 import { sendPushNotificationServerAction } from '@/app/admin/actions';
 import type { VendorCode, UserProfile, VendorProfile, UpgradeRequest, PlatformAnalytics, VendorInquiry, ServiceOrOffer } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -168,11 +168,22 @@ export default function AdminHomePage() {
   // State for automatic approval
   const [autoApprovalEnabled, setAutoApprovalEnabled] = useState(false);
   const [isUpdatingAutoApproval, setIsUpdatingAutoApproval] = useState(false);
+  
+  // State for login button settings
+  const [clientLoginEnabled, setClientLoginEnabled] = useState(true);
+  const [vendorLoginEnabled, setVendorLoginEnabled] = useState(true);
+  const [isUpdatingLoginButtons, setIsUpdatingLoginButtons] = useState(false);
+  
+  // State for mobile intro setting
+  const [mobileIntroEnabled, setMobileIntroEnabled] = useState(true);
+  const [isUpdatingMobileIntro, setIsUpdatingMobileIntro] = useState(false);
 
 
   useEffect(() => {
     fetchData();
     loadAutoApprovalSetting();
+    loadLoginButtonSettings();
+    loadMobileIntroSetting();
   }, []);
 
   const loadAutoApprovalSetting = async () => {
@@ -181,6 +192,16 @@ export default function AdminHomePage() {
       setAutoApprovalEnabled(setting);
     } catch (error) {
       console.error('Failed to load auto-approval setting:', error);
+    }
+  };
+
+  const loadLoginButtonSettings = async () => {
+    try {
+      const settings = await getLoginButtonSettings();
+      setClientLoginEnabled(settings.clientLoginEnabled);
+      setVendorLoginEnabled(settings.vendorLoginEnabled);
+    } catch (error) {
+      console.error('Failed to load login button settings:', error);
     }
   };
 
@@ -372,6 +393,84 @@ export default function AdminHomePage() {
     }
   };
 
+  const handleClientLoginToggle = async (enabled: boolean) => {
+    setIsUpdatingLoginButtons(true);
+    try {
+      await updateLoginButtonSettings(enabled, vendorLoginEnabled);
+      setClientLoginEnabled(enabled);
+      toast({
+        title: "Client Login Updated",
+        description: enabled 
+          ? "Client login button is now enabled on the login page."
+          : "Client login button has been disabled on the login page."
+      });
+    } catch (error) {
+      console.error("Failed to update client login setting", error);
+      toast({ 
+        title: "Update Failed", 
+        description: "Could not update client login setting.", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsUpdatingLoginButtons(false);
+    }
+  };
+
+  const handleVendorLoginToggle = async (enabled: boolean) => {
+    setIsUpdatingLoginButtons(true);
+    try {
+      await updateLoginButtonSettings(clientLoginEnabled, enabled);
+      setVendorLoginEnabled(enabled);
+      toast({
+        title: "Vendor Login Updated",
+        description: enabled 
+          ? "Vendor login button is now enabled on the login page."
+          : "Vendor login button has been disabled on the login page."
+      });
+    } catch (error) {
+      console.error("Failed to update vendor login setting", error);
+      toast({ 
+        title: "Update Failed", 
+        description: "Could not update vendor login setting.", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsUpdatingLoginButtons(false);
+    }
+  };
+
+  const loadMobileIntroSetting = async () => {
+    try {
+      const setting = await getMobileIntroSetting();
+      setMobileIntroEnabled(setting);
+    } catch (error) {
+      console.error('Failed to load mobile intro setting:', error);
+    }
+  };
+
+  const handleMobileIntroToggle = async (enabled: boolean) => {
+    setIsUpdatingMobileIntro(true);
+    try {
+      await updateMobileIntroSetting(enabled);
+      setMobileIntroEnabled(enabled);
+      toast({
+        title: "Mobile Intro Updated",
+        description: enabled 
+          ? "Mobile intro page is now enabled for new users."
+          : "Mobile intro page has been disabled. Users will go directly to login page."
+      });
+    } catch (error) {
+      console.error("Failed to update mobile intro setting", error);
+      toast({ 
+        title: "Update Failed", 
+        description: "Could not update mobile intro setting.", 
+        variant: "destructive" 
+      });
+    } finally {
+      setIsUpdatingMobileIntro(false);
+    }
+  };
+
   const handleScheduledApproval = (listing: ServiceOrOffer, hours: number) => {
     handleListingStatusChange(listing, 'approved', undefined, hours);
   };
@@ -433,6 +532,10 @@ export default function AdminHomePage() {
           </TabsTrigger>
           <TabsTrigger value="notifications">Push Notifications</TabsTrigger>
           <TabsTrigger value="codes">Codes</TabsTrigger>
+          <TabsTrigger value="settings">
+            <Settings className="h-4 w-4 mr-1" />
+            Settings
+          </TabsTrigger>
           <TabsTrigger value="danger">Danger Zone</TabsTrigger>
         </TabsList>
         
@@ -635,42 +738,6 @@ export default function AdminHomePage() {
                     <CardDescription>Review and approve or reject new vendor listings. Click "Review Details" to see full information including media portfolio before making decisions. Approving a listing also approves all its pending media.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {/* Auto-Approval Setting */}
-                    <div className="mb-6 p-4 border rounded-lg bg-muted/20">
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-1">
-                                <h3 className="text-sm font-medium flex items-center gap-2">
-                                    <Settings className="h-4 w-4" />
-                                    Auto-Approval Settings
-                                </h3>
-                                <p className="text-xs text-muted-foreground">
-                                    When enabled, listings will be automatically approved after 12 hours unless manually rejected
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <span className="text-sm text-muted-foreground">
-                                    {autoApprovalEnabled ? 'Enabled' : 'Disabled'}
-                                </span>
-                                <Switch
-                                    checked={autoApprovalEnabled}
-                                    onCheckedChange={handleAutoApprovalToggle}
-                                    disabled={isUpdatingAutoApproval}
-                                />
-                                {isUpdatingAutoApproval && <Loader2 className="h-4 w-4 animate-spin" />}
-                            </div>
-                        </div>
-                        {autoApprovalEnabled && (
-                            <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded text-sm text-green-700">
-                                <div className="flex items-center gap-2">
-                                    <Clock className="h-4 w-4" />
-                                    <span className="font-medium">Auto-approval is active</span>
-                                </div>
-                                <p className="mt-1 text-xs">
-                                    New listings will be automatically approved after 12 hours if not manually reviewed
-                                </p>
-                            </div>
-                        )}
-                    </div>
                      <Table>
                         <TableHeader>
                             <TableRow>
@@ -1068,6 +1135,84 @@ export default function AdminHomePage() {
                 </Table>
                 </CardContent>
             </Card>
+        </TabsContent>
+        
+        <TabsContent value="settings" className="mt-4">
+            <div className="grid gap-4 md:grid-cols-2">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Login Page Settings</CardTitle>
+                        <CardDescription>Control which login buttons are available on the login page and mobile intro behavior.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="client-login-toggle" className="text-base">Client Login Button</Label>
+                                <p className="text-sm text-muted-foreground">
+                                    Allow clients to access the login page
+                                </p>
+                            </div>
+                            <Switch
+                                id="client-login-toggle"
+                                checked={clientLoginEnabled}
+                                onCheckedChange={handleClientLoginToggle}
+                                disabled={isUpdatingLoginButtons}
+                            />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="vendor-login-toggle" className="text-base">Vendor Login Button</Label>
+                                <p className="text-sm text-muted-foreground">
+                                    Allow vendors to access the login page
+                                </p>
+                            </div>
+                            <Switch
+                                id="vendor-login-toggle"
+                                checked={vendorLoginEnabled}
+                                onCheckedChange={handleVendorLoginToggle}
+                                disabled={isUpdatingLoginButtons}
+                            />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="mobile-intro-toggle" className="text-base">Mobile Intro Page</Label>
+                                <p className="text-sm text-muted-foreground">
+                                    Show mobile intro page before login page
+                                </p>
+                            </div>
+                            <Switch
+                                id="mobile-intro-toggle"
+                                checked={mobileIntroEnabled}
+                                onCheckedChange={handleMobileIntroToggle}
+                                disabled={isUpdatingMobileIntro}
+                            />
+                        </div>
+                    </CardContent>
+                </Card>
+                
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Auto-Approval Settings</CardTitle>
+                        <CardDescription>Configure automatic approval for new listings.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex items-center justify-between">
+                            <div className="space-y-0.5">
+                                <Label htmlFor="auto-approval-toggle" className="text-base">Auto-Approval</Label>
+                                <p className="text-sm text-muted-foreground">
+                                    Automatically approve listings after 12 hours
+                                </p>
+                            </div>
+                            <Switch
+                                id="auto-approval-toggle"
+                                checked={autoApprovalEnabled}
+                                onCheckedChange={handleAutoApprovalToggle}
+                                disabled={isUpdatingAutoApproval}
+                            />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </TabsContent>
         
         <TabsContent value="danger" className="mt-4">
