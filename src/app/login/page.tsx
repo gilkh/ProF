@@ -132,6 +132,7 @@ export default function LoginPage() {
   const [userType, setUserType] = useState<'client' | 'vendor'>('client');
   const [clientLoginEnabled, setClientLoginEnabled] = useState(true);
   const [vendorLoginEnabled, setVendorLoginEnabled] = useState(true);
+  const [isLoginSettingsLoading, setIsLoginSettingsLoading] = useState(true);
   const { toast } = useToast();
   const { translations } = useLanguage();
   const t = translations.loginPage;
@@ -158,9 +159,11 @@ export default function LoginPage() {
       const settings = await getLoginButtonSettings();
       setClientLoginEnabled(settings.clientLoginEnabled);
       setVendorLoginEnabled(settings.vendorLoginEnabled);
+      setIsLoginSettingsLoading(false);
     } catch (error) {
       console.error('Failed to load login button settings:', error);
       // Keep default values (true) if loading fails
+      setIsLoginSettingsLoading(false);
     }
   };
 
@@ -192,8 +195,6 @@ export default function LoginPage() {
           router.push('/client/home');
       } else if (role === 'vendor') {
           router.push('/vendor/home');
-      } else if (role === 'admin') {
-          router.push('/admin/home');
       }
   };
 
@@ -203,6 +204,17 @@ export default function LoginPage() {
       try {
           const result = await signInWithGoogle();
           if (result.success) {
+            // Block admin sessions on the normal login page
+            if (result.role === 'admin') {
+              toast({
+                title: 'Admin Login Restricted',
+                description: 'Please use your dedicated admin login URL.',
+                variant: 'destructive',
+              });
+              // Ensure no session is established
+              logout();
+              return;
+            }
             localStorage.setItem('userId', result.userId);
             localStorage.setItem('role', result.role);
             setCookie('role', result.role, 7);
@@ -234,6 +246,17 @@ export default function LoginPage() {
         const result = await signInUser(email, password);
 
         if (result.success) {
+            // Block admin sessions on the normal login page
+            if (result.role === 'admin') {
+                toast({
+                    title: 'Admin Login Restricted',
+                    description: 'Please use your dedicated admin login URL.',
+                    variant: 'destructive',
+                });
+                // Ensure no session is established
+                logout();
+                return;
+            }
             // Save user info to localStorage to simulate a session
             localStorage.setItem('userId', result.userId);
             localStorage.setItem('role', result.role);
@@ -320,14 +343,14 @@ export default function LoginPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
               <Button 
                 size="lg" 
-                disabled={!clientLoginEnabled}
+                disabled={isLoginSettingsLoading || !clientLoginEnabled}
                 className={`w-full sm:w-auto text-lg h-14 px-8 shadow-2xl transition-all duration-300 group ${
-                  clientLoginEnabled 
+                  (!isLoginSettingsLoading && clientLoginEnabled)
                     ? 'bg-primary hover:bg-primary/90 hover:shadow-primary/25' 
                     : 'bg-gray-400 cursor-not-allowed opacity-50'
                 }`}
                 onClick={() => {
-                  if (clientLoginEnabled) {
+                  if (!isLoginSettingsLoading && clientLoginEnabled) {
                     setUserType('client');
                     setShowLoginForm(true);
                   }
@@ -354,14 +377,14 @@ export default function LoginPage() {
               <Button 
                 size="lg" 
                 variant="outline" 
-                disabled={!vendorLoginEnabled}
+                disabled={isLoginSettingsLoading || !vendorLoginEnabled}
                 className={`w-full sm:w-auto text-lg h-14 px-8 backdrop-blur-sm transition-all duration-300 group ${
-                  vendorLoginEnabled 
+                  (!isLoginSettingsLoading && vendorLoginEnabled)
                     ? 'bg-white/10 border-white/30 text-white hover:bg-white hover:text-primary' 
                     : 'bg-gray-400/20 border-gray-400/30 text-gray-400 cursor-not-allowed opacity-50'
                 }`}
                 onClick={() => {
-                  if (vendorLoginEnabled) {
+                  if (!isLoginSettingsLoading && vendorLoginEnabled) {
                     setUserType('vendor');
                     setShowLoginForm(true);
                   }
