@@ -324,7 +324,7 @@ export default function LoginPage() {
           {/* Main Headline */}
           <div className="mb-8 animate-fade-in-up delay-300">
             <h2 className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 leading-tight">
-              Hearts match,<span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"> sure.</span><br className="sm:hidden" /> But so do our plans.
+              Hearts match,<span className="bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"> sure.</span><br className="sm:hidden" /> So do our plans.
             </h2>
             <p className="text-lg sm:text-xl text-white/90 max-w-2xl mx-auto leading-relaxed">
               From intimate gatherings to grand celebrations, we connect you with Lebanon's finest event professionals
@@ -736,7 +736,7 @@ export default function LoginPage() {
                   <div>
                     <p className="text-sm text-gray-400">Email</p>
                     <a href="mailto:support@farhetkoun.com" className="text-white hover:text-primary transition-colors font-medium">
-                      support@farhetkoun.com
+                      Info@farhetkoun.com
                     </a>
                   </div>
                 </div>
