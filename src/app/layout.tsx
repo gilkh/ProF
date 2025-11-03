@@ -36,6 +36,10 @@ function AppBody({ children }: { children: React.ReactNode }) {
         <html lang={language} dir={language === 'ar' ? 'rtl' : 'ltr'} className={theme} style={{ colorScheme: theme }}>
             <head>
                  <meta name="description" content={translations.meta.description} />
+                 <link rel="icon" href="/logo-web.png" type="image/png" />
+                 <link rel="icon" href="/logo-web.png" sizes="32x32" type="image/png" />
+                 <link rel="icon" href="/logo-web.png" sizes="16x16" type="image/png" />
+                 <link rel="apple-touch-icon" href="/logo-web.png" />
             </head>
             <body className={`${inter.variable} font-sans antialiased`}>
                 {children}
