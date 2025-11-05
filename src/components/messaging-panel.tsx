@@ -14,13 +14,15 @@ import { getChatsForUser, getMessagesForChat, sendMessage, markChatAsRead, appro
 import { useAuth } from '@/hooks/use-auth';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Skeleton } from './ui/skeleton';
-import { parseForwardedMessage, parseQuestionTemplateMessage, parseTemplateResponseMessage } from '@/lib/utils';
+import { parseForwardedMessage, parseQuestionTemplateMessage, parseTemplateResponseMessage, parseMeetingProposalMessage, parseMeetingStatusMessage } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
 import { QuestionTemplateBubble, TemplateResponseBubble } from './question-template-bubble';
+import { MeetingProposalBubble, MeetingStatusBubble } from './meeting-proposal-bubble';
+import { MeetingRequestDialog } from './meeting-request-dialog';
 import { QuestionTemplateSelector } from './question-template-selector';
 
 function ForwardedItemBubble({ item, timestamp }: { item: ForwardedItem, timestamp?: Date }) {
@@ -198,6 +200,31 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
         );
     }
 
+    // Check for meeting proposal
+    const meetingProposal = parseMeetingProposalMessage(message.text);
+    if (meetingProposal) {
+        return (
+            <div className={cn('flex w-full', isOwnMessage ? 'justify-end' : 'justify-start')}>
+                <MeetingProposalBubble 
+                    message={message}
+                    isOwnMessage={isOwnMessage}
+                />
+            </div>
+        );
+    }
+
+    // Check for meeting status update
+    const meetingStatus = parseMeetingStatusMessage(message.text);
+    if (meetingStatus) {
+        return (
+            <div className={cn('flex w-full', isOwnMessage ? 'justify-end' : 'justify-start')}>
+                <MeetingStatusBubble 
+                    message={message}
+                />
+            </div>
+        );
+    }
+
     const forwardedItem = parseForwardedMessage(message.text);
 
     if (forwardedItem) {
@@ -362,6 +389,15 @@ export function MessagingPanel() {
         )
     }
 
+    const meeting = parseMeetingProposalMessage(chat.lastMessage) || parseMeetingStatusMessage(chat.lastMessage);
+    if (meeting) {
+        return (
+            <span className={cn('flex items-center gap-1.5', isUnread && 'text-foreground font-medium')}>
+                {sender} <Calendar className="h-4 w-4" /> Meeting update
+            </span>
+        );
+    }
+
     return (
          <span className={cn("truncate", isUnread && 'text-foreground font-medium')}>
             {sender}{chat.lastMessage}
@@ -469,6 +505,15 @@ export function MessagingPanel() {
                         </div>
                         <p className="text-sm text-muted-foreground">Online</p>
                     </div>
+                    {!isAdmin && selectedChat && (
+                        <div className="ml-auto">
+                          <MeetingRequestDialog chat={selectedChat}>
+                            <Button size="sm" variant="outline">
+                              <Calendar className="h-4 w-4 mr-2" /> Schedule Meeting
+                            </Button>
+                          </MeetingRequestDialog>
+                        </div>
+                    )}
                 </div>
                 <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
                     <div className="flex flex-col gap-4">

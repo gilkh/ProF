@@ -219,3 +219,19 @@ html {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Calendar day modifier styles */
+.day-has-bookings {
+  background-color: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+}
+
+.day-fully-booked {
+  background-color: hsl(var(--destructive)) !important;
+  color: hsl(var(--destructive-foreground)) !important;
+}
+
+.day-available {
+  background-color: hsl(var(--secondary)) !important;
+  color: hsl(var(--secondary-foreground)) !important;
+}

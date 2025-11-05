@@ -1,8 +1,8 @@
 
 import { collection, doc, getDoc, setDoc, updateDoc, getDocs, query, where, DocumentData, deleteDoc, addDoc, serverTimestamp, orderBy, onSnapshot, limit, increment, writeBatch, runTransaction, arrayUnion, arrayRemove, getCountFromServer, deleteField } from 'firebase/firestore';
 import { db, auth } from './firebase';
-import type { UserProfile, VendorProfile, Service, Offer, QuoteRequest, Booking, SavedTimeline, ServiceOrOffer, VendorCode, Chat, ChatMessage, UpgradeRequest, VendorAnalyticsData, PlatformAnalytics, Review, LineItem, VendorInquiry, AppNotification, QuestionTemplate, TemplateResponse, QuestionTemplateMessage, TimeSlot, DayAvailability, ServiceAvailability, VendorAvailability, AvailabilitySlot } from './types';
-import { formatItemForMessage, formatQuoteResponseMessage, parseForwardedMessage } from './utils';
+import type { UserProfile, VendorProfile, Service, Offer, QuoteRequest, Booking, SavedTimeline, ServiceOrOffer, VendorCode, Chat, ChatMessage, UpgradeRequest, VendorAnalyticsData, PlatformAnalytics, Review, LineItem, VendorInquiry, AppNotification, QuestionTemplate, TemplateResponse, QuestionTemplateMessage, TimeSlot, DayAvailability, ServiceAvailability, VendorAvailability, AvailabilitySlot, MeetingProposal, MeetingType, MeetingProposalStatus } from './types';
+import { formatItemForMessage, formatQuoteResponseMessage, parseForwardedMessage, formatMeetingProposalMessage, formatMeetingStatusMessage } from './utils';
 import { dataCache, cacheKeys } from './cache';
 import { subMonths, format, startOfMonth, addDays, addMonths, startOfDay, subDays } from 'date-fns';
 import { GoogleAuthProvider, signInWithPopup, User as FirebaseUser, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword, sendPasswordResetEmail as firebaseSendPasswordResetEmail, confirmPasswordReset } from 'firebase/auth';
@@ -11,7 +11,21 @@ import { GoogleAuthProvider, signInWithPopup, User as FirebaseUser, createUserWi
 function toDate(value: any): Date {
     if (!value) return new Date();
     if (value instanceof Date) return value;
-    if (typeof value.toDate === 'function') return value.toDate();
+    // Firestore Timestamp
+    if (typeof value?.toDate === 'function') return value.toDate();
+    // Safely parse ISO-like strings
+    if (typeof value === 'string') {
+        // Handle plain date strings like "yyyy-MM-dd" as LOCAL dates to avoid timezone shifts
+        const plainDateMatch = /^\d{4}-\d{2}-\d{2}$/.test(value);
+        if (plainDateMatch) {
+            const [y, m, d] = value.split('-').map(Number);
+            // new Date(year, monthIndex, day) produces a local midnight date
+            return new Date(y, m - 1, d);
+        }
+        // Fallback to native parsing for other formats
+        return new Date(value);
+    }
+    // Numbers or other serializable values
     return new Date(value);
 }
 
@@ -827,6 +841,7 @@ export async function createBooking(booking: Omit<Booking, 'id'>) {
         ...booking,
         serviceId: offer.id,
         serviceType: offer.type,
+        category: booking.category ?? 'booking',
     }
 
     await addDoc(collection(db, 'bookings'), bookingWithDetails);
@@ -1493,6 +1508,217 @@ export async function sendMessage(chatId: string, senderId: string, text: string
         console.error("Transaction failed: ", error);
         throw error;
     }
+}
+
+// Meeting Scheduling Services
+export async function createMeetingProposal(data: {
+    chatId: string;
+    proposerId: string;
+    recipientId: string;
+    type: MeetingType;
+    dateTime: string; // ISO string
+    agenda?: string;
+    previousProposalId?: string;
+}): Promise<string> {
+    const chatRef = doc(db, 'chats', data.chatId);
+    const proposalsRef = collection(db, 'meetingProposals');
+    const messagesRef = collection(db, `chats/${data.chatId}/messages`);
+
+    return await runTransaction(db, async (transaction) => {
+        // READS FIRST (Firestore requires all reads before any writes)
+        let round = 1;
+        if (data.previousProposalId) {
+            const prevSnap = await transaction.get(doc(db, 'meetingProposals', data.previousProposalId));
+            if (prevSnap.exists()) {
+                const prevData = prevSnap.data() as MeetingProposal;
+                round = (prevData.round || 1) + 1;
+            }
+        }
+
+        const chatSnap = await transaction.get(chatRef);
+        if (!chatSnap.exists()) {
+            throw new Error('Chat does not exist');
+        }
+
+        // Create proposal
+        const proposalRef = doc(proposalsRef);
+        const proposalBase: Omit<MeetingProposal, 'id'> = {
+            chatId: data.chatId,
+            proposerId: data.proposerId,
+            recipientId: data.recipientId,
+            type: data.type,
+            dateTime: data.dateTime,
+            status: 'pending',
+            round,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp(),
+        };
+        // Only include optional fields if defined (Firestore disallows undefined)
+        const proposal: Omit<MeetingProposal, 'id'> = {
+            ...proposalBase,
+            ...(data.agenda ? { agenda: data.agenda } : {}),
+            ...(data.previousProposalId ? { previousProposalId: data.previousProposalId } : {}),
+        };
+        transaction.set(proposalRef, proposal);
+
+        // Add message to chat
+        const message: Omit<ChatMessage, 'id'> = {
+            senderId: data.proposerId,
+            text: formatMeetingProposalMessage({ id: proposalRef.id, ...proposal } as MeetingProposal),
+            timestamp: new Date(),
+        };
+        transaction.set(doc(messagesRef), message);
+
+        // Update chat last message and unread count
+        transaction.update(chatRef, {
+            lastMessage: '📅 Meeting proposal',
+            lastMessageTimestamp: message.timestamp,
+            lastMessageSenderId: data.proposerId,
+            [`unreadCount.${data.recipientId}`]: increment(1),
+        });
+
+        return proposalRef.id;
+    });
+}
+
+export async function respondToMeetingProposal(proposalId: string, responderId: string, status: MeetingProposalStatus, reason?: string): Promise<void> {
+    const proposalRef = doc(db, 'meetingProposals', proposalId);
+
+    // Pre-compute booking details when accepted
+    let bookingData: Omit<Booking, 'id'> | null = null;
+    if (status === 'accepted') {
+        const proposalSnap = await getDoc(proposalRef);
+        if (!proposalSnap.exists()) throw new Error('Proposal not found');
+        const proposal = proposalSnap.data() as MeetingProposal;
+
+        const chatRefOutside = doc(db, 'chats', proposal.chatId);
+        const chatSnap = await getDoc(chatRefOutside);
+        if (!chatSnap.exists()) throw new Error('Chat does not exist');
+        const chatData = chatSnap.data() as any;
+
+        const participantIds: string[] = Array.isArray(chatData.participantIds) && chatData.participantIds.length > 0
+            ? chatData.participantIds
+            : (Array.isArray(chatData.participants) ? chatData.participants.map((p: any) => p.id) : []);
+
+        // Determine vendor and client by checking vendor profiles
+        let vendorId: string | null = null;
+        let clientId: string | null = null;
+        for (const pid of participantIds) {
+            const vSnap = await getDoc(doc(db, 'vendors', pid));
+            if (vSnap.exists()) {
+                vendorId = pid;
+            }
+        }
+        // Fallbacks if vendorId not determined
+        if (!vendorId) {
+            const vSnapResponder = await getDoc(doc(db, 'vendors', responderId));
+            if (vSnapResponder.exists()) vendorId = responderId;
+        }
+        const proposedOtherId = responderId === proposal.proposerId ? proposal.recipientId : proposal.proposerId;
+        clientId = proposedOtherId === vendorId ? responderId : proposedOtherId;
+        if (!clientId) clientId = proposedOtherId; // final fallback
+
+        // Compute "with" name as the client name (consistent with existing bookings)
+        let withName = 'Client';
+        if (Array.isArray(chatData.participants)) {
+            const clientParticipant = (chatData.participants as any[]).find(p => p.id === clientId);
+            if (clientParticipant?.name) withName = clientParticipant.name;
+        }
+
+        // Choose a service/offer to attach booking to (first listing for vendor if any)
+        let serviceId = vendorId || '__meeting__';
+        let serviceType: 'service' | 'offer' = 'service';
+        try {
+            if (vendorId) {
+                const listings = await getServicesAndOffers(vendorId);
+                if (listings && listings.length > 0) {
+                    serviceId = listings[0].id;
+                    serviceType = listings[0].type;
+                } else {
+                    serviceId = vendorId; // fallback placeholder to keep filtering consistent
+                    serviceType = 'service';
+                }
+            }
+        } catch (e) {
+            // Keep fallback values
+        }
+
+        bookingData = {
+            title: proposal.agenda ? `Meeting: ${proposal.agenda}` : (proposal.type === 'call' ? 'Call' : 'In-person Meeting'),
+            with: withName,
+            clientId: clientId!,
+            vendorId: vendorId || proposedOtherId,
+            date: new Date(proposal.dateTime),
+            time: format(new Date(proposal.dateTime), 'p'),
+            serviceId,
+            serviceType,
+            category: 'appointment',
+        };
+    }
+
+    await runTransaction(db, async (transaction) => {
+        // READ: get latest proposal inside transaction
+        const snap = await transaction.get(proposalRef);
+        if (!snap.exists()) throw new Error('Proposal not found');
+        const proposal = snap.data() as MeetingProposal;
+
+        // Guard: only allow a single response while pending
+        if (proposal.status !== 'pending') {
+            throw new Error('Proposal already responded');
+        }
+
+        const chatRef = doc(db, 'chats', proposal.chatId);
+        const messagesRef = collection(db, `chats/${proposal.chatId}/messages`);
+        const otherParticipantId = responderId === proposal.proposerId ? proposal.recipientId : proposal.proposerId;
+
+        // Update proposal status and mark who responded
+        transaction.update(proposalRef, { status, updatedAt: serverTimestamp(), respondedBy: responderId });
+
+        // Add status message
+        const statusText = formatMeetingStatusMessage(proposalId, status, reason);
+        const msg: Omit<ChatMessage, 'id'> = {
+            senderId: responderId,
+            text: statusText,
+            timestamp: new Date(),
+        };
+        transaction.set(doc(messagesRef), msg);
+
+        // Update chat last message
+        const lastText = status === 'accepted' ? '✅ Meeting accepted' : status === 'declined' ? '❌ Meeting declined' : '📅 Meeting pending';
+        transaction.update(chatRef, {
+            lastMessage: lastText,
+            lastMessageTimestamp: msg.timestamp,
+            lastMessageSenderId: responderId,
+            [`unreadCount.${otherParticipantId}`]: increment(1),
+        });
+
+        // Create booking when accepted
+        if (status === 'accepted' && bookingData) {
+            const bookingRef = doc(collection(db, 'bookings'));
+            transaction.set(bookingRef, bookingData);
+        }
+    });
+}
+
+export async function counterProposeMeeting(originalProposalId: string, proposerId: string, newData: { type?: MeetingType; dateTime: string; agenda?: string }): Promise<string> {
+    const originalRef = doc(db, 'meetingProposals', originalProposalId);
+    const originalSnap = await getDoc(originalRef);
+    if (!originalSnap.exists()) throw new Error('Original proposal not found');
+    const original = originalSnap.data() as MeetingProposal;
+
+    const recipientId = proposerId === original.proposerId ? original.recipientId : original.proposerId;
+    const newProposalId = await createMeetingProposal({
+        chatId: original.chatId,
+        proposerId,
+        recipientId,
+        type: newData.type || original.type,
+        dateTime: newData.dateTime,
+        agenda: newData.agenda ?? original.agenda,
+        previousProposalId: originalProposalId,
+    });
+    // Mark original as responded by this user to prevent repeated actions
+    await updateDoc(originalRef, { respondedBy: proposerId, updatedAt: serverTimestamp() });
+    return newProposalId;
 }
 
 
@@ -2209,6 +2435,21 @@ export async function getTemplateResponse(responseId: string): Promise<TemplateR
 
 // Vendor Availability Management Functions
 
+// Ensure vendor availability doc exists before any updateDoc calls
+async function ensureVendorAvailabilityDoc(vendorId: string) {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    const snapshot = await getDoc(availabilityRef);
+    if (!snapshot.exists()) {
+        // Create minimal skeleton so nested update paths can be created
+        await setDoc(availabilityRef, {
+            id: vendorId,
+            vendorId,
+            services: {},
+            updatedAt: serverTimestamp(),
+        }, { merge: true });
+    }
+}
+
 export async function getVendorAvailability(vendorId: string): Promise<VendorAvailability | null> {
     const availabilityDoc = await getDoc(doc(db, 'vendorAvailability', vendorId));
     if (!availabilityDoc.exists()) {
@@ -2235,6 +2476,7 @@ export async function updateVendorAvailability(vendorId: string, availability: P
 
 export async function updateServiceAvailability(vendorId: string, serviceId: string, availability: ServiceAvailability): Promise<void> {
     const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await ensureVendorAvailabilityDoc(vendorId);
     await updateDoc(availabilityRef, {
         [`services.${serviceId}`]: availability,
         updatedAt: serverTimestamp(),
@@ -2243,6 +2485,7 @@ export async function updateServiceAvailability(vendorId: string, serviceId: str
 
 export async function toggleServiceVisibility(vendorId: string, serviceId: string, visible: boolean): Promise<void> {
     const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await ensureVendorAvailabilityDoc(vendorId);
     await updateDoc(availabilityRef, {
         [`services.${serviceId}.visible`]: visible,
         updatedAt: serverTimestamp(),
@@ -2251,14 +2494,26 @@ export async function toggleServiceVisibility(vendorId: string, serviceId: strin
 
 export async function setDayAvailability(vendorId: string, serviceId: string, date: string, dayAvailability: DayAvailability): Promise<void> {
     const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await ensureVendorAvailabilityDoc(vendorId);
     await updateDoc(availabilityRef, {
         [`services.${serviceId}.dates.${date}`]: dayAvailability,
         updatedAt: serverTimestamp(),
     });
 }
 
+// Set the mode for a specific day: 'slots' or 'normal'
+export async function setDayMode(vendorId: string, serviceId: string, date: string, mode: 'slots' | 'normal'): Promise<void> {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await ensureVendorAvailabilityDoc(vendorId);
+    await updateDoc(availabilityRef, {
+        [`services.${serviceId}.dates.${date}.mode`]: mode,
+        updatedAt: serverTimestamp(),
+    });
+}
+
 export async function addTimeSlot(vendorId: string, serviceId: string, date: string, timeSlot: TimeSlot): Promise<void> {
     const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await ensureVendorAvailabilityDoc(vendorId);
     await updateDoc(availabilityRef, {
         [`services.${serviceId}.dates.${date}.timeSlots`]: arrayUnion(timeSlot),
         updatedAt: serverTimestamp(),
@@ -2267,8 +2522,62 @@ export async function addTimeSlot(vendorId: string, serviceId: string, date: str
 
 export async function removeTimeSlot(vendorId: string, serviceId: string, date: string, timeSlot: TimeSlot): Promise<void> {
     const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await ensureVendorAvailabilityDoc(vendorId);
     await updateDoc(availabilityRef, {
         [`services.${serviceId}.dates.${date}.timeSlots`]: arrayRemove(timeSlot),
+        updatedAt: serverTimestamp(),
+    });
+}
+
+// Toggle vendor-marked taken/unavailable for a specific slot
+export async function toggleTimeSlotTaken(vendorId: string, serviceId: string, date: string, timeSlot: TimeSlot): Promise<void> {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await ensureVendorAvailabilityDoc(vendorId);
+    // Remove old slot object, then add updated one with toggled 'taken'
+    await updateDoc(availabilityRef, {
+        [`services.${serviceId}.dates.${date}.timeSlots`]: arrayRemove(timeSlot),
+        updatedAt: serverTimestamp(),
+    });
+    const updatedSlot: TimeSlot = { ...timeSlot, taken: !timeSlot.taken };
+    await updateDoc(availabilityRef, {
+        [`services.${serviceId}.dates.${date}.timeSlots`]: arrayUnion(updatedSlot),
+        updatedAt: serverTimestamp(),
+    });
+}
+
+// Add/remove normal free/busy ranges for a day
+export async function addFreeTime(vendorId: string, serviceId: string, date: string, range: { startTime: string; endTime: string }): Promise<void> {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await ensureVendorAvailabilityDoc(vendorId);
+    await updateDoc(availabilityRef, {
+        [`services.${serviceId}.dates.${date}.freeTimes`]: arrayUnion(range),
+        updatedAt: serverTimestamp(),
+    });
+}
+
+export async function removeFreeTime(vendorId: string, serviceId: string, date: string, range: { startTime: string; endTime: string }): Promise<void> {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await ensureVendorAvailabilityDoc(vendorId);
+    await updateDoc(availabilityRef, {
+        [`services.${serviceId}.dates.${date}.freeTimes`]: arrayRemove(range),
+        updatedAt: serverTimestamp(),
+    });
+}
+
+export async function addBusyTime(vendorId: string, serviceId: string, date: string, range: { startTime: string; endTime: string }): Promise<void> {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await ensureVendorAvailabilityDoc(vendorId);
+    await updateDoc(availabilityRef, {
+        [`services.${serviceId}.dates.${date}.busyTimes`]: arrayUnion(range),
+        updatedAt: serverTimestamp(),
+    });
+}
+
+export async function removeBusyTime(vendorId: string, serviceId: string, date: string, range: { startTime: string; endTime: string }): Promise<void> {
+    const availabilityRef = doc(db, 'vendorAvailability', vendorId);
+    await ensureVendorAvailabilityDoc(vendorId);
+    await updateDoc(availabilityRef, {
+        [`services.${serviceId}.dates.${date}.busyTimes`]: arrayRemove(range),
         updatedAt: serverTimestamp(),
     });
 }
@@ -2299,9 +2608,9 @@ export async function getAvailableSlots(vendorId: string, serviceId: string, dat
     const bookingsSnapshot = await getDocs(bookingsQuery);
     const bookedTimes = bookingsSnapshot.docs.map(doc => doc.data().time);
 
-    // Filter out booked time slots
-    const availableSlots: AvailabilitySlot[] = dayAvailability.timeSlots
-        .filter(slot => !bookedTimes.includes(slot.startTime))
+    // Filter out booked or vendor-taken time slots
+    const availableSlots: AvailabilitySlot[] = (dayAvailability.timeSlots || [])
+        .filter(slot => !!slot.startTime && !bookedTimes.includes(slot.startTime) && !slot.taken)
         .map(slot => ({
             startTime: slot.startTime,
             endTime: slot.endTime,

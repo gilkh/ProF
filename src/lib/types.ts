@@ -115,6 +115,8 @@ export interface Booking {
   time: string;
   serviceId: string; // The ID of the service or offer that was booked
   serviceType: ServiceType;
+  // Category distinguishes meetings (appointments) from standard service/offer bookings
+  category?: 'appointment' | 'booking';
 }
 
 export interface ChatMessage {
@@ -268,6 +270,45 @@ export interface ForwardedItem {
   quoteRequestId?: string;
 }
 
+// Meeting scheduling types
+export type MeetingType = 'in_person' | 'call';
+export type MeetingProposalStatus = 'pending' | 'accepted' | 'declined';
+
+export interface MeetingProposal {
+  id: string;
+  chatId: string;
+  proposerId: string;
+  recipientId: string;
+  type: MeetingType;
+  dateTime: string; // ISO string
+  agenda?: string;
+  status: MeetingProposalStatus;
+  round: number; // 1-based round count for negotiation
+  previousProposalId?: string;
+  respondedBy?: string;
+  createdAt: Date | any;
+  updatedAt: Date | any;
+}
+
+export interface MeetingProposalMessage {
+  isMeetingProposal: true;
+  proposalId: string;
+  type: MeetingType;
+  dateTime: string;
+  agenda?: string;
+  status: MeetingProposalStatus;
+  round: number;
+  proposerId: string;
+  recipientId: string;
+}
+
+export interface MeetingStatusMessage {
+  isMeetingStatus: true;
+  proposalId: string;
+  status: MeetingProposalStatus;
+  reason?: string;
+}
+
 
 export interface UpgradeRequest {
   id: string;
@@ -384,19 +425,36 @@ export interface QuestionTemplateMessage {
 
 // Availability Management Types
 export interface TimeSlot {
-    id: string;
-    startTime: string; // Format: "HH:mm" (e.g., "09:00")
-    endTime: string;   // Format: "HH:mm" (e.g., "17:00")
-    isAvailable: boolean;
+    // Core slot identity
+    id?: string;
+    // Common discrete slot fields used in calendar UI
+    startTime?: string; // Format: "HH:mm" (e.g., "09:00")
+    endTime?: string;   // Format: "HH:mm" (e.g., "17:00")
+    price?: number;
+    // Availability flags
+    isAvailable?: boolean;
+    taken?: boolean; // Vendor-marked as taken/unavailable (without a booking)
+    // Capacity controls
     maxBookings?: number; // For services that can handle multiple bookings per slot
     currentBookings?: number;
 }
 
 export interface DayAvailability {
-    date: string; // Format: "yyyy-MM-dd"
-    isFullyBooked: boolean;
-    isAvailable: boolean; // Vendor can mark entire day as unavailable
-    timeSlots: TimeSlot[];
+    // Date key (optional since we often store by keyed map)
+    date?: string; // Format: "yyyy-MM-dd"
+    // Legacy flags used elsewhere in the app
+    isFullyBooked?: boolean;
+    isAvailable?: boolean; // Vendor can mark entire day as unavailable
+    // Current calendar implementation flags/fields
+    fullyBooked?: boolean;
+    // Per-day mode: 'slots' for discrete slots, 'normal' for free/busy ranges
+    mode?: 'slots' | 'normal';
+    // Discrete slots
+    timeSlots?: TimeSlot[];
+    // Normal time ranges
+    freeTimes?: { startTime: string; endTime: string }[];
+    busyTimes?: { startTime: string; endTime: string }[];
+    // Notes
     notes?: string; // Optional notes for the day
 }
 
@@ -404,10 +462,16 @@ export interface ServiceAvailability {
     serviceId: string;
     serviceTitle: string;
     serviceType: ServiceType;
+    // Visibility and activation
     isVisible: boolean; // Toggle visibility to users
     isActive: boolean;  // Whether accepting bookings
+    // Discrete slots defaults
     defaultTimeSlots: TimeSlot[]; // Default time slots for this service
-    customAvailability: DayAvailability[]; // Custom availability overrides
+    // Overrides
+    customAvailability: DayAvailability[]; // Custom availability overrides (list)
+    // Map-based availability used by calendar & services
+    dates?: Record<string, DayAvailability>;
+    visible?: boolean; // Mirror of isVisible used by calendar code
     advanceBookingDays: number; // How many days in advance bookings are allowed
     bufferTime: number; // Minutes between bookings
     maxDailyBookings?: number; // Maximum bookings per day for this service
@@ -416,7 +480,10 @@ export interface ServiceAvailability {
 export interface VendorAvailability {
     id: string;
     vendorId: string;
+    // List-based availability
     serviceAvailabilities: ServiceAvailability[];
+    // Map-based availability used by calendar & services
+    services?: Record<string, ServiceAvailability>;
     globalSettings: {
         timezone: string;
         workingDays: number[]; // 0-6 (Sunday-Saturday)
@@ -431,9 +498,15 @@ export interface VendorAvailability {
 }
 
 export interface AvailabilitySlot {
-    date: string;
-    timeSlot: TimeSlot;
-    serviceId: string;
-    isBookable: boolean;
+    // Flexible shape to support both legacy and current consumers
+    date?: string;
+    timeSlot?: TimeSlot;
+    // Flat fields used by booking dialogs
+    startTime?: string;
+    endTime?: string;
+    available?: boolean;
+    price?: number;
+    serviceId?: string;
+    isBookable?: boolean;
     conflictReason?: string; // Why it's not bookable if applicable
 }

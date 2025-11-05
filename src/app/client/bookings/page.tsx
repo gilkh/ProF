@@ -59,7 +59,7 @@ export default function ClientBookingsPage() {
                 <CardDescription>{t.description}</CardDescription>
             </CardHeader>
         </Card>
-        <CalendarView bookings={upcomingBookings} isLoading={isLoading || isAuthLoading} />
+        <CalendarView bookings={bookings} isLoading={isLoading || isAuthLoading} />
 
         <Card>
             <CardHeader>

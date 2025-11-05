@@ -22,6 +22,12 @@ import {
   setDayAvailability, 
   addTimeSlot, 
   removeTimeSlot,
+  setDayMode,
+  toggleTimeSlotTaken,
+  addFreeTime,
+  removeFreeTime,
+  addBusyTime,
+  removeBusyTime,
   subscribeToVendorAvailability,
   getServicesAndOffers
 } from '@/lib/services';
@@ -55,6 +61,8 @@ export function VendorAvailabilityCalendar({ vendorId, bookings, isLoading }: Ve
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isDaySettingsOpen, setIsDaySettingsOpen] = useState(false);
   const [newTimeSlot, setNewTimeSlot] = useState({ startTime: '', endTime: '', price: 0 });
+  const [newFreeTime, setNewFreeTime] = useState({ startTime: '', endTime: '' });
+  const [newBusyTime, setNewBusyTime] = useState({ startTime: '', endTime: '' });
 
   // Load services and availability
   useEffect(() => {
@@ -95,6 +103,7 @@ export function VendorAvailabilityCalendar({ vendorId, bookings, isLoading }: Ve
   const serviceAvailability = availability?.services[selectedService];
   const selectedDateStr = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '';
   const dayAvailability = serviceAvailability?.dates[selectedDateStr];
+  const currentMode: 'slots' | 'normal' = dayAvailability?.mode || 'slots';
 
   const handleToggleServiceVisibility = async (serviceId: string, visible: boolean) => {
     try {
@@ -112,7 +121,10 @@ export function VendorAvailabilityCalendar({ vendorId, bookings, isLoading }: Ve
     try {
       const newDayAvailability: DayAvailability = {
         fullyBooked: !dayAvailability?.fullyBooked,
-        timeSlots: dayAvailability?.timeSlots || []
+        mode: dayAvailability?.mode || 'slots',
+        timeSlots: dayAvailability?.timeSlots || [],
+        freeTimes: dayAvailability?.freeTimes || [],
+        busyTimes: dayAvailability?.busyTimes || []
       };
 
       await setDayAvailability(vendorId, selectedService, selectedDateStr, newDayAvailability);
@@ -130,7 +142,8 @@ export function VendorAvailabilityCalendar({ vendorId, bookings, isLoading }: Ve
       const timeSlot: TimeSlot = {
         startTime: newTimeSlot.startTime,
         endTime: newTimeSlot.endTime,
-        price: newTimeSlot.price
+        price: newTimeSlot.price,
+        taken: false
       };
 
       await addTimeSlot(vendorId, selectedService, selectedDateStr, timeSlot);
@@ -151,6 +164,76 @@ export function VendorAvailabilityCalendar({ vendorId, bookings, isLoading }: Ve
     } catch (error) {
       console.error('Error removing time slot:', error);
       toast.error('Failed to remove time slot');
+    }
+  };
+
+  const handleToggleSlotTaken = async (timeSlot: TimeSlot) => {
+    if (!selectedService || !selectedDate) return;
+
+    try {
+      await toggleTimeSlotTaken(vendorId, selectedService, selectedDateStr, timeSlot);
+      toast.success(`Slot marked as ${timeSlot.taken ? 'available' : 'taken'}`);
+    } catch (error) {
+      console.error('Error toggling slot taken:', error);
+      toast.error('Failed to update slot status');
+    }
+  };
+
+  const handleDayModeChange = async (mode: 'slots' | 'normal') => {
+    if (!selectedService || !selectedDate) return;
+
+    try {
+      await setDayMode(vendorId, selectedService, selectedDateStr, mode);
+      toast.success(`Day mode set to ${mode === 'slots' ? 'Slots' : 'Normal Time'}`);
+    } catch (error) {
+      console.error('Error setting day mode:', error);
+      toast.error('Failed to update day mode');
+    }
+  };
+
+  const handleAddFreeTime = async () => {
+    if (!selectedService || !selectedDate || !newFreeTime.startTime || !newFreeTime.endTime) return;
+    try {
+      await addFreeTime(vendorId, selectedService, selectedDateStr, newFreeTime);
+      setNewFreeTime({ startTime: '', endTime: '' });
+      toast.success('Free time added');
+    } catch (error) {
+      console.error('Error adding free time:', error);
+      toast.error('Failed to add free time');
+    }
+  };
+
+  const handleRemoveFreeTime = async (range: { startTime: string; endTime: string }) => {
+    if (!selectedService || !selectedDate) return;
+    try {
+      await removeFreeTime(vendorId, selectedService, selectedDateStr, range);
+      toast.success('Free time removed');
+    } catch (error) {
+      console.error('Error removing free time:', error);
+      toast.error('Failed to remove free time');
+    }
+  };
+
+  const handleAddBusyTime = async () => {
+    if (!selectedService || !selectedDate || !newBusyTime.startTime || !newBusyTime.endTime) return;
+    try {
+      await addBusyTime(vendorId, selectedService, selectedDateStr, newBusyTime);
+      setNewBusyTime({ startTime: '', endTime: '' });
+      toast.success('Busy time added');
+    } catch (error) {
+      console.error('Error adding busy time:', error);
+      toast.error('Failed to add busy time');
+    }
+  };
+
+  const handleRemoveBusyTime = async (range: { startTime: string; endTime: string }) => {
+    if (!selectedService || !selectedDate) return;
+    try {
+      await removeBusyTime(vendorId, selectedService, selectedDateStr, range);
+      toast.success('Busy time removed');
+    } catch (error) {
+      console.error('Error removing busy time:', error);
+      toast.error('Failed to remove busy time');
     }
   };
 
@@ -285,19 +368,10 @@ export function VendorAvailabilityCalendar({ vendorId, bookings, isLoading }: Ve
                     'has-bookings': (date) => getDayStatus(date) === 'has-bookings',
                     'available': (date) => getDayStatus(date) === 'available',
                   }}
-                  modifiersStyles={{
-                    'fully-booked': { 
-                      backgroundColor: 'hsl(var(--destructive))',
-                      color: 'hsl(var(--destructive-foreground))',
-                    },
-                    'has-bookings': { 
-                      backgroundColor: 'hsl(var(--primary))',
-                      color: 'hsl(var(--primary-foreground))',
-                    },
-                    'available': { 
-                      backgroundColor: 'hsl(var(--secondary))',
-                      color: 'hsl(var(--secondary-foreground))',
-                    },
+                  modifiersClassNames={{
+                    'fully-booked': 'day-fully-booked',
+                    'has-bookings': 'day-has-bookings',
+                    'available': 'day-available',
                   }}
                 />
               )}
@@ -320,7 +394,27 @@ export function VendorAvailabilityCalendar({ vendorId, bookings, isLoading }: Ve
             <CardContent className="space-y-4">
               {selectedDate && selectedService ? (
                 <>
-                  {/* Fully Booked Toggle */}
+                  {/* Day Mode Selection & Fully Booked Toggle */}
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="day-mode">Day Mode</Label>
+                    <Select value={currentMode} onValueChange={(val) => handleDayModeChange(val as 'slots' | 'normal')}>
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Select mode" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="slots">Slots</SelectItem>
+                        <SelectItem value="normal">Normal Time</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="fully-booked">Fully Booked</Label>
+                    <Switch
+                      id="fully-booked"
+                      checked={dayAvailability?.fullyBooked ?? dayAvailability?.isFullyBooked ?? false}
+                      onCheckedChange={handleToggleFullyBooked}
+                    />
+                  </div>
                   <div className="flex items-center justify-between">
                     <Label htmlFor="fully-booked">Fully Booked</Label>
                     <Switch
@@ -332,89 +426,171 @@ export function VendorAvailabilityCalendar({ vendorId, bookings, isLoading }: Ve
 
                   <Separator />
 
-                  {/* Time Slots */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium">Time Slots</h4>
-                      <Dialog open={isDaySettingsOpen} onOpenChange={setIsDaySettingsOpen}>
-                        <DialogTrigger asChild>
-                          <Button size="sm" variant="outline">
-                            <Plus className="h-4 w-4 mr-1" />
-                            Add Slot
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Add Time Slot</DialogTitle>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <Label htmlFor="start-time">Start Time</Label>
-                                <Input
-                                  id="start-time"
-                                  type="time"
-                                  value={newTimeSlot.startTime}
-                                  onChange={(e) => setNewTimeSlot(prev => ({ ...prev, startTime: e.target.value }))}
-                                />
+                  {currentMode === 'slots' ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium">Time Slots</h4>
+                        <Dialog open={isDaySettingsOpen} onOpenChange={setIsDaySettingsOpen}>
+                          <DialogTrigger asChild>
+                            <Button size="sm" variant="outline">
+                              <Plus className="h-4 w-4 mr-1" />
+                              Add Slot
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Add Time Slot</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                  <Label htmlFor="start-time">Start Time</Label>
+                                  <Input
+                                    id="start-time"
+                                    type="time"
+                                    value={newTimeSlot.startTime}
+                                    onChange={(e) => setNewTimeSlot(prev => ({ ...prev, startTime: e.target.value }))}
+                                  />
+                                </div>
+                                <div>
+                                  <Label htmlFor="end-time">End Time</Label>
+                                  <Input
+                                    id="end-time"
+                                    type="time"
+                                    value={newTimeSlot.endTime}
+                                    onChange={(e) => setNewTimeSlot(prev => ({ ...prev, endTime: e.target.value }))}
+                                  />
+                                </div>
                               </div>
                               <div>
-                                <Label htmlFor="end-time">End Time</Label>
+                                <Label htmlFor="price">Price (optional)</Label>
                                 <Input
-                                  id="end-time"
-                                  type="time"
-                                  value={newTimeSlot.endTime}
-                                  onChange={(e) => setNewTimeSlot(prev => ({ ...prev, endTime: e.target.value }))}
+                                  id="price"
+                                  type="number"
+                                  placeholder="0"
+                                  value={newTimeSlot.price || ''}
+                                  onChange={(e) => setNewTimeSlot(prev => ({ ...prev, price: Number(e.target.value) }))}
                                 />
                               </div>
+                              <div className="flex justify-end gap-2">
+                                <Button variant="outline" onClick={() => setIsDaySettingsOpen(false)}>
+                                  Cancel
+                                </Button>
+                                <Button onClick={handleAddTimeSlot}>
+                                  Add Slot
+                                </Button>
+                              </div>
                             </div>
-                            <div>
-                              <Label htmlFor="price">Price (optional)</Label>
-                              <Input
-                                id="price"
-                                type="number"
-                                placeholder="0"
-                                value={newTimeSlot.price || ''}
-                                onChange={(e) => setNewTimeSlot(prev => ({ ...prev, price: Number(e.target.value) }))}
-                              />
-                            </div>
-                            <div className="flex justify-end gap-2">
-                              <Button variant="outline" onClick={() => setIsDaySettingsOpen(false)}>
-                                Cancel
-                              </Button>
-                              <Button onClick={handleAddTimeSlot}>
-                                Add Slot
-                              </Button>
-                            </div>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
+                          </DialogContent>
+                        </Dialog>
+                      </div>
 
-                    {dayAvailability?.timeSlots && dayAvailability.timeSlots.length > 0 ? (
-                      <div className="space-y-2">
-                        {dayAvailability.timeSlots.map((slot, index) => (
-                          <div key={index} className="flex items-center justify-between p-2 border rounded">
-                            <div>
-                              <span className="font-medium">{slot.startTime} - {slot.endTime}</span>
-                              {slot.price && <span className="text-sm text-muted-foreground ml-2">${slot.price}</span>}
+                      {dayAvailability?.timeSlots && dayAvailability.timeSlots.length > 0 ? (
+                        <div className="space-y-2">
+                          {dayAvailability.timeSlots.map((slot, index) => (
+                            <div key={index} className="flex items-center justify-between p-2 border rounded">
+                              <div className="flex items-center gap-3">
+                                <span className="font-medium">{slot.startTime} - {slot.endTime}</span>
+                                {slot.price && <span className="text-sm text-muted-foreground ml-2">${slot.price}</span>}
+                                <div className="flex items-center gap-2">
+                                  <Label className="text-sm">Taken</Label>
+                                  <Switch
+                                    checked={!!slot.taken}
+                                    onCheckedChange={() => handleToggleSlotTaken(slot)}
+                                  />
+                                </div>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => handleRemoveTimeSlot(slot)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => handleRemoveTimeSlot(slot)}
-                            >
-                              <Trash2 className="h-4 w-4" />
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground text-center py-4">
+                          No time slots configured
+                        </p>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="space-y-6">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium">Free Times</h4>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="time"
+                              value={newFreeTime.startTime}
+                              onChange={(e) => setNewFreeTime(prev => ({ ...prev, startTime: e.target.value }))}
+                            />
+                            <Input
+                              type="time"
+                              value={newFreeTime.endTime}
+                              onChange={(e) => setNewFreeTime(prev => ({ ...prev, endTime: e.target.value }))}
+                            />
+                            <Button size="sm" variant="outline" onClick={handleAddFreeTime}>
+                              <Plus className="h-4 w-4 mr-1" /> Add
                             </Button>
                           </div>
-                        ))}
+                        </div>
+                        {dayAvailability?.freeTimes && dayAvailability.freeTimes.length > 0 ? (
+                          <div className="space-y-2">
+                            {dayAvailability.freeTimes.map((range, idx) => (
+                              <div key={idx} className="flex items-center justify-between p-2 border rounded">
+                                <span className="font-medium">{range.startTime} - {range.endTime}</span>
+                                <Button size="sm" variant="ghost" onClick={() => handleRemoveFreeTime(range)}>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground text-center py-4">No free times set</p>
+                        )}
                       </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground text-center py-4">
-                        No time slots configured
-                      </p>
-                    )}
-                  </div>
+
+                      <Separator />
+
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium">Busy Times</h4>
+                          <div className="flex items-center gap-2">
+                            <Input
+                              type="time"
+                              value={newBusyTime.startTime}
+                              onChange={(e) => setNewBusyTime(prev => ({ ...prev, startTime: e.target.value }))}
+                            />
+                            <Input
+                              type="time"
+                              value={newBusyTime.endTime}
+                              onChange={(e) => setNewBusyTime(prev => ({ ...prev, endTime: e.target.value }))}
+                            />
+                            <Button size="sm" variant="outline" onClick={handleAddBusyTime}>
+                              <Plus className="h-4 w-4 mr-1" /> Add
+                            </Button>
+                          </div>
+                        </div>
+                        {dayAvailability?.busyTimes && dayAvailability.busyTimes.length > 0 ? (
+                          <div className="space-y-2">
+                            {dayAvailability.busyTimes.map((range, idx) => (
+                              <div key={idx} className="flex items-center justify-between p-2 border rounded">
+                                <span className="font-medium">{range.startTime} - {range.endTime}</span>
+                                <Button size="sm" variant="ghost" onClick={() => handleRemoveBusyTime(range)}>
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-muted-foreground text-center py-4">No busy times set</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   <Separator />
 

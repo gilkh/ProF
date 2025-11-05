@@ -1,7 +1,7 @@
 
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import type { ServiceOrOffer, ForwardedItem, QuoteRequest, LineItem, QuestionTemplateMessage } from "./types";
+import type { ServiceOrOffer, ForwardedItem, QuoteRequest, LineItem, QuestionTemplateMessage, MeetingProposal, MeetingProposalMessage, MeetingStatusMessage } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -91,6 +91,56 @@ export function parseTemplateResponseMessage(text: string): any | null {
     const data = JSON.parse(text);
     if (data && data.isTemplateResponse === true) {
       return data;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Meeting proposal helpers
+export function formatMeetingProposalMessage(proposal: MeetingProposal): string {
+  const msg: MeetingProposalMessage = {
+    isMeetingProposal: true,
+    proposalId: proposal.id,
+    type: proposal.type,
+    dateTime: proposal.dateTime,
+    agenda: proposal.agenda,
+    status: proposal.status,
+    round: proposal.round,
+    proposerId: proposal.proposerId,
+    recipientId: proposal.recipientId,
+  };
+  return JSON.stringify(msg);
+}
+
+export function parseMeetingProposalMessage(text: string): MeetingProposalMessage | null {
+  try {
+    const data = JSON.parse(text);
+    if (data && data.isMeetingProposal === true) {
+      return data as MeetingProposalMessage;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+export function formatMeetingStatusMessage(proposalId: string, status: MeetingStatusMessage['status'], reason?: string): string {
+  const msg: MeetingStatusMessage = {
+    isMeetingStatus: true,
+    proposalId,
+    status,
+    reason,
+  };
+  return JSON.stringify(msg);
+}
+
+export function parseMeetingStatusMessage(text: string): MeetingStatusMessage | null {
+  try {
+    const data = JSON.parse(text);
+    if (data && data.isMeetingStatus === true) {
+      return data as MeetingStatusMessage;
     }
     return null;
   } catch (e) {
