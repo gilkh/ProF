@@ -38,6 +38,7 @@ import { AdminAnalyticsChart } from '@/components/admin-analytics-chart';
 import { AdminStatCard } from '@/components/admin-stat-card';
 import { MessagingPanel } from '@/components/messaging-panel';
 import { AdminListingDetailView } from '@/components/admin-listing-detail-view';
+import AdminReportsPage from '@/app/admin/reports/page';
 import AdminEmailVerification from '@/components/admin/admin-email-verification';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -522,6 +523,7 @@ export default function AdminHomePage() {
             {pendingListings.length > 0 && <Badge className="ml-1 text-xs">{pendingListings.length}</Badge>}
           </TabsTrigger>
           <TabsTrigger value="messages">Messages</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="inquiries">
             Inquiries
             {vendorInquiries.filter(i => i.status === 'pending').length > 0 && <Badge className="ml-1 text-xs">{vendorInquiries.filter(i => i.status === 'pending').length}</Badge>}
@@ -847,11 +849,19 @@ export default function AdminHomePage() {
         </TabsContent>
         
         <TabsContent value="messages" className="mt-4 h-[calc(100vh-20rem)]">
-            <Card className="h-full">
-                <CardContent className="p-0 h-full">
-                    <MessagingPanel />
-                </CardContent>
-            </Card>
+          <Card className="h-full">
+            <CardContent className="p-0 h-full">
+              <MessagingPanel />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="reports" className="mt-4">
+          <Card>
+            <CardContent className="p-0">
+              <AdminReportsPage />
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="inquiries" className="mt-4">

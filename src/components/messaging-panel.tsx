@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { Search, SendHorizonal, Loader2, FileQuestion, ArrowLeft, Calendar, Users, Phone, PencilRuler, Check, CreditCard, ShieldCheck, FileText } from 'lucide-react';
+import { Search, SendHorizonal, Loader2, FileQuestion, ArrowLeft, Calendar, Users, Phone, PencilRuler, Check, CreditCard, ShieldCheck, FileText, MoreVertical, Flag, Ban, Unlock } from 'lucide-react';
 import React, { useEffect, useState, useRef } from 'react';
 import type { Chat, ChatMessage, ForwardedItem, LineItem, QuoteRequest, ChatParticipant, QuestionTemplateMessage } from '@/lib/types';
-import { getChatsForUser, getMessagesForChat, sendMessage, markChatAsRead, approveQuote } from '@/lib/services';
+import { getChatsForUser, getMessagesForChat, sendMessage, markChatAsRead, approveQuote, subscribeToBlockStatus, blockUser, unblockUser, reportUser } from '@/lib/services';
 import { useAuth } from '@/hooks/use-auth';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Skeleton } from './ui/skeleton';
@@ -24,6 +24,9 @@ import { QuestionTemplateBubble, TemplateResponseBubble } from './question-templ
 import { MeetingProposalBubble, MeetingStatusBubble } from './meeting-proposal-bubble';
 import { MeetingRequestDialog } from './meeting-request-dialog';
 import { QuestionTemplateSelector } from './question-template-selector';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Textarea } from './ui/textarea';
 
 function ForwardedItemBubble({ item, timestamp }: { item: ForwardedItem, timestamp?: Date }) {
     if (!item.itemId || !item.itemType) {
@@ -297,6 +300,14 @@ export function MessagingPanel() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const isAdmin = role === 'admin';
+  const { toast } = useToast();
+
+  const [blockedByOther, setBlockedByOther] = useState(false);
+  const [youBlockedOther, setYouBlockedOther] = useState(false);
+  const [isBlocking, setIsBlocking] = useState(false);
+  const [isReporting, setIsReporting] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportComment, setReportComment] = useState('');
 
   useEffect(() => {
     // Admins don't need a user ID to fetch all chats
@@ -325,6 +336,18 @@ export function MessagingPanel() {
     return () => unsubscribe();
   }, [selectedChat]);
 
+  // Subscribe to block status for current conversation
+  useEffect(() => {
+    if (!selectedChat || !userId || isAdmin) return;
+    const other = getOtherParticipant(selectedChat) as ChatParticipant | undefined;
+    if (!other?.id) return;
+    const unsub = subscribeToBlockStatus(userId, other.id, ({ youBlockedOther, blockedByOther }) => {
+      setYouBlockedOther(youBlockedOther);
+      setBlockedByOther(blockedByOther);
+    });
+    return () => unsub();
+  }, [selectedChat, userId, isAdmin]);
+
   // Auto-scroll to bottom of messages
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -348,7 +371,18 @@ export function MessagingPanel() {
 
     const textToSend = newMessage;
     setNewMessage('');
-    await sendMessage(selectedChat.id, userId, textToSend);
+    try {
+      await sendMessage(selectedChat.id, userId, textToSend);
+    } catch (err: any) {
+      // Restore text so it isn't lost
+      setNewMessage(textToSend);
+      const msg = (err && typeof err.message === 'string') ? err.message : '';
+      if (msg === 'blocked_by_recipient') {
+        toast({ title: 'Cannot send message', description: 'You have been blocked by this user.', variant: 'destructive' });
+      } else {
+        toast({ title: 'Failed to send message', description: 'Please try again.', variant: 'destructive' });
+      }
+    }
   };
   
   const getOtherParticipant = (chat: Chat) => {
@@ -502,16 +536,55 @@ export function MessagingPanel() {
                             <p className="font-semibold">{isAdmin ? `${(getOtherParticipant(selectedChat) as any).p1.name} & ${(getOtherParticipant(selectedChat) as any).p2.name}` : currentOtherParticipant?.name}</p>
                             {currentOtherParticipant?.verification === 'verified' && <ShieldCheck className="h-4 w-4 text-green-600" />}
                             {currentOtherParticipant?.verification === 'trusted' && <ShieldCheck className="h-4 w-4 text-blue-600" />}
-                        </div>
-                        <p className="text-sm text-muted-foreground">Online</p>
+                         </div>
+                        <p className="text-sm text-muted-foreground">
+                          Online
+                          {!isAdmin && youBlockedOther && <span className="ml-2 text-xs">• You blocked this user</span>}
+                          {!isAdmin && blockedByOther && <span className="ml-2 text-xs">• You are blocked</span>}
+                        </p>
                     </div>
                     {!isAdmin && selectedChat && (
-                        <div className="ml-auto">
+                        <div className="ml-auto flex items-center gap-2">
                           <MeetingRequestDialog chat={selectedChat}>
                             <Button size="sm" variant="outline">
                               <Calendar className="h-4 w-4 mr-2" /> Schedule Meeting
                             </Button>
                           </MeetingRequestDialog>
+
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" aria-label="More actions">
+                                <MoreVertical className="h-5 w-5" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onClick={async () => {
+                                  if (!userId || !currentOtherParticipant?.id) return;
+                                  setIsBlocking(true);
+                                  try {
+                                    if (youBlockedOther) {
+                                      await unblockUser(userId, currentOtherParticipant.id);
+                                      toast({ title: 'Unblocked', description: 'They can send you messages again.' });
+                                    } else {
+                                      await blockUser(userId, currentOtherParticipant.id);
+                                      toast({ title: 'Blocked', description: 'They cannot send you messages anymore.' });
+                                    }
+                                  } catch (e) {
+                                    toast({ title: 'Error', description: 'Failed to update block status.', variant: 'destructive' });
+                                  } finally {
+                                    setIsBlocking(false);
+                                  }
+                                }}
+                              >
+                                {youBlockedOther ? (<><Unlock className="mr-2 h-4 w-4" /> Unblock</>) : (<><Ban className="mr-2 h-4 w-4" /> Block</>)}
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem onClick={() => setReportOpen(true)}>
+                                <Flag className="mr-2 h-4 w-4" /> Report user
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                     )}
                 </div>
@@ -546,12 +619,13 @@ export function MessagingPanel() {
                             )}
                             <form onSubmit={handleSendMessage} className="relative">
                                 <Input 
-                                    placeholder="Type a message..." 
+                                    placeholder={blockedByOther ? 'You are blocked and cannot send messages.' : 'Type a message...'} 
                                     className="pr-12"
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
+                                    disabled={blockedByOther || isBlocking}
                                 />
-                                <Button type="submit" size="icon" className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2">
+                                <Button type="submit" size="icon" className="absolute right-1 top-1/2 h-8 w-8 -translate-y-1/2" disabled={blockedByOther || isBlocking}>
                                     <SendHorizonal className="h-4 w-4" />
                                 </Button>
                             </form>
@@ -566,6 +640,44 @@ export function MessagingPanel() {
             )}
         </div>
       </div>
+
+      {/* Report dialog */}
+      <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Report user</DialogTitle>
+            <DialogDescription>Share details (optional) about your report.</DialogDescription>
+          </DialogHeader>
+          <Textarea
+            placeholder="Add a brief comment (optional)"
+            value={reportComment}
+            onChange={(e) => setReportComment(e.target.value)}
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setReportOpen(false)}>Cancel</Button>
+            <Button
+              onClick={async () => {
+                if (!userId || !selectedChat || !currentOtherParticipant?.id) return;
+                setIsReporting(true);
+                try {
+                  await reportUser(userId, currentOtherParticipant.id, selectedChat.id, reportComment);
+                  setReportComment('');
+                  setReportOpen(false);
+                  toast({ title: 'Report submitted', description: 'Thanks for your feedback.' });
+                } catch (e) {
+                  toast({ title: 'Error', description: 'Failed to submit report.', variant: 'destructive' });
+                } finally {
+                  setIsReporting(false);
+                }
+              }}
+              disabled={isReporting}
+            >
+              {isReporting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Submit report
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

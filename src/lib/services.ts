@@ -1,7 +1,7 @@
 
 import { collection, doc, getDoc, setDoc, updateDoc, getDocs, query, where, DocumentData, deleteDoc, addDoc, serverTimestamp, orderBy, onSnapshot, limit, increment, writeBatch, runTransaction, arrayUnion, arrayRemove, getCountFromServer, deleteField } from 'firebase/firestore';
 import { db, auth } from './firebase';
-import type { UserProfile, VendorProfile, Service, Offer, QuoteRequest, Booking, SavedTimeline, ServiceOrOffer, VendorCode, Chat, ChatMessage, UpgradeRequest, VendorAnalyticsData, PlatformAnalytics, Review, LineItem, VendorInquiry, AppNotification, QuestionTemplate, TemplateResponse, QuestionTemplateMessage, TimeSlot, DayAvailability, ServiceAvailability, VendorAvailability, AvailabilitySlot, MeetingProposal, MeetingType, MeetingProposalStatus } from './types';
+import type { UserProfile, VendorProfile, Service, Offer, QuoteRequest, Booking, SavedTimeline, ServiceOrOffer, VendorCode, Chat, ChatMessage, UpgradeRequest, VendorAnalyticsData, PlatformAnalytics, Review, LineItem, VendorInquiry, AppNotification, QuestionTemplate, TemplateResponse, QuestionTemplateMessage, TimeSlot, DayAvailability, ServiceAvailability, VendorAvailability, AvailabilitySlot, MeetingProposal, MeetingType, MeetingProposalStatus, Report } from './types';
 import { formatItemForMessage, formatQuoteResponseMessage, parseForwardedMessage, formatMeetingProposalMessage, formatMeetingStatusMessage } from './utils';
 import { dataCache, cacheKeys } from './cache';
 import { subMonths, format, startOfMonth, addDays, addMonths, startOfDay, subDays } from 'date-fns';
@@ -1461,6 +1461,83 @@ export function getMessagesForChat(chatId: string, callback: (messages: ChatMess
     return unsubscribe;
 }
 
+// --- Chat Moderation & Blocking ---
+export function subscribeToBlockStatus(
+    userId: string,
+    otherId: string,
+    callback: (status: { youBlockedOther: boolean; blockedByOther: boolean }) => void,
+): () => void {
+    const youBlockRef = doc(db, 'blocks', `${userId}_${otherId}`);
+    const otherBlocksYouRef = doc(db, 'blocks', `${otherId}_${userId}`);
+
+    let youBlockedOther = false;
+    let blockedByOther = false;
+
+    const unsubA = onSnapshot(youBlockRef, (snap) => {
+        youBlockedOther = snap.exists();
+        callback({ youBlockedOther, blockedByOther });
+    });
+    const unsubB = onSnapshot(otherBlocksYouRef, (snap) => {
+        blockedByOther = snap.exists();
+        callback({ youBlockedOther, blockedByOther });
+    });
+
+    return () => {
+        try { unsubA(); } catch {}
+        try { unsubB(); } catch {}
+    };
+}
+
+export async function blockUser(blockerId: string, blockedId: string): Promise<void> {
+    const ref = doc(db, 'blocks', `${blockerId}_${blockedId}`);
+    await setDoc(ref, {
+        blockerId,
+        blockedId,
+        createdAt: serverTimestamp(),
+    });
+}
+
+export async function unblockUser(blockerId: string, blockedId: string): Promise<void> {
+    const ref = doc(db, 'blocks', `${blockerId}_${blockedId}`);
+    await deleteDoc(ref);
+}
+
+export async function reportUser(
+    reporterId: string,
+    reportedUserId: string,
+    chatId: string,
+    comment?: string,
+): Promise<string> {
+    const ref = doc(collection(db, 'reports'));
+    await setDoc(ref, {
+        reporterId,
+        reportedUserId,
+        chatId,
+        comment: (comment ?? '').trim() || null,
+        createdAt: serverTimestamp(),
+    });
+    return ref.id;
+}
+
+export function subscribeToReports(callback: (reports: Report[]) => void): () => void {
+    const q = query(collection(db, 'reports'), orderBy('createdAt', 'desc'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+        const reports: Report[] = snapshot.docs.map((docSnap) => {
+            const data = docSnap.data() as any;
+            return {
+                id: docSnap.id,
+                reporterId: data.reporterId,
+                reportedUserId: data.reportedUserId,
+                chatId: data.chatId,
+                comment: data.comment ?? null,
+                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+            } as Report;
+        });
+        callback(reports);
+    });
+    return unsubscribe;
+}
+
 export async function sendMessage(chatId: string, senderId: string, text: string) {
     if (!text.trim()) return;
 
@@ -1484,6 +1561,14 @@ export async function sendMessage(chatId: string, senderId: string, text: string
 
             if (!otherParticipantId) {
                 throw new Error("Could not find other participant in chat");
+            }
+
+            // Guard: prevent sending if recipient has blocked the sender
+            const recipientBlocksSenderRef = doc(db, 'blocks', `${otherParticipantId}_${senderId}`);
+            const blockSnap = await transaction.get(recipientBlocksSenderRef);
+            if (blockSnap.exists()) {
+                // Use a specific error code string to allow UI to handle gracefully
+                throw new Error('blocked_by_recipient');
             }
 
             const isForwarded = parseForwardedMessage(text);

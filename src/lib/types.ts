@@ -143,6 +143,16 @@ export interface Chat {
   unreadCount?: { [key: string]: number };
 }
 
+// Reports
+export interface Report {
+  id: string;
+  reporterId: string;
+  reportedUserId: string;
+  chatId?: string;
+  comment?: string | null;
+  createdAt: Date;
+}
+
 
 export interface EventTask {
   id: string;
