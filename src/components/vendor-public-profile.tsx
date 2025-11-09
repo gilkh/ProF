@@ -125,14 +125,15 @@ export function VendorPublicProfile({ vendor: initialVendor, listings: initialLi
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-4 md:p-6 pt-0">
+       <CardContent className="p-4 md:p-6 pt-0">
             <p className="text-muted-foreground mt-4">{vendor.description}</p>
         </CardContent>
       </Card>
       
        <Tabs defaultValue="services" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 md:w-auto md:inline-flex mb-4">
+            <TabsList className="grid w-full grid-cols-3 md:w-auto md:inline-flex mb-4">
                 <TabsTrigger value="services">Services & Offers</TabsTrigger>
+                <TabsTrigger value="portfolio">Portfolio</TabsTrigger>
                 <TabsTrigger value="reviews">Reviews ({vendor.reviewCount || 0})</TabsTrigger>
             </TabsList>
             <TabsContent value="services">
@@ -170,6 +171,48 @@ export function VendorPublicProfile({ vendor: initialVendor, listings: initialLi
                                 )}
                             </TabsContent>
                         </Tabs>
+                    </CardContent>
+                </Card>
+            </TabsContent>
+            <TabsContent value="portfolio">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Portfolio Galleries</CardTitle>
+                        <CardDescription>Approved media organized by category.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {approvedPortfolio.length > 0 ? (
+                            <div className="space-y-8">
+                                {Object.entries(
+                                    approvedPortfolio.reduce((acc: Record<string, typeof approvedPortfolio>, item) => {
+                                        const key = item.category || 'Uncategorized';
+                                        acc[key] = acc[key] || [];
+                                        acc[key].push(item);
+                                        return acc;
+                                    }, {})
+                                ).map(([category, items]) => (
+                                    <div key={category}>
+                                        <div className="flex items-center justify-between mb-3">
+                                            <h3 id={`gallery-${category.replace(/\s+/g,'-').toLowerCase()}`} className="text-lg font-semibold">{category}</h3>
+                                            <Link href={`#gallery-${category.replace(/\s+/g,'-').toLowerCase()}`} className="text-sm text-primary">Link</Link>
+                                        </div>
+                                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                                            {items.map((m, idx) => (
+                                                <div key={idx} className="relative aspect-square overflow-hidden rounded-lg">
+                                                    {m.type === 'image' ? (
+                                                        <img src={m.url} alt={`${category} media ${idx+1}`} className="object-cover w-full h-full" />
+                                                    ) : (
+                                                        <video src={m.url} className="w-full h-full object-cover" controls />
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-center text-muted-foreground py-8">No approved portfolio media yet.</p>
+                        )}
                     </CardContent>
                 </Card>
             </TabsContent>

@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { generateVendorCode, getVendorCodes, resetAllPasswords, getAllUsersAndVendors, updateVendorTier, deleteVendorCode, updateUserStatus, deleteUser, getUpgradeRequests, getPlatformAnalytics, updateUpgradeRequestStatus, updateVendorVerification, getVendorInquiries, updateVendorInquiryStatus, getPendingListings, updateListingStatus, createNotification, scheduleListingApproval, updateAutoApprovalSetting, getAutoApprovalSetting, updateLoginButtonSettings, getLoginButtonSettings, updateMobileIntroSetting, getMobileIntroSetting } from '@/lib/services';
+import { generateVendorCode, getVendorCodes, resetAllPasswords, getAllUsersAndVendors, updateVendorTier, deleteVendorCode, updateUserStatus, deleteUser, getUpgradeRequests, getPlatformAnalytics, updateUpgradeRequestStatus, updateVendorVerification, getVendorInquiries, updateVendorInquiryStatus, getPendingListings, updateListingStatus, createNotification, scheduleListingApproval, updateAutoApprovalSetting, getAutoApprovalSetting, getAutoApprovalConfig, updateLoginButtonSettings, getLoginButtonSettings, updateMobileIntroSetting, getMobileIntroSetting, processScheduledActions } from '@/lib/services';
 import { sendPushNotificationServerAction } from '@/app/admin/actions';
 import type { VendorCode, UserProfile, VendorProfile, UpgradeRequest, PlatformAnalytics, VendorInquiry, ServiceOrOffer } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -69,7 +69,7 @@ const providerIcons: Record<string, React.ElementType> = {
   'google.com': GoogleIcon
 };
 
-function ApprovalDropdown({ listing, onApprove, isLoading }: { listing: ServiceOrOffer, onApprove: (delayHours?: number) => void, isLoading: boolean }) {
+function ApprovalDropdown({ listing, onApprove, isLoading, hours = 12 }: { listing: ServiceOrOffer, onApprove: (delayHours?: number) => void, isLoading: boolean, hours?: number }) {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -94,9 +94,9 @@ function ApprovalDropdown({ listing, onApprove, isLoading }: { listing: ServiceO
                     <CheckCircle className="h-4 w-4 mr-2" />
                     Approve Now
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onApprove(12)}>
+                <DropdownMenuItem onClick={() => onApprove(hours)}>
                     <Clock className="h-4 w-4 mr-2" />
-                    Approve in 12 hours
+                    Approve in {hours} hours
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
@@ -168,6 +168,8 @@ export default function AdminHomePage() {
   
   // State for automatic approval
   const [autoApprovalEnabled, setAutoApprovalEnabled] = useState(false);
+  const [autoApprovalHours, setAutoApprovalHours] = useState(12);
+  const [autoApprovalMode, setAutoApprovalMode] = useState<'instant' | 'scheduled'>('scheduled');
   const [isUpdatingAutoApproval, setIsUpdatingAutoApproval] = useState(false);
   
   // State for login button settings
@@ -187,10 +189,32 @@ export default function AdminHomePage() {
     loadMobileIntroSetting();
   }, []);
 
+  // Process due scheduled actions periodically
+  useEffect(() => {
+    let timer: any;
+    const run = async () => {
+      try {
+        const count = await processScheduledActions();
+        if (count > 0) {
+          // refresh data since some approvals may have completed
+          fetchData(analyticsTimePeriod);
+          toast({ title: "Scheduled approvals processed", description: `${count} action(s) executed.` });
+        }
+      } catch (e) {
+        console.error('Failed to process scheduled actions', e);
+      }
+    };
+    run();
+    timer = setInterval(run, 60000);
+    return () => clearInterval(timer);
+  }, [analyticsTimePeriod]);
+
   const loadAutoApprovalSetting = async () => {
     try {
-      const setting = await getAutoApprovalSetting();
-      setAutoApprovalEnabled(setting);
+      const config = await getAutoApprovalConfig();
+      setAutoApprovalEnabled(config.enabled);
+      setAutoApprovalMode(config.mode);
+      setAutoApprovalHours(config.hours);
     } catch (error) {
       console.error('Failed to load auto-approval setting:', error);
     }
@@ -374,12 +398,14 @@ export default function AdminHomePage() {
   const handleAutoApprovalToggle = async (enabled: boolean) => {
     setIsUpdatingAutoApproval(true);
     try {
-      await updateAutoApprovalSetting(enabled);
+      await updateAutoApprovalSetting(enabled, { mode: autoApprovalMode, hours: autoApprovalHours });
       setAutoApprovalEnabled(enabled);
       toast({
         title: "Auto-approval Updated",
-        description: enabled 
-          ? "Listings will now be automatically approved after 12 hours."
+        description: enabled
+          ? (autoApprovalMode === 'instant'
+              ? "Listings will now be automatically approved instantly."
+              : `Listings will now be automatically approved after ${autoApprovalHours} hour${autoApprovalHours !== 1 ? 's' : ''}.`)
           : "Auto-approval has been disabled. All listings require manual review."
       });
     } catch (error) {
@@ -389,6 +415,26 @@ export default function AdminHomePage() {
         description: "Could not update auto-approval setting.", 
         variant: "destructive" 
       });
+    } finally {
+      setIsUpdatingAutoApproval(false);
+    }
+  };
+
+  const handleAutoApprovalSettingsSave = async () => {
+    setIsUpdatingAutoApproval(true);
+    try {
+      await updateAutoApprovalSetting(autoApprovalEnabled, { mode: autoApprovalMode, hours: autoApprovalHours });
+      toast({
+        title: "Auto-approval Settings Saved",
+        description: autoApprovalEnabled
+          ? (autoApprovalMode === 'instant'
+              ? "Listings will be approved instantly."
+              : `Listings will be approved after ${autoApprovalHours} hour${autoApprovalHours !== 1 ? 's' : ''}.`)
+          : "Auto-approval remains disabled."
+      });
+    } catch (error) {
+      console.error('Failed to save auto-approval settings', error);
+      toast({ title: 'Save Failed', description: 'Could not save auto-approval settings.', variant: 'destructive' });
     } finally {
       setIsUpdatingAutoApproval(false);
     }
@@ -828,6 +874,7 @@ export default function AdminHomePage() {
                                                     }
                                                 }}
                                                 isLoading={isModerating === item.id}
+                                                hours={autoApprovalHours}
                                             />
                                             <RejectListingDialog
                                                 listing={item}
@@ -1206,11 +1253,15 @@ export default function AdminHomePage() {
                         <CardDescription>Configure automatic approval for new listings.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-0.5">
+                        <div className="flex items-start justify-between gap-4">
+                            <div className="space-y-1">
                                 <Label htmlFor="auto-approval-toggle" className="text-base">Auto-Approval</Label>
                                 <p className="text-sm text-muted-foreground">
-                                    Automatically approve listings after 12 hours
+                                    {autoApprovalEnabled
+                                        ? (autoApprovalMode === 'instant'
+                                            ? 'Automatically approve new listings instantly'
+                                            : `Automatically approve new listings after ${autoApprovalHours} hour${autoApprovalHours !== 1 ? 's' : ''}`)
+                                        : 'Auto-approval disabled; all listings require manual review'}
                                 </p>
                             </div>
                             <Switch
@@ -1219,6 +1270,40 @@ export default function AdminHomePage() {
                                 onCheckedChange={handleAutoApprovalToggle}
                                 disabled={isUpdatingAutoApproval}
                             />
+                        </div>
+                        <div className="mt-4 flex items-end gap-4">
+                            <div className="space-y-1">
+                                <Label className="text-sm">Mode</Label>
+                                <Select
+                                    value={autoApprovalMode}
+                                    onValueChange={(v) => setAutoApprovalMode(v as 'instant' | 'scheduled')}
+                                    disabled={!autoApprovalEnabled || isUpdatingAutoApproval}
+                                >
+                                    <SelectTrigger className="w-[200px]">
+                                        <SelectValue placeholder="Select mode" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="instant">Instant</SelectItem>
+                                        <SelectItem value="scheduled">Scheduled</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            {autoApprovalMode === 'scheduled' && (
+                                <div className="space-y-1">
+                                    <Label className="text-sm">Delay (hours)</Label>
+                                    <Input
+                                        type="number"
+                                        min={1}
+                                        value={autoApprovalHours}
+                                        onChange={(e) => setAutoApprovalHours(Math.max(1, parseInt(e.target.value || '0', 10)))}
+                                        disabled={!autoApprovalEnabled || isUpdatingAutoApproval}
+                                        className="w-[160px]"
+                                    />
+                                </div>
+                            )}
+                            <Button onClick={handleAutoApprovalSettingsSave} disabled={isUpdatingAutoApproval}>
+                                Save
+                            </Button>
                         </div>
                     </CardContent>
                 </Card>

@@ -15,7 +15,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { getVendorProfile, createOrUpdateVendorProfile, getReviewsForVendor, getUserProfile, createOrUpdateUserProfile, getPhoneNumberReveals } from '@/lib/services';
-import type { VendorProfile, Review, UserProfile, ServiceCategory, Location } from '@/lib/types';
+import type { VendorProfile, Review, UserProfile, ServiceCategory, Location, MediaItem } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
@@ -31,6 +31,16 @@ import { Label } from '@/components/ui/label';
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
+const mediaTypeSchema = z.enum(["image", "video"]);
+const mediaStatusSchema = z.enum(["pending", "approved", "rejected"]);
+const portfolioItemSchema = z.object({
+  url: z.string(),
+  type: mediaTypeSchema,
+  status: mediaStatusSchema,
+  isThumbnail: z.boolean(),
+  category: z.string().optional(),
+});
+
 const profileFormSchema = z.object({
   // From VendorProfile
   businessName: z.string().min(1, "Business name is required"),
@@ -38,7 +48,7 @@ const profileFormSchema = z.object({
   location: z.string().min(1, "Location is required"),
   tagline: z.string().min(1, "Tagline is required"),
   description: z.string().min(1, "Description is required"),
-  portfolio: z.array(z.string()).optional(),
+  portfolio: z.array(portfolioItemSchema).optional(),
   avatar: z.string().optional(),
   
   // From UserProfile
@@ -101,6 +111,9 @@ export default function VendorProfilePage() {
     const [isLoadingReviews, setIsLoadingReviews] = useState(true);
     const portfolioFileRef = useRef<HTMLInputElement>(null);
     const avatarFileRef = useRef<HTMLInputElement>(null);
+    const [selectedUploadCategory, setSelectedUploadCategory] = useState<string | null>(null);
+    const [newCategoryName, setNewCategoryName] = useState('');
+    const [categoriesList, setCategoriesList] = useState<string[]>([]);
 
     const form = useForm<z.infer<typeof profileFormSchema>>({
         resolver: zodResolver(profileFormSchema),
@@ -217,7 +230,7 @@ export default function VendorProfilePage() {
                     const MAX_HEIGHT = isAvatar ? 256 : 1024;
                     let width = img.width;
                     let height = img.height;
-    
+
                     if (width > height) {
                         if (width > MAX_WIDTH) {
                             height *= MAX_WIDTH / width;
@@ -233,7 +246,7 @@ export default function VendorProfilePage() {
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     if (!ctx) return reject('Could not get canvas context');
-    
+
                     ctx.drawImage(img, 0, 0, width, height);
                     resolve(canvas.toDataURL('image/jpeg', isAvatar ? 0.95 : 0.9));
                 };
@@ -248,31 +261,96 @@ export default function VendorProfilePage() {
 
         form.control.getFieldState('portfolio').isSubmitting = true;
 
-        const compressedImages: string[] = [];
-        for (const file of Array.from(files)) {
+        const newMediaItems: MediaItem[] = [];
+        const fileArray = Array.from(files);
+
+        for (const file of fileArray) {
+            const isVideo = file.type.startsWith('video');
+
             if (file.size > MAX_FILE_SIZE) {
                 toast({ title: 'File too large', description: `${file.name} is over 5MB.`, variant: 'destructive' });
                 continue;
             }
-            if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-                toast({ title: 'Invalid file type', description: `${file.name} is not a valid image type.`, variant: 'destructive' });
-                continue;
-            }
-            try {
-                const compressedDataUrl = await compressImage(file, false);
-                compressedImages.push(compressedDataUrl);
-            } catch (error) {
-                console.error("Image processing failed", error);
-                toast({ title: 'Image Error', description: `Could not process ${file.name}.`, variant: 'destructive' });
+
+                if (isVideo) {
+                    const reader = new FileReader();
+                    const loadPromise = new Promise<void>((resolve) => {
+                        reader.onloadend = () => {
+                            newMediaItems.push({
+                                url: reader.result as string,
+                                type: 'video',
+                                status: 'pending',
+                                isThumbnail: false,
+                                category: selectedUploadCategory || undefined,
+                            });
+                            resolve();
+                        };
+                    });
+                    reader.readAsDataURL(file);
+                await loadPromise;
+            } else {
+                if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+                    toast({ title: 'Invalid file type', description: `${file.name} is not a valid image type.`, variant: 'destructive' });
+                    continue;
+                }
+                try {
+                    const compressedDataUrl = await compressImage(file, false);
+                    newMediaItems.push({
+                        url: compressedDataUrl,
+                        type: 'image',
+                        status: 'pending',
+                        isThumbnail: false,
+                        category: selectedUploadCategory || undefined,
+                    });
+                } catch (error) {
+                    console.error('Image processing failed', error);
+                    toast({ title: 'Image Error', description: `Could not process ${file.name}.`, variant: 'destructive' });
+                }
             }
         }
-        
-        const currentPortfolio = form.getValues('portfolio') || [];
-        form.setValue('portfolio', [...currentPortfolio, ...compressedImages], { shouldDirty: true });
+
+        // Merge and sort to ensure images come first
+        const currentPortfolio = (form.getValues('portfolio') || []) as MediaItem[];
+        const merged = [...currentPortfolio, ...newMediaItems];
+        merged.sort((a, b) => {
+            if (a.type === 'image' && b.type === 'video') return -1;
+            if (a.type === 'video' && b.type === 'image') return 1;
+            return 0;
+        });
+
+        // Ensure first item is an image for thumbnail
+        if (merged.length > 0 && merged[0].type === 'video') {
+            toast({
+                title: 'Invalid Thumbnail',
+                description: 'The first item must be an image. It has been moved.',
+                variant: 'destructive',
+            });
+            // Move first video after the first image
+            const firstImageIndex = merged.findIndex(m => m.type === 'image');
+            if (firstImageIndex > -1) {
+                const [videoItem] = merged.splice(0, 1);
+                merged.splice(firstImageIndex, 0, videoItem);
+            }
+        }
+
+        // Set thumbnail flags
+        const finalPortfolio = merged.map((item, index) => ({ ...item, isThumbnail: index === 0 }));
+
+        form.setValue('portfolio', finalPortfolio, { shouldDirty: true });
         form.control.getFieldState('portfolio').isSubmitting = false;
-        
+
         // Auto-save after upload
         await form.handleSubmit(onSubmit)();
+    }
+
+    const handleAddCategory = () => {
+        const name = newCategoryName.trim();
+        if (!name) return;
+        if (!categoriesList.includes(name)) {
+            setCategoriesList(prev => [...prev, name]);
+        }
+        setSelectedUploadCategory(name);
+        setNewCategoryName('');
     }
     
      const handleAvatarUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -298,10 +376,17 @@ export default function VendorProfilePage() {
         }
     }
     
-    const handleRemovePortfolioImage = async (index: number) => {
-        const currentPortfolio = form.getValues('portfolio') || [];
-        const updatedPortfolio = currentPortfolio.filter((_, i) => i !== index);
-        form.setValue('portfolio', updatedPortfolio, { shouldDirty: true });
+    const handleRemovePortfolioItem = async (index: number) => {
+        const currentPortfolio = (form.getValues('portfolio') || []) as MediaItem[];
+        const updated = currentPortfolio.filter((_, i) => i !== index).map((item, i) => ({ ...item, isThumbnail: i === 0 }));
+        form.setValue('portfolio', updated, { shouldDirty: true });
+        await form.handleSubmit(onSubmit)();
+    }
+
+    const handleChangePortfolioCategory = async (index: number, value: string) => {
+        const currentPortfolio = (form.getValues('portfolio') || []) as MediaItem[];
+        const updated = currentPortfolio.map((item, i) => i === index ? { ...item, category: value || undefined } : item);
+        form.setValue('portfolio', updated, { shouldDirty: true });
         await form.handleSubmit(onSubmit)();
     }
     
@@ -350,7 +435,7 @@ export default function VendorProfilePage() {
     )
   }
 
-  const portfolioImages = form.watch('portfolio') || [];
+  const portfolioItems = (form.watch('portfolio') || []) as MediaItem[];
   const avatarUrl = form.watch('avatar');
 
   return (
@@ -569,28 +654,90 @@ export default function VendorProfilePage() {
                         <CardTitle>Portfolio Gallery</CardTitle>
                         <CardDescription>Showcase your best work to attract clients.</CardDescription>
                     </div>
-                     <Button variant="outline" onClick={() => portfolioFileRef.current?.click()} disabled={form.control.getFieldState('portfolio').isSubmitting}>
-                        <ImagePlus className="mr-2 h-4 w-4" /> Add Photos
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        <Select value={selectedUploadCategory ?? 'uncategorized'} onValueChange={(v) => setSelectedUploadCategory(v === 'uncategorized' ? null : v)}>
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder="Upload to category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="uncategorized">Uncategorized</SelectItem>
+                                {Array.from(new Set([...(categoriesList || []), ...(((form.watch('portfolio') || []) as MediaItem[]).map(i => i.category).filter(Boolean) as string[])]))
+                                    .map((cat) => (
+                                        <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                                    ))}
+                            </SelectContent>
+                        </Select>
+                        <Input
+                            value={newCategoryName}
+                            onChange={(e) => setNewCategoryName(e.target.value)}
+                            placeholder="New category"
+                            className="w-[160px]"
+                        />
+                        <Button variant="outline" onClick={handleAddCategory} disabled={!newCategoryName.trim()}>
+                            Add Category
+                        </Button>
+                        <Button variant="outline" onClick={() => portfolioFileRef.current?.click()} disabled={form.control.getFieldState('portfolio').isSubmitting}>
+                            <ImagePlus className="mr-2 h-4 w-4" /> Add Photos
+                        </Button>
+                    </div>
                     <Input 
                         type="file" 
                         ref={portfolioFileRef} 
                         className="hidden" 
                         multiple 
-                        accept="image/*"
+                        accept="image/*,video/*"
                         onChange={handlePortfolioUpload}
                     />
                 </div>
             </CardHeader>
             <CardContent>
-                {portfolioImages.length > 0 ? (
-                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {portfolioImages.map((src, index) => (
-                            <div key={index} className="relative aspect-square overflow-hidden rounded-lg group">
-                                <Image src={src} alt={`Portfolio image ${index + 1}`} layout="fill" className="object-cover" />
-                                <Button variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleRemovePortfolioImage(index)}>
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
+                {portfolioItems.length > 0 ? (
+                    <div className="space-y-6">
+                        {Object.entries(
+                            (portfolioItems || []).reduce((acc: Record<string, MediaItem[]>, it) => {
+                                const key = it.category || 'Uncategorized';
+                                acc[key] = acc[key] || [];
+                                acc[key].push(it);
+                                return acc;
+                            }, {})
+                        ).map(([category, items]) => (
+                            <div key={category}>
+                                <div className="flex items-center justify-between mb-2">
+                                    <h3 className="text-sm font-semibold">{category}</h3>
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    {items.map((item) => {
+                                        const globalIndex = portfolioItems.findIndex(m => m === item);
+                                        return (
+                                            <div key={globalIndex} className="relative overflow-hidden rounded-lg group">
+                                                <div className="aspect-square">
+                                                    {item.type === 'image' ? (
+                                                        <Image src={item.url} alt={`Portfolio item ${globalIndex + 1}`} layout="fill" className="object-cover" />
+                                                    ) : (
+                                                        <video src={item.url} className="w-full h-full object-cover" controls />
+                                                    )}
+                                                </div>
+                                                {/* Status badge */}
+                                                <Badge
+                                                    variant={item.status === 'approved' ? 'default' : item.status === 'rejected' ? 'destructive' : 'secondary'}
+                                                    className={`${item.status === 'approved' ? 'bg-green-500 text-white' : item.status === 'pending' ? 'bg-amber-500 text-white' : 'bg-red-500 text-white'} absolute top-2 left-2 z-10`}
+                                                >
+                                                    {item.status === 'pending' ? 'In Progress' : item.status === 'approved' ? 'Accepted' : 'Rejected'}
+                                                </Badge>
+                                                <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur p-2 flex items-center gap-2">
+                                                    <Input 
+                                                        placeholder="Category (optional)" 
+                                                        value={item.category || ''} 
+                                                        onChange={(e) => handleChangePortfolioCategory(globalIndex, e.target.value)}
+                                                    />
+                                                </div>
+                                                <Button variant="destructive" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleRemovePortfolioItem(globalIndex)}>
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
                             </div>
                         ))}
                     </div>

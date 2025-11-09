@@ -14,6 +14,8 @@ export interface MediaItem {
   type: 'image' | 'video';
   status: 'pending' | 'approved' | 'rejected';
   isThumbnail?: boolean;
+  // Optional category label used for portfolio galleries (e.g., Weddings)
+  category?: string;
 }
 
 export interface ServiceInclusions {
@@ -317,6 +319,19 @@ export interface MeetingStatusMessage {
   proposalId: string;
   status: MeetingProposalStatus;
   reason?: string;
+}
+
+// Portfolio mention message for chat
+export interface PortfolioMentionMessage {
+  isPortfolioMention: true;
+  vendorId: string;
+  vendorName: string;
+  media: {
+    url: string;
+    type: 'image' | 'video';
+    category?: string;
+  };
+  caption?: string;
 }
 
 

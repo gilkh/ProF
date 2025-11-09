@@ -15,10 +15,28 @@ export async function initializeNotifications(userId: string) {
     if (permission === 'granted') {
       console.log('Notification permission granted.');
 
+      // Ensure our service worker is registered explicitly to avoid default registration 404s
+      let swReg: ServiceWorkerRegistration | undefined;
+      if ('serviceWorker' in navigator) {
+        try {
+          swReg = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+          console.log('[notifications] Service worker registered:', swReg.scope);
+        } catch (swErr) {
+          console.warn('[notifications] Failed to register service worker, proceeding without explicit registration.', swErr);
+        }
+      }
+
       // Get the token
-      const currentToken = await getToken(messaging, {
-        vapidKey: 'BO2Tgi02oBTPlrFxYWDms6NVHEKqzy3Z7QtfCslG1GZda4hVpIu9eTx5C7tCrMwHqyY7NCFbw1LXr-d9P-GKctk', // IMPORTANT: Replace this
-      });
+      let currentToken: string | undefined;
+      try {
+        currentToken = await getToken(messaging, {
+          vapidKey: 'BO2Tgi02oBTPlrFxYWDms6NVHEKqzy3Z7QtfCslG1GZda4hVpIu9eTx5C7tCrMwHqyY7NCFbw1LXr-d9P-GKctk', // IMPORTANT: Replace this
+          serviceWorkerRegistration: swReg,
+        });
+      } catch (tokenErr) {
+        console.warn('[notifications] Failed to obtain FCM token. Verify VAPID key and push configuration.', tokenErr);
+        return; // Gracefully abort without throwing
+      }
 
       if (currentToken) {
         console.log('FCM Token:', currentToken);
@@ -46,6 +64,6 @@ export async function initializeNotifications(userId: string) {
       new Notification(notificationTitle, notificationOptions);
     });
   } catch (error) {
-    console.error('An error occurred while setting up notifications.', error);
+    console.warn('An error occurred while setting up notifications.', error);
   }
 }

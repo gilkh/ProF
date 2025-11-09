@@ -14,7 +14,7 @@ import { getChatsForUser, getMessagesForChat, sendMessage, markChatAsRead, appro
 import { useAuth } from '@/hooks/use-auth';
 import { format, formatDistanceToNow } from 'date-fns';
 import { Skeleton } from './ui/skeleton';
-import { parseForwardedMessage, parseQuestionTemplateMessage, parseTemplateResponseMessage, parseMeetingProposalMessage, parseMeetingStatusMessage } from '@/lib/utils';
+import { parseForwardedMessage, parseQuestionTemplateMessage, parseTemplateResponseMessage, parseMeetingProposalMessage, parseMeetingStatusMessage, parsePortfolioMentionMessage } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -22,8 +22,10 @@ import { useToast } from '@/hooks/use-toast';
 import { Separator } from './ui/separator';
 import { QuestionTemplateBubble, TemplateResponseBubble } from './question-template-bubble';
 import { MeetingProposalBubble, MeetingStatusBubble } from './meeting-proposal-bubble';
+import { PortfolioMentionBubble } from './portfolio-mention-bubble';
 import { MeetingRequestDialog } from './meeting-request-dialog';
 import { QuestionTemplateSelector } from './question-template-selector';
+import { PortfolioMentionDialog } from './portfolio-mention-dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Textarea } from './ui/textarea';
@@ -228,6 +230,16 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
         );
     }
 
+    // Check for portfolio mention
+    const portfolioMention = parsePortfolioMentionMessage(message.text);
+    if (portfolioMention) {
+        return (
+            <div className={cn('flex w-full', isOwnMessage ? 'justify-end' : 'justify-start')}>
+                <PortfolioMentionBubble data={portfolioMention} isOwnMessage={isOwnMessage} timestamp={message.timestamp} />
+            </div>
+        );
+    }
+
     const forwardedItem = parseForwardedMessage(message.text);
 
     if (forwardedItem) {
@@ -248,12 +260,19 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
         return (
              <div className={cn("flex items-end gap-2", isOwnMessage && "justify-end")}>
                  {!isOwnMessage && (
-                    <Link href={`/vendor/${otherParticipant?.id}`}>
+                    (role === 'client' && otherParticipant?.id) ? (
+                      <Link href={`/vendor/${otherParticipant.id}`}>
                         <Avatar className="h-8 w-8 self-start">
                             <AvatarImage src={otherParticipant?.avatar} />
                             <AvatarFallback>{otherParticipant?.name?.substring(0,2)}</AvatarFallback>
                         </Avatar>
-                    </Link>
+                      </Link>
+                    ) : (
+                      <Avatar className="h-8 w-8 self-start">
+                          <AvatarImage src={otherParticipant?.avatar} />
+                          <AvatarFallback>{otherParticipant?.name?.substring(0,2)}</AvatarFallback>
+                      </Avatar>
+                    )
                 )}
                 <ForwardedItemBubble item={forwardedItem} timestamp={message.timestamp} />
              </div>
@@ -263,12 +282,19 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
     return (
         <div className={cn("flex items-end gap-2", isOwnMessage && "justify-end")}>
             {!isOwnMessage && (
-                 <Link href={`/vendor/${otherParticipant?.id}`}>
+                (role === 'client' && otherParticipant?.id) ? (
+                  <Link href={`/vendor/${otherParticipant.id}`}>
                     <Avatar className="h-8 w-8">
                         <AvatarImage src={sender?.avatar} />
                         <AvatarFallback>{sender?.name?.substring(0,2)}</AvatarFallback>
                     </Avatar>
-                </Link>
+                  </Link>
+                ) : (
+                  <Avatar className="h-8 w-8">
+                      <AvatarImage src={sender?.avatar} />
+                      <AvatarFallback>{sender?.name?.substring(0,2)}</AvatarFallback>
+                  </Avatar>
+                )
             )}
                 <div
                 className={cn(
@@ -308,6 +334,7 @@ export function MessagingPanel() {
   const [isReporting, setIsReporting] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
   const [reportComment, setReportComment] = useState('');
+  const [mentionOpen, setMentionOpen] = useState(false);
 
   useEffect(() => {
     // Admins don't need a user ID to fetch all chats
@@ -526,23 +553,41 @@ export function MessagingPanel() {
                     <Button variant="ghost" size="icon" className="sm:hidden" onClick={() => setSelectedChat(null)}>
                         <ArrowLeft className="h-5 w-5" />
                     </Button>
-                     <Avatar className="h-10 w-10">
-                        <AvatarImage src={currentOtherParticipant?.avatar} alt={currentOtherParticipant?.name} />
-                        <AvatarFallback>{currentOtherParticipant?.name?.substring(0,2)}</AvatarFallback>
-                    </Avatar>
-                    
-                    <div>
-                         <div className="flex items-center gap-1.5">
-                            <p className="font-semibold">{isAdmin ? `${(getOtherParticipant(selectedChat) as any).p1.name} & ${(getOtherParticipant(selectedChat) as any).p2.name}` : currentOtherParticipant?.name}</p>
-                            {currentOtherParticipant?.verification === 'verified' && <ShieldCheck className="h-4 w-4 text-green-600" />}
-                            {currentOtherParticipant?.verification === 'trusted' && <ShieldCheck className="h-4 w-4 text-blue-600" />}
-                         </div>
-                        <p className="text-sm text-muted-foreground">
-                          Online
-                          {!isAdmin && youBlockedOther && <span className="ml-2 text-xs">• You blocked this user</span>}
-                          {!isAdmin && blockedByOther && <span className="ml-2 text-xs">• You are blocked</span>}
-                        </p>
-                    </div>
+                    {(role === 'client' && !isAdmin && currentOtherParticipant?.id) ? (
+                        <Link href={`/vendor/${currentOtherParticipant?.id}`} className="flex items-center gap-3">
+                            <Avatar className="h-10 w-10">
+                                <AvatarImage src={currentOtherParticipant?.avatar} alt={currentOtherParticipant?.name} />
+                                <AvatarFallback>{currentOtherParticipant?.name?.substring(0,2)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <div className="flex items-center gap-1.5">
+                                    <p className="font-semibold">{currentOtherParticipant?.name}</p>
+                                    {currentOtherParticipant?.verification === 'verified' && <ShieldCheck className="h-4 w-4 text-green-600" />}
+                                    {currentOtherParticipant?.verification === 'trusted' && <ShieldCheck className="h-4 w-4 text-blue-600" />}
+                                </div>
+                                <p className="text-sm text-muted-foreground">Online</p>
+                            </div>
+                        </Link>
+                    ) : (
+                        <>
+                            <Avatar className="h-10 w-10">
+                                <AvatarImage src={currentOtherParticipant?.avatar} alt={currentOtherParticipant?.name} />
+                                <AvatarFallback>{currentOtherParticipant?.name?.substring(0,2)}</AvatarFallback>
+                            </Avatar>
+                            <div>
+                                <div className="flex items-center gap-1.5">
+                                    <p className="font-semibold">{isAdmin ? `${(getOtherParticipant(selectedChat) as any).p1.name} & ${(getOtherParticipant(selectedChat) as any).p2.name}` : currentOtherParticipant?.name}</p>
+                                    {currentOtherParticipant?.verification === 'verified' && <ShieldCheck className="h-4 w-4 text-green-600" />}
+                                    {currentOtherParticipant?.verification === 'trusted' && <ShieldCheck className="h-4 w-4 text-blue-600" />}
+                                </div>
+                                <p className="text-sm text-muted-foreground">
+                                    Online
+                                    {!isAdmin && youBlockedOther && <span className="ml-2 text-xs">• You blocked this user</span>}
+                                    {!isAdmin && blockedByOther && <span className="ml-2 text-xs">• You are blocked</span>}
+                                </p>
+                            </div>
+                        </>
+                    )}
                     {!isAdmin && selectedChat && (
                         <div className="ml-auto flex items-center gap-2">
                           <MeetingRequestDialog chat={selectedChat}>
@@ -600,23 +645,30 @@ export function MessagingPanel() {
                          <div className="text-center text-sm text-muted-foreground">Admin view is read-only</div>
                     ) : (
                         <div className="space-y-3">
-                            {role === 'vendor' && (
-                                <div className="flex justify-between items-center">
+                            <div className="flex justify-between items-center">
+                                {role === 'vendor' ? (
                                     <Link href="/vendor/templates">
                                         <Button variant="outline" size="sm">
                                             <FileText className="h-4 w-4 mr-2" />
                                             Manage Templates
                                         </Button>
                                     </Link>
-                                    <QuestionTemplateSelector 
-                                        chatId={selectedChat.id}
-                                        clientId={getOtherParticipant(selectedChat)?.id}
-                                        onTemplateSent={() => {
-                                            // Refresh messages to show the sent template
-                                        }}
-                                    />
+                                ) : <div />}
+                                <div className="flex items-center gap-2">
+                                    {role === 'vendor' && (
+                                        <QuestionTemplateSelector 
+                                            chatId={selectedChat.id}
+                                            clientId={getOtherParticipant(selectedChat)?.id}
+                                            onTemplateSent={() => {
+                                                // Messages update via real-time listener
+                                            }}
+                                        />
+                                    )}
+                                    <Button variant="outline" size="sm" onClick={() => setMentionOpen(true)}>
+                                        Mention Portfolio
+                                    </Button>
                                 </div>
-                            )}
+                            </div>
                             <form onSubmit={handleSendMessage} className="relative">
                                 <Input 
                                     placeholder={blockedByOther ? 'You are blocked and cannot send messages.' : 'Type a message...'} 
@@ -629,6 +681,16 @@ export function MessagingPanel() {
                                     <SendHorizonal className="h-4 w-4" />
                                 </Button>
                             </form>
+                            {selectedChat && (
+                                <PortfolioMentionDialog 
+                                    chat={selectedChat}
+                                    sender={selectedChat.participants.find(p => p.id === (userId || '')) || null}
+                                    other={getOtherParticipant(selectedChat) as any}
+                                    userId={userId || ''}
+                                    open={mentionOpen}
+                                    onOpenChange={setMentionOpen}
+                                />
+                            )}
                         </div>
                     )}
                 </div>

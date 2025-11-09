@@ -1,7 +1,7 @@
 
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import type { ServiceOrOffer, ForwardedItem, QuoteRequest, LineItem, QuestionTemplateMessage, MeetingProposal, MeetingProposalMessage, MeetingStatusMessage } from "./types";
+import type { ServiceOrOffer, ForwardedItem, QuoteRequest, LineItem, QuestionTemplateMessage, MeetingProposal, MeetingProposalMessage, MeetingStatusMessage, PortfolioMentionMessage } from "./types";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -141,6 +141,27 @@ export function parseMeetingStatusMessage(text: string): MeetingStatusMessage | 
     const data = JSON.parse(text);
     if (data && data.isMeetingStatus === true) {
       return data as MeetingStatusMessage;
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Portfolio mention helpers
+export function formatPortfolioMentionMessage(message: Omit<PortfolioMentionMessage, 'isPortfolioMention'>): string {
+  const payload: PortfolioMentionMessage = {
+    ...message,
+    isPortfolioMention: true,
+  };
+  return JSON.stringify(payload);
+}
+
+export function parsePortfolioMentionMessage(text: string): PortfolioMentionMessage | null {
+  try {
+    const data = JSON.parse(text);
+    if (data && data.isPortfolioMention === true) {
+      return data as PortfolioMentionMessage;
     }
     return null;
   } catch (e) {

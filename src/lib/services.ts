@@ -379,7 +379,33 @@ export async function getVendorProfile(vendorId: string): Promise<VendorProfile 
 export async function createOrUpdateVendorProfile(vendorId: string, data: Partial<Omit<VendorProfile, 'id' | 'createdAt'>>) {
     if (!vendorId) return;
      const docRef = doc(db, 'vendors', vendorId);
-    await setDoc(docRef, { ...data, lastModified: serverTimestamp() }, { merge: true });
+
+    // Apply auto-approval or scheduling to new pending portfolio items
+    let payload = { ...data } as Partial<VendorProfile>;
+    try {
+        if (data.portfolio && Array.isArray(data.portfolio) && data.portfolio.length > 0) {
+            const config = await getAutoApprovalConfig();
+            if (config.enabled) {
+                if (config.mode === 'instant') {
+                    const updatedPortfolio = data.portfolio.map(item => (
+                        item.status === 'pending' ? { ...item, status: 'approved' } : item
+                    ));
+                    payload.portfolio = updatedPortfolio;
+                } else if (config.mode === 'scheduled' && config.hours && config.hours > 0) {
+                    const pendingItems = data.portfolio.filter(item => item.status === 'pending');
+                    if (pendingItems.length) {
+                        await Promise.all(pendingItems.map(item =>
+                            scheduleProfileMediaApproval(vendorId, item.url, 'approved', config.hours)
+                        ));
+                    }
+                }
+            }
+        }
+    } catch (e) {
+        console.warn('Auto-approval check failed during vendor profile update, continuing with normal save', e);
+    }
+
+    await setDoc(docRef, { ...payload, lastModified: serverTimestamp() }, { merge: true });
 }
 
 // Timeline Services
@@ -563,12 +589,25 @@ export async function getServiceOrOfferById(id: string): Promise<ServiceOrOffer 
 
 export async function createServiceOrOffer(item: Omit<Service, 'id'> | Omit<Offer, 'id'>) {
     const collectionName = item.type === 'service' ? 'services' : 'offers';
-    await addDoc(collection(db, collectionName), {
+    const docRef = await addDoc(collection(db, collectionName), {
         ...item,
         rating: 0,
         reviewCount: 0,
         status: 'pending',
     });
+
+    try {
+        const config = await getAutoApprovalConfig();
+        if (config.enabled) {
+            if (config.mode === 'instant') {
+                await updateDoc(docRef, { status: 'approved' });
+            } else if (config.hours && config.hours > 0) {
+                await scheduleListingApproval(docRef.id, item.type, 'approved', config.hours);
+            }
+        }
+    } catch (e) {
+        console.warn('Auto-approval processing failed, leaving listing pending:', e);
+    }
 }
 
 export async function updateServiceOrOffer(itemId: string, itemData: Partial<ServiceOrOffer>) {
@@ -1378,6 +1417,26 @@ export async function getPendingMediaForModeration(): Promise<any[]> {
         });
     });
 
+    // Include vendor profile portfolio items
+    const vendorsSnapshot = await getDocs(collection(db, 'vendors'));
+    vendorsSnapshot.forEach(doc => {
+        const vendor = { id: doc.id, ...doc.data() } as VendorProfile;
+        vendor.portfolio?.forEach(media => {
+            if (media.status === 'pending') {
+                allItems.push({
+                    ...media,
+                    context: {
+                        ownerId: vendor.id,
+                        ownerName: vendor.businessName,
+                        listingId: vendor.id,
+                        listingTitle: 'Profile Portfolio',
+                        listingType: 'profile'
+                    }
+                });
+            }
+        });
+    });
+
     return allItems;
 }
 
@@ -1386,7 +1445,22 @@ export async function moderateMedia(ownerId: string, listingType: 'service' | 'o
     
     if (listingType === 'profile') {
         const vendorRef = doc(db, 'vendors', ownerId);
-        console.log(`Moderating profile picture for ${ownerId} - ${decision}`);
+        await runTransaction(db, async (transaction) => {
+            const vendorDoc = await transaction.get(vendorRef);
+            if (!vendorDoc.exists()) throw new Error("Vendor not found");
+
+            const vendorData = vendorDoc.data() as VendorProfile;
+            const portfolio = vendorData.portfolio || [];
+
+            const newPortfolio = portfolio.map(item => {
+                if (item.url === mediaUrl) {
+                    return { ...item, status: decision };
+                }
+                return item;
+            });
+
+            transaction.update(vendorRef, { portfolio: newPortfolio });
+        });
 
     } else {
         if (!listingId) throw new Error("Listing ID is required for service/offer media moderation.");
@@ -2175,12 +2249,64 @@ export async function scheduleListingApproval(listingId: string, type: 'service'
     await addDoc(collection(db, 'scheduledActions'), scheduledAction);
 }
 
+// Schedule approval for vendor profile media (portfolio item)
+export async function scheduleProfileMediaApproval(vendorId: string, mediaUrl: string, decision: 'approved' | 'rejected', delayHours: number, reason?: string) {
+    const scheduledDate = new Date(Date.now() + (delayHours * 60 * 60 * 1000));
+    const scheduledAction = {
+        vendorId,
+        mediaUrl,
+        type: 'profile',
+        decision,
+        reason,
+        scheduledFor: scheduledDate,
+        createdAt: new Date(),
+        status: 'pending'
+    };
+    await addDoc(collection(db, 'scheduledActions'), scheduledAction);
+}
+
+// Process due scheduled actions (listings and profile media)
+export async function processScheduledActions(): Promise<number> {
+    try {
+        const now = new Date();
+        const q = query(
+            collection(db, 'scheduledActions'),
+            where('status', '==', 'pending'),
+            where('scheduledFor', '<=', now),
+            orderBy('scheduledFor', 'asc')
+        );
+
+        const snapshot = await getDocs(q);
+        let processed = 0;
+        for (const docSnap of snapshot.docs) {
+            const action = docSnap.data() as any;
+            try {
+                if (action.type === 'service' || action.type === 'offer') {
+                    await updateListingStatus(action.listingId, action.type, action.decision, action.reason);
+                } else if (action.type === 'profile') {
+                    const ownerId = action.vendorId || action.ownerId; // support both fields
+                    await moderateMedia(ownerId, 'profile', action.mediaUrl, action.decision);
+                }
+                await updateDoc(doc(db, 'scheduledActions', docSnap.id), { status: 'completed', processedAt: new Date() });
+                processed++;
+            } catch (err) {
+                await updateDoc(doc(db, 'scheduledActions', docSnap.id), { status: 'failed', error: String(err), processedAt: new Date() });
+            }
+        }
+        return processed;
+    } catch (error) {
+        console.error('Failed to process scheduled actions', error);
+        return 0;
+    }
+}
+
 // New function to update auto-approval setting
-export async function updateAutoApprovalSetting(enabled: boolean) {
+export async function updateAutoApprovalSetting(enabled: boolean, options?: { mode?: 'instant' | 'scheduled'; hours?: number }) {
     const settingsRef = doc(db, 'adminSettings', 'moderation');
     await setDoc(settingsRef, {
         autoApprovalEnabled: enabled,
-        autoApprovalHours: 12,
+        autoApprovalMode: options?.mode ?? 'scheduled',
+        autoApprovalHours: typeof options?.hours === 'number' ? options.hours : 12,
         updatedAt: serverTimestamp()
     }, { merge: true });
 }
@@ -2199,6 +2325,23 @@ export async function getAutoApprovalSetting(): Promise<boolean> {
         console.error('Error fetching auto-approval setting:', error);
         return false;
     }
+}
+
+export async function getAutoApprovalConfig(): Promise<{ enabled: boolean; mode: 'instant' | 'scheduled'; hours: number }> {
+    try {
+        const settingsRef = doc(db, 'adminSettings', 'moderation');
+        const settingsSnap = await getDoc(settingsRef);
+        if (settingsSnap.exists()) {
+            const data = settingsSnap.data();
+            const enabled = !!data.autoApprovalEnabled;
+            const mode: 'instant' | 'scheduled' = data.autoApprovalMode === 'instant' ? 'instant' : 'scheduled';
+            const hours = typeof data.autoApprovalHours === 'number' ? data.autoApprovalHours : 12;
+            return { enabled, mode, hours };
+        }
+    } catch (error) {
+        console.error('Error fetching auto-approval config:', error);
+    }
+    return { enabled: false, mode: 'scheduled', hours: 12 };
 }
 
 // Login button toggle functions
