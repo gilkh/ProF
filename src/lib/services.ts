@@ -54,14 +54,12 @@ export async function createNewUser(data: {
         throw new Error("Could not create user account in Firebase Authentication.");
     }
     
-    // Step 2: Send verification email ONLY for clients (if verification is enabled)
+    // Step 2: Send verification email for non-admin accounts when enabled
     let verificationSent = false;
-    if (accountType === 'client') {
-        const emailVerificationRequired = await getEmailVerificationSetting();
-        if (emailVerificationRequired) {
-            await sendCustomVerificationEmail(firebaseUser, data.firstName);
-            verificationSent = true;
-        }
+    const emailVerificationRequired = await getEmailVerificationSetting();
+    if (emailVerificationRequired) {
+        await sendCustomVerificationEmail(firebaseUser, data.firstName);
+        verificationSent = true;
     }
     
     // Step 3: For vendors, validate the code and mark it as "reserved" for this user
@@ -87,7 +85,6 @@ export async function createNewUser(data: {
 
     } else {
         // Store temporary client info
-        const emailVerificationRequired = await getEmailVerificationSetting();
         if (emailVerificationRequired) {
             const tempClientData = {
                  ...data,
@@ -113,18 +110,44 @@ export async function createNewUser(data: {
         }
     }
     
+    // Step 4: Set durable role claim via secure server route and refresh token
+    try {
+        const csrfRes = await fetch('/api/auth/csrf', { method: 'GET' });
+        const { token } = await csrfRes.json();
+        const idToken = await firebaseUser.getIdToken();
+        await fetch('/api/auth/set-role', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-csrf-token': token,
+            },
+            body: JSON.stringify({ role: accountType, idToken })
+        });
+        // Force refresh so subsequent operations see the role claim
+        await firebaseUser.getIdToken(true);
+    } catch (e) {
+        console.warn('Failed to set durable role claim at registration; will bootstrap on session.', e);
+    }
+
     return { success: true, userId: firebaseUser.uid, role: accountType, verificationSent };
 }
 
 
-export async function signInUser(email: string, password?: string): Promise<{ success: boolean, role?: 'client' | 'vendor' | 'admin'; userId?: string; message?: string }> {
+export async function signInUser(email: string, password?: string): Promise<{ success: boolean, role?: 'client' | 'vendor' | 'admin'; userId?: string; idToken?: string; message?: string }> {
     
     // Handle admin sign-in through Firebase Auth
-    if (email.toLowerCase() === 'admin@tradecraft.com') {
+    const adminEmails = [
+        process.env.NEXT_PUBLIC_ADMIN_EMAIL,
+        process.env.ADMIN_EMAIL,
+        'admin@tradecraft.com'
+    ].filter(Boolean).map(e => (e as string).toLowerCase());
+    const inputEmail = email.trim().toLowerCase();
+    if (adminEmails.includes(inputEmail)) {
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password!);
             const user = userCredential.user;
-            return { success: true, role: 'admin', userId: user.uid };
+            const idToken = await user.getIdToken();
+            return { success: true, role: 'admin', userId: user.uid, idToken };
         } catch (e: any) {
             console.error("Admin Firebase Auth sign in error:", e);
             if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
@@ -141,6 +164,13 @@ export async function signInUser(email: string, password?: string): Promise<{ su
         const userCredential = await signInWithEmailAndPassword(auth, email, password!);
         const user = userCredential.user;
 
+        // Post-auth admin fallback to bypass client/vendor registration checks
+        const signedInEmail = (user.email || '').toLowerCase();
+        if (adminEmails.includes(signedInEmail)) {
+            const idToken = await user.getIdToken();
+            return { success: true, role: 'admin', userId: user.uid, idToken };
+        }
+
         // Check if user is a vendor before checking email verification
         const pendingVendorSnap = await getDoc(doc(db, 'pendingVendors', user.uid));
         const vendorProfileSnap = await getDoc(doc(db, 'vendors', user.uid));
@@ -150,30 +180,13 @@ export async function signInUser(email: string, password?: string): Promise<{ su
         const pendingClientDoc = await getDoc(doc(db, 'pendingClients', user.uid));
         if (pendingClientDoc.exists()) {
             const emailVerificationRequired = await getEmailVerificationSetting();
-            if (emailVerificationRequired && !user.emailVerified) {
-                return { success: false, message: 'Please verify your email before logging in. Check your inbox for a verification link.' };
-            }
             // If verification is disabled or user is verified, complete their profile
             if (!emailVerificationRequired || user.emailVerified) {
                 await completeEmailVerification(user.uid);
             }
         }
         
-        // Check existing user's email verification status (check both Firebase Auth and Firestore)
-        if (!isVendor) {
-            const existingUserDoc = await getDoc(doc(db, 'users', user.uid));
-            const firestoreEmailVerified = existingUserDoc.exists() ? existingUserDoc.data().emailVerified : false;
-            
-            // User is considered verified if either Firebase Auth or Firestore says so
-            const isEmailVerified = user.emailVerified || firestoreEmailVerified;
-            
-            if (!isEmailVerified) {
-                const emailVerificationRequired = await getEmailVerificationSetting();
-                if (emailVerificationRequired) {
-                    return { success: false, message: 'Please verify your email before logging in. Check your inbox for a verification link.'};
-                }
-            }
-        }
+        // Defer email verification enforcement to the server-side session route
         
         let userProfileDoc = await getDoc(doc(db, 'users', user.uid));
         
@@ -191,7 +204,7 @@ export async function signInUser(email: string, password?: string): Promise<{ su
                     savedItemIds: [],
                     status: 'active',
                     avatar: data.avatar || user?.photoURL || '',
-                    emailVerified: true, // Vendors don't need verification
+                    emailVerified: !!user.emailVerified,
                     provider: 'password',
                 };
                 const vendorProfile: Omit<VendorProfile, 'id'> = {
@@ -252,10 +265,12 @@ export async function signInUser(email: string, password?: string): Promise<{ su
             if (vendorProfileSnap.exists() && vendorProfileSnap.data().status === 'disabled') {
                  return { success: false, message: 'Your account has been disabled. Please contact support.'};
             }
-            return { success: true, role: 'vendor', userId: user.uid };
+            const idToken = await user.getIdToken();
+            return { success: true, role: 'vendor', userId: user.uid, idToken };
         }
         
-        return { success: true, role: 'client', userId: user.uid };
+        const idToken = await user.getIdToken();
+        return { success: true, role: 'client', userId: user.uid, idToken };
 
     } catch (e: any) {
         console.error("Firebase Auth sign in error:", e);
@@ -269,7 +284,7 @@ export async function signInUser(email: string, password?: string): Promise<{ su
     }
 }
 
-async function handleSocialSignIn(firebaseUser: FirebaseUser): Promise<{ success: boolean; userId: string; role: 'client' | 'vendor' }> {
+async function handleSocialSignIn(firebaseUser: FirebaseUser): Promise<{ success: boolean; userId: string; role: 'client' | 'vendor'; idToken: string }> {
     if (!firebaseUser.email || !firebaseUser.uid) {
         throw new Error("Social sign-in failed to provide user details.");
     }
@@ -285,7 +300,26 @@ async function handleSocialSignIn(firebaseUser: FirebaseUser): Promise<{ success
         if (!userDoc.data().provider) {
             await updateDoc(userRef, { provider: providerId });
         }
-    return { success: true, userId: firebaseUser.uid, role };
+        // Ensure durable role claim exists; bootstrap if missing
+        try {
+            const csrfRes = await fetch('/api/auth/csrf', { method: 'GET' });
+            const { token } = await csrfRes.json();
+            const idToken = await firebaseUser.getIdToken();
+            await fetch('/api/auth/set-role', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-csrf-token': token,
+                },
+                body: JSON.stringify({ role, idToken })
+            });
+            // Refresh to pick up any newly-set claims
+            await firebaseUser.getIdToken(true);
+        } catch (e) {
+            console.warn('Social sign-in claim bootstrap failed; will rely on server session bootstrap.', e);
+        }
+        const idToken = await firebaseUser.getIdToken();
+        return { success: true, userId: firebaseUser.uid, role, idToken };
     } else {
         const [firstName, ...lastNameParts] = (firebaseUser.displayName || 'New User').split(' ');
         const lastName = lastNameParts.join(' ');
@@ -302,12 +336,30 @@ async function handleSocialSignIn(firebaseUser: FirebaseUser): Promise<{ success
             emailVerified: true, // Social provider handles verification
             provider: providerId,
         };
-    await setDoc(userRef, userProfile);
-    return { success: true, userId: firebaseUser.uid, role: 'client' };
+        await setDoc(userRef, userProfile);
+        // Set durable client role claim and return idToken for session
+        try {
+            const csrfRes = await fetch('/api/auth/csrf', { method: 'GET' });
+            const { token } = await csrfRes.json();
+            const idToken = await firebaseUser.getIdToken();
+            await fetch('/api/auth/set-role', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-csrf-token': token,
+                },
+                body: JSON.stringify({ role: 'client', idToken })
+            });
+            await firebaseUser.getIdToken(true);
+        } catch (e) {
+            console.warn('Failed to set client role claim on social sign-up; will bootstrap on session.', e);
+        }
+        const idToken = await firebaseUser.getIdToken();
+        return { success: true, userId: firebaseUser.uid, role: 'client', idToken };
     }
 }
 
-export async function signInWithGoogle(): Promise<{ success: boolean; role?: 'client' | 'vendor' | 'admin'; userId?: string; message?: string; }> {
+export async function signInWithGoogle(): Promise<{ success: boolean; role?: 'client' | 'vendor' | 'admin'; userId?: string; idToken?: string; message?: string; }> {
     const provider = new GoogleAuthProvider();
     try {
         const result = await signInWithPopup(auth, provider);
@@ -378,34 +430,19 @@ export async function getVendorProfile(vendorId: string): Promise<VendorProfile 
 
 export async function createOrUpdateVendorProfile(vendorId: string, data: Partial<Omit<VendorProfile, 'id' | 'createdAt'>>) {
     if (!vendorId) return;
-     const docRef = doc(db, 'vendors', vendorId);
-
-    // Apply auto-approval or scheduling to new pending portfolio items
-    let payload = { ...data } as Partial<VendorProfile>;
-    try {
-        if (data.portfolio && Array.isArray(data.portfolio) && data.portfolio.length > 0) {
-            const config = await getAutoApprovalConfig();
-            if (config.enabled) {
-                if (config.mode === 'instant') {
-                    const updatedPortfolio = data.portfolio.map(item => (
-                        item.status === 'pending' ? { ...item, status: 'approved' } : item
-                    ));
-                    payload.portfolio = updatedPortfolio;
-                } else if (config.mode === 'scheduled' && config.hours && config.hours > 0) {
-                    const pendingItems = data.portfolio.filter(item => item.status === 'pending');
-                    if (pendingItems.length) {
-                        await Promise.all(pendingItems.map(item =>
-                            scheduleProfileMediaApproval(vendorId, item.url, 'approved', config.hours)
-                        ));
-                    }
-                }
-            }
-        }
-    } catch (e) {
-        console.warn('Auto-approval check failed during vendor profile update, continuing with normal save', e);
+    const idToken = await auth.currentUser?.getIdToken();
+    if (!idToken) throw new Error('Not authenticated');
+    const csrfRes = await fetch('/api/auth/csrf', { method: 'GET' });
+    const { token } = await csrfRes.json();
+    const res = await fetch('/api/vendor/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': token },
+        body: JSON.stringify({ idToken, vendorId, data }),
+    });
+    if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j?.error || 'Failed to update vendor profile');
     }
-
-    await setDoc(docRef, { ...payload, lastModified: serverTimestamp() }, { merge: true });
 }
 
 // Timeline Services
@@ -1173,38 +1210,68 @@ export async function getAllUsersAndVendors() {
 
 export async function updateVendorTier(vendorId: string, tier: VendorProfile['accountTier']) {
     if (!vendorId) return;
-    const vendorRef = doc(db, 'vendors', vendorId);
-    await updateDoc(vendorRef, { accountTier: tier });
+    const idToken = await auth.currentUser?.getIdToken();
+    if (!idToken) throw new Error('Not authenticated');
+    const csrfRes = await fetch('/api/auth/csrf', { method: 'GET' });
+    const { token } = await csrfRes.json();
+    const res = await fetch('/api/vendor/tier', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': token },
+        body: JSON.stringify({ idToken, vendorId, tier }),
+    });
+    if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j?.error || 'Failed to update tier');
+    }
 }
 
 export async function updateVendorVerification(vendorId: string, verification: VendorProfile['verification']) {
     if (!vendorId) return;
-    const vendorRef = doc(db, 'vendors', vendorId);
-    await updateDoc(vendorRef, { verification: verification });
+    const idToken = await auth.currentUser?.getIdToken();
+    if (!idToken) throw new Error('Not authenticated');
+    const csrfRes = await fetch('/api/auth/csrf', { method: 'GET' });
+    const { token } = await csrfRes.json();
+    const res = await fetch('/api/vendor/verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': token },
+        body: JSON.stringify({ idToken, vendorId, verification }),
+    });
+    if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j?.error || 'Failed to update verification');
+    }
 }
 
 export async function updateUserStatus(userId: string, role: 'client' | 'vendor', status: 'active' | 'disabled') {
-    const batch = writeBatch(db);
-    const userRef = doc(db, 'users', userId);
-    batch.update(userRef, { status });
-
-    if (role === 'vendor') {
-        const vendorRef = doc(db, 'vendors', userId);
-        batch.update(vendorRef, { status });
+    const idToken = await auth.currentUser?.getIdToken();
+    if (!idToken) throw new Error('Not authenticated');
+    const csrfRes = await fetch('/api/auth/csrf', { method: 'GET' });
+    const { token } = await csrfRes.json();
+    const res = await fetch('/api/admin/user/status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': token },
+        body: JSON.stringify({ idToken, userId, role, status }),
+    });
+    if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j?.error || 'Failed to update user status');
     }
-    await batch.commit();
 }
 
 export async function deleteUser(userId: string, role: 'client' | 'vendor') {
-    const batch = writeBatch(db);
-    const userRef = doc(db, 'users', userId);
-    batch.delete(userRef);
-
-    if (role === 'vendor') {
-        const vendorRef = doc(db, 'vendors', userId);
-        batch.delete(vendorRef);
+    const idToken = await auth.currentUser?.getIdToken();
+    if (!idToken) throw new Error('Not authenticated');
+    const csrfRes = await fetch('/api/auth/csrf', { method: 'GET' });
+    const { token } = await csrfRes.json();
+    const res = await fetch('/api/admin/user/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': token },
+        body: JSON.stringify({ idToken, userId, role }),
+    });
+    if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j?.error || 'Failed to delete user');
     }
-    await batch.commit();
 }
 
 
@@ -1898,29 +1965,21 @@ export async function sendPasswordResetEmail(email: string) {
 // Custom email verification with styled template
 export async function sendCustomVerificationEmail(user: FirebaseUser, firstName: string) {
     try {
-        // Generate custom verification link
-        const actionCodeSettings = {
-            url: `${window.location.origin}/verify-email`,
-            handleCodeInApp: true,
-        };
-        
-        // For now, we'll use Firebase's default verification email
-        // In production, you might want to use a custom email service like SendGrid, Mailgun, etc.
-        // with the generateVerificationEmailHTML function from the email template
-        await sendEmailVerification(user, actionCodeSettings);
-        
-        // TODO: Implement custom email service integration
-        // const { generateVerificationEmailHTML } = await import('../components/email-templates/verification-email');
-        // const emailHTML = generateVerificationEmailHTML({
-        //   firstName,
-        //   verificationUrl: actionCodeSettings.url,
-        //   companyName: 'TradeCraft'
-        // });
-        // await customEmailService.send({
-        //   to: user.email,
-        //   subject: 'Verify Your Email Address - TradeCraft',
-        //   html: emailHTML
-        // });
+        // Prefer custom styled email via server route; fallback to Firebase default if not configured
+        const res = await fetch('/api/email/send-verification', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: user.email, firstName })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data?.success) {
+            // Fallback to default Firebase email verification
+            const actionCodeSettings = {
+                url: `${window.location.origin}/verify-email`,
+                handleCodeInApp: true,
+            };
+            await sendEmailVerification(user, actionCodeSettings);
+        }
     } catch (error) {
         console.error('Error sending custom verification email:', error);
         throw error;
@@ -1930,26 +1989,62 @@ export async function sendCustomVerificationEmail(user: FirebaseUser, firstName:
 // Get pending accounts awaiting email verification
 export async function getPendingVerificationAccounts(): Promise<Array<{id: string, email: string, firstName: string, lastName: string, createdAt: Date, accountType: 'client' | 'vendor'}>> {
     try {
-        const pendingClients = await getDocs(collection(db, 'pendingClients'));
-        const pendingVendors = await getDocs(collection(db, 'pendingVendors'));
-        
-        const accounts = [];
-        
-        // Add pending clients
-        pendingClients.docs.forEach(doc => {
-            const data = doc.data();
-            if (data.isPendingVerification) {
+        const pendingClientsSnap = await getDocs(collection(db, 'pendingClients'));
+        const pendingVendorsSnap = await getDocs(collection(db, 'pendingVendors'));
+        const unverifiedUsersSnap = await getDocs(query(collection(db, 'users'), where('emailVerified', '==', false)));
+
+        const accounts: Array<{id: string, email: string, firstName: string, lastName: string, createdAt: Date, accountType: 'client' | 'vendor'}> = [];
+        const seen = new Set<string>();
+
+        // Include pending clients awaiting email verification
+        pendingClientsSnap.docs.forEach(docSnap => {
+            const data = docSnap.data();
+            // Show clients awaiting verification; treat missing flag as pending (backward compatibility)
+            if (data.isPendingVerification !== false) {
                 accounts.push({
-                    id: doc.id,
+                    id: docSnap.id,
                     email: data.email,
                     firstName: data.firstName,
                     lastName: data.lastName,
                     createdAt: toDate(data.createdAt || new Date()),
-                    accountType: 'client' as const
+                    accountType: 'client'
                 });
+                seen.add(docSnap.id);
             }
         });
-        
+
+        // Include pending vendors (shown for admin visibility; vendors don't require email verification)
+        pendingVendorsSnap.docs.forEach(docSnap => {
+            const data = docSnap.data();
+            accounts.push({
+                id: docSnap.id,
+                email: data.email,
+                firstName: data.firstName,
+                lastName: data.lastName,
+                createdAt: toDate(data.createdAt || new Date()),
+                accountType: 'vendor'
+            });
+            seen.add(docSnap.id);
+        });
+
+        // Include existing unverified accounts from users collection (clients and vendors)
+        for (const docSnap of unverifiedUsersSnap.docs) {
+            const data = docSnap.data();
+            const id = docSnap.id;
+            if (seen.has(id)) continue; // avoid duplicates
+            const vendorDoc = await getDoc(doc(db, 'vendors', id));
+            const accountType: 'client' | 'vendor' = vendorDoc.exists() ? 'vendor' : 'client';
+            accounts.push({
+                id,
+                email: data.email,
+                firstName: data.firstName || '',
+                lastName: data.lastName || '',
+                createdAt: toDate(data.createdAt || new Date()),
+                accountType,
+            });
+            seen.add(id);
+        }
+
         return accounts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     } catch (error) {
         console.error('Error fetching pending verification accounts:', error);
@@ -1966,7 +2061,7 @@ export async function getEmailVerificationSetting(): Promise<boolean> {
         const settingsSnap = await getDoc(settingsRef);
         
         if (settingsSnap.exists()) {
-            return settingsSnap.data().required || true; // Default to true
+            return settingsSnap.data().required ?? true; // Default to true
         }
         return true;
     } catch (error) {
@@ -2073,28 +2168,52 @@ export async function resetPasswordWithToken(token: string, newPassword: string)
 }
 
 // Resend verification email for existing user
-export async function resendVerificationEmail(email: string): Promise<{ success: boolean; message: string }> {
+export async function resendVerificationEmail(
+    email: string,
+    options?: { allowFirebaseFallback?: boolean }
+): Promise<{ success: boolean; message: string }> {
+    const allowFirebaseFallback = options?.allowFirebaseFallback !== false;
     try {
-        // Check if user exists in pending clients
-        const pendingQuery = query(collection(db, 'pendingClients'), where('email', '==', email));
-        const pendingSnapshot = await getDocs(pendingQuery);
-        
-        if (!pendingSnapshot.empty) {
-            const pendingDoc = pendingSnapshot.docs[0];
-            const userData = pendingDoc.data();
-            
-            // For resending, we need to use Firebase Admin SDK or handle this server-side
-            // For now, return a message indicating they should contact support or try signing up again
-            return { 
-                success: false, 
-                message: 'To resend verification email, please try signing up again with the same email address.' 
-            };
+        // Attempt to send via server route (styled email using Admin SDK link)
+        const res = await fetch('/api/email/send-verification', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, firstName: 'there', companyName: 'TradeCraft' })
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok && data?.success) {
+            return { success: true, message: `Verification email resent to ${email}.` };
         }
-        
-        return { success: false, message: 'No pending verification found for this email address.' };
+
+        // Optional fallback: send Firebase default verification to current user (when email matches)
+        const currentUser = auth.currentUser;
+        if (allowFirebaseFallback && currentUser?.email && currentUser.email.toLowerCase() === email.toLowerCase()) {
+            try {
+                const actionCodeSettings = {
+                    url: `${window.location.origin}/verify-email`,
+                    handleCodeInApp: true,
+                } as const;
+                await sendEmailVerification(currentUser, actionCodeSettings);
+                return { success: true, message: `Verification email resent to your account (${email}).` };
+            } catch (err: any) {
+                if (err?.code === 'auth/too-many-requests') {
+                    return { success: false, message: 'Too many requests. Please wait a few minutes before trying again.' };
+                }
+                console.warn('Fallback Firebase verification send failed:', err);
+                return { success: false, message: err?.message || 'Failed to send default verification email.' };
+            }
+        }
+
+        const message = data?.message || 'Unable to resend verification email via server.';
+        return { success: false, message };
     } catch (error: any) {
-        console.error('Error resending verification email:', error);
-        return { success: false, message: 'Failed to check verification status. Please try again.' };
+        // Gracefully handle known Firebase rate-limit code
+        if (error?.code === 'auth/too-many-requests') {
+            return { success: false, message: 'Too many requests. Please wait a few minutes before trying again.' };
+        }
+        console.warn('Error resending verification email:', error);
+        return { success: false, message: error?.message || 'Failed to resend verification email.' };
     }
 }
 
@@ -2102,14 +2221,19 @@ export async function resendVerificationEmail(email: string): Promise<{ success:
 // --- Vendor Analytics ---
 export async function logPhoneNumberReveal(vendorId: string, clientId?: string) {
     if (!vendorId) return;
-    const vendorRef = doc(db, 'vendors', vendorId);
-    const revealRef = collection(db, `vendors/${vendorId}/phoneReveals`);
-
-    const batch = writeBatch(db);
-    batch.update(vendorRef, { totalPhoneReveals: increment(1) });
-    batch.set(doc(revealRef), { revealedAt: serverTimestamp(), clientId: clientId || 'anonymous' });
-
-    await batch.commit();
+    const idToken = await auth.currentUser?.getIdToken();
+    if (!idToken) throw new Error('Not authenticated');
+    const csrfRes = await fetch('/api/auth/csrf', { method: 'GET' });
+    const { token } = await csrfRes.json();
+    const res = await fetch('/api/vendor/phone-reveal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-csrf-token': token },
+        body: JSON.stringify({ idToken, vendorId }),
+    });
+    if (!res.ok) {
+        const j = await res.json().catch(() => ({}));
+        throw new Error(j?.error || 'Failed to log phone reveal');
+    }
 }
 
 

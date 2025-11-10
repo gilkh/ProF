@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function safeUserUpdateKeys() {
+      return ['firstName', 'lastName', 'phone', 'avatar', 'savedItemIds', 'hasUnreadNotifications', 'settings', 'fcmTokens'];
+    }
+
+    // Vendors are server-managed. Clients cannot write vendors/{uid}.
+    match /vendors/{vendorId} {
+      allow read: if true; // public read allowed
+      allow write: if false; // all client writes denied
+    }
+
+    // Users can read any profile, but only write their own safe fields.
+    match /users/{userId} {
+      allow read: if true;
+
+      // Allow self-create with a constrained set of fields. Prevent privilege fields.
+      allow create: if isOwner(userId)
+                    && request.resource.data.keys().hasOnly(safeUserUpdateKeys() + ['email', 'status', 'emailVerified', 'provider', 'createdAt'])
+                    && request.resource.data.status == 'active'
+                    && request.resource.data.email == request.auth.token.email
+                    && !('role' in request.resource.data);
+
+      // Allow self-update only for safe fields; block privilege escalation.
+      allow update: if isOwner(userId)
+                    && request.resource.data.diff(resource.data).changedKeys().hasOnly(safeUserUpdateKeys());
+
+      // Block client-side deletion of user profiles.
+      allow delete: if false;
+    }
+
+    // Pending collections are client-managed during registration/verification.
+    match /pendingClients/{userId} {
+      allow read: if isOwner(userId);
+      allow create, update, delete: if isOwner(userId);
+    }
+    match /pendingVendors/{userId} {
+      allow read: if isOwner(userId);
+      allow create, update, delete: if isOwner(userId);
+    }
+
+    // Default access for other collections: keep current app behavior
+    // Reads are public; writes require authentication. Sensitive docs must
+    // be covered by explicit rules above.
+    match /{document=**} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+  }
+}

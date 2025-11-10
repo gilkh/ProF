@@ -3,28 +3,27 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-  // Check for the 'role' cookie
-  const role = request.cookies.get('role')?.value
-  const pathname = request.nextUrl.pathname
+  const { pathname } = request.nextUrl
 
-  // Allow access to the hidden admin login entry point even if not authenticated
-  if (pathname === '/admin/login/jwrvbo3uibr53487rbv847bev4') {
-    return NextResponse.next()
-  }
+  // Restrict direct access to the signup page.
+  if (pathname === '/signup') {
+    const cookie = request.cookies.get('signup_access')?.value
+    const referer = request.headers.get('referer') || ''
+    const allowedReferrer = referer.includes('/login') || referer.includes('/admin/login')
 
-  // If the user is trying to access an admin route
-  if (pathname.startsWith('/admin')) {
-    // And they are not an admin, redirect them to the login page
-    if (role !== 'admin') {
-      return NextResponse.redirect(new URL('/login', request.url))
+    // Block if no short-lived access cookie and not coming from allowed pages
+    if (!cookie && !allowedReferrer) {
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      url.searchParams.set('error', 'signup-blocked')
+      return NextResponse.redirect(url)
     }
   }
 
-  // Allow the request to continue
+  // Default behavior
   return NextResponse.next()
 }
 
-// See "Matching Paths" below to learn more
 export const config = {
-  matcher: '/admin/:path*',
+  matcher: ['/admin/:path*', '/signup'],
 }

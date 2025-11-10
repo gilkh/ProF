@@ -39,6 +39,7 @@ import { AdminStatCard } from '@/components/admin-stat-card';
 import { MessagingPanel } from '@/components/messaging-panel';
 import { AdminListingDetailView } from '@/components/admin-listing-detail-view';
 import AdminReportsPage from '@/app/admin/reports/page';
+import { AdminEmailTest } from '@/components/admin/admin-email-test';
 import AdminEmailVerification from '@/components/admin/admin-email-verification';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -181,6 +182,12 @@ export default function AdminHomePage() {
   const [mobileIntroEnabled, setMobileIntroEnabled] = useState(true);
   const [isUpdatingMobileIntro, setIsUpdatingMobileIntro] = useState(false);
 
+  // State for resend verification preview
+  const [resendDialogOpen, setResendDialogOpen] = useState(false);
+  const [verificationLink, setVerificationLink] = useState<string | null>(null);
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+  const [isResendingEmail, setIsResendingEmail] = useState(false);
+
 
   useEffect(() => {
     fetchData();
@@ -260,6 +267,53 @@ export default function AdminHomePage() {
         } else {
             setIsLoading(false);
         }
+    }
+  };
+
+  const resendVerification = async (user: DisplayUser) => {
+    setIsResendingEmail(true);
+    try {
+      const res = await fetch('/api/email/send-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: user.email,
+          firstName: user.firstName || 'there',
+          companyName: user.role === 'vendor' ? (user.businessName || 'TradeCraft') : 'TradeCraft',
+        })
+      });
+      const data = await res.json();
+      setVerificationLink(data?.verificationLink || null);
+      if (res.ok && data?.success) {
+        toast({ title: 'Verification email sent', description: `Sent to ${user.email}.` });
+      } else {
+        const status = res.status;
+        const message = data?.message || 'Failed to send verification email.';
+        const providerNotConfigured = message.includes('Email provider not configured') || status === 503;
+        if (status === 429) {
+          toast({ title: 'Too many requests', description: 'Rate limit hit. Please wait a minute and try again.' });
+        } else if (providerNotConfigured) {
+          toast({ title: 'Provider not configured', description: 'Configure Resend or SendGrid to deliver automatically. Showing preview and link.' });
+          if (data?.previewHtml) {
+            setPreviewHtml(data.previewHtml);
+            setResendDialogOpen(true);
+          }
+        } else if (status === 400) {
+          toast({ title: 'Bad request', description: 'Please check the email address and try again.' });
+        } else if (status >= 500) {
+          toast({ title: 'Provider error', description: 'Email provider is unavailable. Try again later.' });
+        } else {
+          toast({ title: 'Email send issue', description: message });
+          if (data?.previewHtml) {
+            setPreviewHtml(data.previewHtml);
+            setResendDialogOpen(true);
+          }
+        }
+      }
+    } catch (e: any) {
+      toast({ title: 'Error', description: e?.message || 'Unknown error' });
+    } finally {
+      setIsResendingEmail(false);
     }
   };
 
@@ -564,6 +618,7 @@ export default function AdminHomePage() {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="email-verification">Email Verification</TabsTrigger>
+          <TabsTrigger value="email-test">Email Test</TabsTrigger>
           <TabsTrigger value="moderation">
             Moderation
             {pendingListings.length > 0 && <Badge className="ml-1 text-xs">{pendingListings.length}</Badge>}
@@ -726,6 +781,10 @@ export default function AdminHomePage() {
                                                 </Button>
                                             </DropdownMenuTrigger>
                                             <DropdownMenuContent align="end">
+                                                <DropdownMenuItem onClick={() => resendVerification(user)}>
+                                                    {isResendingEmail ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
+                                                    Resend Verification Email
+                                                </DropdownMenuItem>
                                                 <ResetPasswordDialog user={user} disabled={user.provider !== 'password'}>
                                                     <DropdownMenuItem onSelect={(e) => e.preventDefault()} disabled={user.provider !== 'password'}>
                                                         <UserCog className="mr-2 h-4 w-4" />
@@ -777,6 +836,38 @@ export default function AdminHomePage() {
 
         <TabsContent value="email-verification" className="mt-4">
           <AdminEmailVerification />
+        </TabsContent>
+        <Dialog open={resendDialogOpen} onOpenChange={setResendDialogOpen}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Email Preview</DialogTitle>
+              <DialogDescription>Styled verification email content. You can copy and test the link.</DialogDescription>
+            </DialogHeader>
+            {verificationLink && (
+              <div className="mb-3 flex items-center gap-2">
+                <code className="text-xs break-all flex-1 p-2 bg-muted rounded">{verificationLink}</code>
+                <Button variant="outline" size="sm" onClick={async () => {
+                  try {
+                    if (verificationLink) await navigator.clipboard.writeText(verificationLink);
+                    toast({ title: 'Copied', description: 'Verification link copied to clipboard.' });
+                  } catch {
+                    toast({ title: 'Copy failed', description: 'Could not copy the link.' });
+                  }
+                }}>
+                  <Copy className="h-3 w-3 mr-1" /> Copy Link
+                </Button>
+              </div>
+            )}
+            <div className="max-h-[70vh] overflow-auto border rounded-md">
+              {previewHtml && (
+                <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <TabsContent value="email-test" className="mt-4">
+          <AdminEmailTest />
         </TabsContent>
 
         <TabsContent value="moderation" className="mt-4">

@@ -1,10 +1,12 @@
 
 import { getAllUsersAndVendors, getUserProfile, getVendorProfile, getServicesAndOffers } from '@/lib/services';
+import { requireRole } from '@/lib/auth-server';
 import { AdminUserManagement } from '@/components/admin-user-management';
 import type { UserProfile, VendorProfile, ServiceOrOffer } from '@/lib/types';
 
 
 export default async function AdminUserManagementPage({ params }: { params: { id: string } }) {
+  await requireRole('admin');
   // Data fetching happens on the server
   const [user, vendor, listings] = await Promise.all([
       getUserProfile(params.id),

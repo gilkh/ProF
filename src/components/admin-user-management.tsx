@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Star, Loader2, Trash2, ArrowLeft } from 'lucide-react';
+import { Camera, Star, Loader2, Trash2, ArrowLeft, Mail, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useEffect, useState } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
@@ -34,6 +34,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 const userProfileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -63,6 +64,10 @@ export function AdminUserManagement({ initialUser, initialVendor, initialListing
     const [vendor, setVendor] = useState<VendorProfile | null>(initialVendor);
     const [listings, setListings] = useState<ServiceOrOffer[]>(initialListings);
     const [isModerating, setIsModerating] = useState<string | null>(null);
+    const [isResending, setIsResending] = useState(false);
+    const [previewHtml, setPreviewHtml] = useState<string | null>(null);
+    const [verificationLink, setVerificationLink] = useState<string | null>(null);
+    const [dialogOpen, setDialogOpen] = useState(false);
     
     // isLoading is no longer needed since data is pre-fetched by the server component.
     // However, we might keep it for refetching actions. Let's start with false.
@@ -183,6 +188,61 @@ export function AdminUserManagement({ initialUser, initialVendor, initialListing
             setIsModerating(null);
         }
     };
+
+    const handleResendVerification = async () => {
+        const targetEmail = userForm.getValues('email') || user?.email || '';
+        if (!targetEmail) {
+            toast({ title: 'Email required', description: 'Please enter a valid email for the user.' });
+            return;
+        }
+        setIsResending(true);
+        try {
+            const res = await fetch('/api/email/send-verification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: targetEmail,
+                    firstName: user?.firstName || 'there',
+                    companyName: vendor?.businessName || 'TradeCraft',
+                })
+            });
+            const data = await res.json();
+            setVerificationLink(data?.verificationLink || null);
+            if (res.ok && data?.success) {
+                toast({ title: 'Verification email sent', description: `Sent to ${targetEmail}.` });
+            } else {
+                const status = res.status;
+                const message = data?.message || 'Failed to send verification email.';
+                const providerNotConfigured = message.includes('Email provider not configured') || status === 503;
+                if (status === 429) {
+                    toast({ title: 'Too many requests', description: 'Rate limit hit. Please wait a minute and try again.' });
+                } else if (providerNotConfigured) {
+                    toast({
+                        title: 'Provider not configured',
+                        description: 'Configure Resend or SendGrid to deliver automatically. Preview and link shown below.',
+                    });
+                    if (data?.previewHtml) {
+                        setPreviewHtml(data.previewHtml);
+                        setDialogOpen(true);
+                    }
+                } else if (status === 400) {
+                    toast({ title: 'Bad request', description: 'Please check the email address and try again.' });
+                } else if (status >= 500) {
+                    toast({ title: 'Provider error', description: 'Email provider is unavailable. Try again later.' });
+                } else {
+                    toast({ title: 'Email send issue', description: message });
+                    if (data?.previewHtml) {
+                        setPreviewHtml(data.previewHtml);
+                        setDialogOpen(true);
+                    }
+                }
+            }
+        } catch (err: any) {
+            toast({ title: 'Error', description: err?.message || 'Unknown error' });
+        } finally {
+            setIsResending(false);
+        }
+    };
     
     if (!user) {
         return <Card>
@@ -214,6 +274,12 @@ export function AdminUserManagement({ initialUser, initialVendor, initialListing
                 <CardDescription>Edit the user's personal information.</CardDescription>
             </CardHeader>
             <CardContent>
+                <div className="flex items-center justify-end mb-4">
+                    <Button onClick={handleResendVerification} disabled={isResending}>
+                        {isResending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Mail className="mr-2 h-4 w-4" />}
+                        Resend Verification Email
+                    </Button>
+                </div>
                 <FormProvider {...userForm}>
                     <form onSubmit={userForm.handleSubmit(onUserSubmit)} className="space-y-6 max-w-2xl">
                         <div className="grid md:grid-cols-2 gap-6">
@@ -440,6 +506,34 @@ export function AdminUserManagement({ initialUser, initialVendor, initialListing
                 </Card>
             </>
         )}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogContent className="max-w-4xl">
+                <DialogHeader>
+                    <DialogTitle>Email Preview</DialogTitle>
+                    <DialogDescription>Styled verification email content. You can copy and test the link.</DialogDescription>
+                </DialogHeader>
+                {verificationLink && (
+                    <div className="mb-3 flex items-center gap-2">
+                        <code className="text-xs break-all flex-1 p-2 bg-muted rounded">{verificationLink}</code>
+                        <Button variant="outline" size="sm" onClick={async () => {
+                            try {
+                                if (verificationLink) await navigator.clipboard.writeText(verificationLink);
+                                toast({ title: 'Copied', description: 'Verification link copied to clipboard.' });
+                            } catch {
+                                toast({ title: 'Copy failed', description: 'Could not copy the link.' });
+                            }
+                        }}>
+                            <Copy className="h-3 w-3 mr-1" /> Copy Link
+                        </Button>
+                    </div>
+                )}
+                <div className="max-h-[70vh] overflow-auto border rounded-md">
+                    {previewHtml && (
+                        <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+                    )}
+                </div>
+            </DialogContent>
+        </Dialog>
      </div>
   )
 }

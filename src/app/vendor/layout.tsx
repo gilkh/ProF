@@ -1,12 +1,14 @@
 
 import { AppHeader } from '@/components/header';
 import { BottomNavBar } from '@/components/bottom-nav-bar';
+import { requireRole } from '@/lib/auth-server';
 
-export default function VendorLayout({
+export default async function VendorLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  await requireRole('vendor');
   return (
     <div className="flex min-h-screen w-full flex-col bg-background">
       <AppHeader />

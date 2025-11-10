@@ -19,7 +19,7 @@ export function VerificationEmailTemplate({ firstName, verificationUrl, companyN
     }}>
       {/* Header */}
       <div style={{
-        backgroundColor: '#1f2937',
+        backgroundImage: 'linear-gradient(90deg, #1f2937 0%, #111827 100%)',
         padding: '32px 24px',
         textAlign: 'center' as const
       }}>
@@ -32,6 +32,13 @@ export function VerificationEmailTemplate({ firstName, verificationUrl, companyN
         }}>
           {companyName}
         </h1>
+        <p style={{
+          color: '#9ca3af',
+          margin: '8px 0 0',
+          fontSize: '14px'
+        }}>
+          Secure account verification
+        </p>
       </div>
 
       {/* Content */}
@@ -88,15 +95,15 @@ export function VerificationEmailTemplate({ firstName, verificationUrl, companyN
             href={verificationUrl}
             style={{
               display: 'inline-block',
-              backgroundColor: '#3b82f6',
+              backgroundImage: 'linear-gradient(90deg, #3b82f6 0%, #2563eb 100%)',
               color: '#ffffff',
               padding: '16px 32px',
-              borderRadius: '8px',
+              borderRadius: '10px',
               textDecoration: 'none',
               fontSize: '16px',
-              fontWeight: '600',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-              transition: 'all 0.2s ease'
+              fontWeight: '700',
+              boxShadow: '0 8px 20px rgba(37, 99, 235, 0.35)',
+              border: '1px solid #1d4ed8'
             }}
           >
             Verify Email Address
@@ -187,10 +194,11 @@ export function generateVerificationEmailHTML(props: VerificationEmailProps): st
     <body style="margin: 0; padding: 20px; background-color: #f3f4f6; font-family: Arial, sans-serif;">
       <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
         <!-- Header -->
-        <div style="background-color: #1f2937; padding: 32px 24px; text-align: center;">
+        <div style="background-image: linear-gradient(90deg, #1f2937 0%, #111827 100%); padding: 32px 24px; text-align: center;">
           <h1 style="color: #ffffff; font-size: 28px; font-weight: bold; margin: 0; letter-spacing: -0.025em;">
             ${props.companyName || 'TradeCraft'}
           </h1>
+          <p style="color: #9ca3af; margin: 8px 0 0; font-size: 14px;">Secure account verification</p>
         </div>
 
         <!-- Content -->
@@ -216,7 +224,7 @@ export function generateVerificationEmailHTML(props: VerificationEmailProps): st
 
           <!-- Verification Button -->
           <div style="text-align: center; margin-bottom: 32px;">
-            <a href="${props.verificationUrl}" style="display: inline-block; background-color: #3b82f6; color: #ffffff; padding: 16px 32px; border-radius: 8px; text-decoration: none; font-size: 16px; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+            <a href="${props.verificationUrl}" style="display: inline-block; background-image: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%); color: #ffffff; padding: 16px 32px; border-radius: 10px; text-decoration: none; font-size: 16px; font-weight: 700; box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35); border: 1px solid #1d4ed8;">
               Verify Email Address
             </a>
           </div>

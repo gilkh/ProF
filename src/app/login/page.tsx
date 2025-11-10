@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Logo } from '@/components/logo';
 import { Briefcase, CalendarCheck, FileText, Search, ShieldCheck, Sparkles, Loader2, PartyPopper, Heart, Star, Users, Calendar, Camera, Music, Utensils, MapPin, ArrowRight, Play, ChevronDown, Phone, Mail, MessageCircle, Gem, Crown, Car, Plane, Stamp, Speaker } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { signInUser, signInWithGoogle, getLoginButtonSettings } from '@/lib/services';
+import { signInUser, signInWithGoogle, getLoginButtonSettings, resendVerificationEmail } from '@/lib/services';
+import { auth } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth, logout } from '@/hooks/use-auth';
 import Image from 'next/image';
@@ -21,15 +22,7 @@ import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { SignupModal } from '@/components/signup-modal';
 
-function setCookie(name: string, value: string, days: number) {
-    let expires = "";
-    if (days) {
-        const date = new Date();
-        date.setTime(date.getTime() + (days*24*60*60*1000));
-        expires = "; expires=" + date.toUTCString();
-    }
-    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
-}
+// Client cookies/localStorage are no longer used for auth; server sets HttpOnly session cookie
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -137,6 +130,7 @@ const categories = [
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
   const [isSocialLoading, setIsSocialLoading] = useState<false | 'google'>(false);
   const [showLoginForm, setShowLoginForm] = useState(false);
@@ -145,6 +139,10 @@ export default function LoginPage() {
   const [clientLoginEnabled, setClientLoginEnabled] = useState(true);
   const [vendorLoginEnabled, setVendorLoginEnabled] = useState(true);
   const [isLoginSettingsLoading, setIsLoginSettingsLoading] = useState(true);
+  const [showVerifyBanner, setShowVerifyBanner] = useState(false);
+  const [resendEmailInput, setResendEmailInput] = useState('');
+  const [isResending, setIsResending] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const { toast } = useToast();
   const { translations } = useLanguage();
   const t = translations.loginPage;
@@ -165,6 +163,43 @@ export default function LoginPage() {
   useEffect(() => {
     loadLoginButtonSettings();
   }, []);
+
+  useEffect(() => {
+    const err = searchParams.get('error');
+    setShowVerifyBanner(err === 'verify-email');
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((c) => (c > 0 ? c - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
+  const handleResendVerification = async () => {
+    const email = resendEmailInput.trim();
+    if (!email) {
+      toast({ title: 'Enter your email', description: 'Please provide the email you used to sign up.', variant: 'destructive' });
+      return;
+    }
+    if (resendCooldown > 0) return;
+    setIsResending(true);
+    try {
+      const res = await resendVerificationEmail(email);
+      if (res.success) {
+        toast({ title: 'Email Sent', description: res.message || 'Please check your inbox for the verification email.' });
+      } else {
+        toast({ title: 'Resend Failed', description: res.message || 'Unable to resend verification email right now.', variant: 'destructive' });
+      }
+      setResendCooldown(60);
+    } catch (e: any) {
+      toast({ title: 'Resend Failed', description: e?.message || 'Unable to resend verification email.', variant: 'destructive' });
+      setResendCooldown(60);
+    } finally {
+      setIsResending(false);
+    }
+  };
 
   const loadLoginButtonSettings = async () => {
     try {
@@ -198,91 +233,141 @@ export default function LoginPage() {
     return () => observer.disconnect();
   }, []);
 
-  const onSocialLoginSuccess = (role: 'client' | 'vendor' | 'admin') => {
-      toast({
-          title: 'Sign In Successful!',
-          description: `Welcome! Redirecting to your dashboard...`,
-      });
-      if (role === 'client') {
-          router.push('/client/home');
-      } else if (role === 'vendor') {
-          router.push('/vendor/home');
-      }
+  const finalizeLogin = (redirect: string) => {
+    toast({
+      title: 'Sign In Successful!',
+      description: 'Welcome! Redirecting to your dashboard...',
+    });
+    router.push(redirect);
   };
 
   const handleSocialLogin = async (provider: 'google') => {
-      setIsSocialLoading(provider);
-      logout();
-      try {
-          const result = await signInWithGoogle();
-          if (result.success) {
-            // Block admin sessions on the normal login page
-            if (result.role === 'admin') {
-              toast({
-                title: 'Admin Login Restricted',
-                description: 'Please use your dedicated admin login URL.',
-                variant: 'destructive',
-              });
-              // Ensure no session is established
-              logout();
-              return;
-            }
-            localStorage.setItem('userId', result.userId);
-            localStorage.setItem('role', result.role);
-            setCookie('role', result.role, 7);
-            setCookie('userId', result.userId, 7);
-            onSocialLoginSuccess(result.role);
-          } else {
-              toast({ title: 'Sign In Failed', description: result.message, variant: 'destructive' });
-          }
-      } catch (error) {
-          const errorMessage = error instanceof Error ? error.message : 'An error occurred during sign-in.';
-          toast({ title: 'Sign In Failed', description: errorMessage, variant: 'destructive' });
-      } finally {
-          setIsSocialLoading(false);
+    setIsSocialLoading(provider);
+    try {
+      // Sign in with provider to obtain Firebase ID token
+      const result = await signInWithGoogle();
+      if (!result.success) {
+        toast({ title: 'Sign In Failed', description: result.message || 'Unable to sign in with Google.', variant: 'destructive' });
+        return;
       }
-  }
+      // Fetch CSRF token and establish server session cookie
+      const csrfRes = await fetch('/api/auth/csrf');
+      const csrfJson = await csrfRes.json();
+      const csrfToken = csrfJson?.token;
+      const sessRes = await fetch('/api/auth/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+        body: JSON.stringify({ idToken: result.idToken }),
+      });
+      const sessJson = await sessRes.json();
+      if (!sessRes.ok || !sessJson?.success) {
+        // If admin detected here, block and clear any session
+        if (sessJson?.role === 'admin') {
+          toast({ title: 'Admin Login Restricted', description: 'Please use your dedicated admin login URL.', variant: 'destructive' });
+          await logout();
+          return;
+        }
+        // If server blocked due to email not verified, trigger provider-based resend and show banner
+        if (sessRes.status === 403 && sessJson?.redirect) {
+          // Throttle automatic resends to avoid rate limits
+          if (resendCooldown <= 0) {
+            try {
+              const user = auth.currentUser;
+              if (user?.email) {
+                const res = await resendVerificationEmail(user.email, { allowFirebaseFallback: false });
+                setResendEmailInput(user.email);
+                toast({ title: res.success ? 'Verification Email Sent' : 'Resend Failed', description: res.message, variant: res.success ? 'default' : 'destructive' });
+              }
+            } catch (e: any) {
+              console.warn('Failed to trigger verification email:', e);
+            }
+            setResendCooldown(60);
+          }
+          setShowVerifyBanner(true);
+          await logout();
+          return;
+        }
+        toast({ title: 'Sign In Failed', description: sessJson?.error || 'Failed to establish session.', variant: 'destructive' });
+        return;
+      }
+      if (sessJson.role === 'admin') {
+        toast({ title: 'Admin Login Restricted', description: 'Please use your dedicated admin login URL.', variant: 'destructive' });
+        await logout();
+        return;
+      }
+      finalizeLogin(sessJson.redirect || (sessJson.role === 'vendor' ? '/vendor/home' : '/client/home'));
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred during sign-in.';
+      toast({ title: 'Sign In Failed', description: errorMessage, variant: 'destructive' });
+    } finally {
+      setIsSocialLoading(false);
+    }
+  };
 
 
   const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setIsLoading(true);
-    // Clear any previous session
-    logout();
-
-    const formData = new FormData(event.currentTarget);
-    const email = formData.get('email') as string;
-    const password = formData.get('password') as string;
+    // Capture form element before any await to avoid SyntheticEvent issues
+    const formEl = event.currentTarget as HTMLFormElement;
+    const formData = new FormData(formEl);
+    const email = (formData.get('email') as string)?.trim();
+    const password = (formData.get('password') as string) ?? '';
+    // Clear any previous session (best effort)
+    await logout();
 
     try {
         const result = await signInUser(email, password);
 
-        if (result.success) {
-            // Block admin sessions on the normal login page
-            if (result.role === 'admin') {
-                toast({
-                    title: 'Admin Login Restricted',
-                    description: 'Please use your dedicated admin login URL.',
-                    variant: 'destructive',
-                });
-                // Ensure no session is established
-                logout();
-                return;
-            }
-            // Save user info to localStorage to simulate a session
-            localStorage.setItem('userId', result.userId);
-            localStorage.setItem('role', result.role);
-            // Set cookie for middleware
-            setCookie('role', result.role, 7);
-            setCookie('userId', result.userId, 7);
-            onSocialLoginSuccess(result.role);
-        } else {
-             toast({
-                title: 'Sign In Failed',
-                description: result.message || 'No account found with that email or password. Please check your credentials or sign up.',
-                variant: 'destructive',
-            });
+        if (!result.success) {
+          toast({
+            title: 'Sign In Failed',
+            description: result.message || 'No account found with that email or password. Please check your credentials or sign up.',
+            variant: 'destructive',
+          });
+          return;
         }
+        // Get CSRF token and establish server session from Firebase ID token
+        const csrfRes = await fetch('/api/auth/csrf');
+        const csrfJson = await csrfRes.json();
+        const csrfToken = csrfJson?.token;
+        const sessRes = await fetch('/api/auth/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': csrfToken },
+          body: JSON.stringify({ idToken: result.idToken }),
+        });
+        const sessJson = await sessRes.json();
+        if (!sessRes.ok || !sessJson?.success) {
+          if (sessJson?.role === 'admin') {
+            toast({ title: 'Admin Login Restricted', description: 'Please use your dedicated admin login URL.', variant: 'destructive' });
+            await logout();
+            return;
+          }
+          // If server blocked due to email not verified, trigger provider-based resend and show banner
+          if (sessRes.status === 403 && sessJson?.redirect) {
+            if (resendCooldown <= 0) {
+              try {
+                const res = await resendVerificationEmail(email, { allowFirebaseFallback: false });
+                setResendEmailInput(email);
+                toast({ title: res.success ? 'Verification Email Sent' : 'Resend Failed', description: res.message, variant: res.success ? 'default' : 'destructive' });
+              } catch (e: any) {
+                console.warn('Failed to trigger verification email:', e);
+              }
+              setResendCooldown(60);
+            }
+            setShowVerifyBanner(true);
+            await logout();
+            return;
+          }
+          toast({ title: 'Sign In Failed', description: sessJson?.error || 'Failed to establish session.', variant: 'destructive' });
+          return;
+        }
+        if (sessJson.role === 'admin') {
+          toast({ title: 'Admin Login Restricted', description: 'Please use your dedicated admin login URL.', variant: 'destructive' });
+          await logout();
+          return;
+        }
+        finalizeLogin(sessJson.redirect || (sessJson.role === 'vendor' ? '/vendor/home' : '/client/home'));
 
     } catch (error) {
         console.error("Login failed:", error);
@@ -299,6 +384,37 @@ export default function LoginPage() {
 
   return (
     <div className="w-full bg-background overflow-x-hidden">
+      {showVerifyBanner && (
+        <div className="w-full bg-amber-50 border-b border-amber-200">
+          <div className="container mx-auto px-6 py-3 space-y-2">
+            <p className="text-sm text-amber-900">
+              Email verification required to continue. Please check your inbox for our verification email and click the link to verify. If you don’t see it, check Spam.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+              <div className="flex-1 w-full sm:w-auto">
+                <Input
+                  id="resend-email"
+                  name="resend-email"
+                  type="email"
+                  placeholder="Enter your email to resend"
+                  value={resendEmailInput}
+                  onChange={(e) => setResendEmailInput(e.target.value)}
+                />
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="h-10"
+                onClick={handleResendVerification}
+                disabled={isResending || resendCooldown > 0}
+              >
+                {isResending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Verification Email'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Hero Section - Mobile First */}
       <section className="relative min-h-screen flex flex-col justify-center items-center text-white">
         {/* Background with multiple layers for depth */}
