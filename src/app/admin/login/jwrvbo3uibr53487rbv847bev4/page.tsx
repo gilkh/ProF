@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -12,7 +12,7 @@ import { useAuth, logout } from '@/hooks/use-auth';
 import { Loader2 } from 'lucide-react';
 import { auth } from '@/lib/firebase';
 
-export default function AdminSecretLoginPage() {
+function AdminSecretLoginInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -404,5 +404,13 @@ export default function AdminSecretLoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function AdminSecretLoginPage() {
+  return (
+    <Suspense fallback={<div className="w-full max-w-xl p-6 text-center text-sm">Loading...</div>}>
+      <AdminSecretLoginInner />
+    </Suspense>
   );
 }
