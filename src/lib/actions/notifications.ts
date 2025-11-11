@@ -1,21 +1,20 @@
 
 'use server';
 
-import { collection, getDocs } from 'firebase/firestore';
 import { adminDb, adminAuth, adminMessaging } from '@/lib/firebase-admin';
 import type { UserProfile } from '@/lib/types';
 
 export async function sendPushNotification(target: 'all' | 'clients' | 'vendors', title: string, body: string) {
     try {
-        const usersSnapshot = await getDocs(collection(adminDb, "users"));
+        const usersSnapshot = await adminDb.collection('users').get();
         let targetUsers = usersSnapshot.docs;
 
         if (target === 'clients') {
-            const vendorsSnapshot = await getDocs(collection(adminDb, "vendors"));
+            const vendorsSnapshot = await adminDb.collection('vendors').get();
             const vendorIds = new Set(vendorsSnapshot.docs.map(doc => doc.id));
             targetUsers = usersSnapshot.docs.filter(doc => !vendorIds.has(doc.id));
         } else if (target === 'vendors') {
-            const vendorsSnapshot = await getDocs(collection(adminDb, "vendors"));
+            const vendorsSnapshot = await adminDb.collection('vendors').get();
             const vendorIds = new Set(vendorsSnapshot.docs.map(doc => doc.id));
             targetUsers = usersSnapshot.docs.filter(doc => vendorIds.has(doc.id));
         }

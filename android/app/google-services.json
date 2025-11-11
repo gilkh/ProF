@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "864853702730",
+    "project_id": "tradecraft-5c8mv",
+    "storage_bucket": "tradecraft-5c8mv.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:864853702730:android:57439cd44b9f1aa2fd8eb3",
+        "android_client_info": {
+          "package_name": "com.tradecraft.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "864853702730-ma1a8ei16j77s4cvm98knlu85sctk2bl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAj1q6tSrovSfQLZ0S_g2P0q76D3-xRp-o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "864853702730-ma1a8ei16j77s4cvm98knlu85sctk2bl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

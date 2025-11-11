@@ -6,8 +6,13 @@ const config: CapacitorConfig = {
   appName: 'Farhetkoun',
   webDir: 'out',
   server: {
-    url: 'https://pro-f-ecru.vercel.app',
+    url: 'https://farhetkoun.com',
     cleartext: false
+  },
+  plugins: {
+    FirebaseMessaging: {
+      presentationOptions: ["alert", "badge", "sound"],
+    },
   },
 };
 

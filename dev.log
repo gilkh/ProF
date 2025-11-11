@@ -8,82 +8,308 @@
    - Environments: .env.local
 
  ✓ Starting...
- ✓ Compiled middleware in 93ms
- ✓ Ready in 1112ms
+ ✓ Compiled middleware in 92ms
+ ✓ Ready in 1030ms
  ⚠ Webpack is configured while Turbopack is not, which may cause problems.
  ⚠ See instructions if you need to configure Turbopack:
   https://nextjs.org/docs/app/api-reference/next-config-js/turbo
 
- ✓ Compiled /favicon.ico in 463ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 812ms
  ○ Compiling /admin/login/jwrvbo3uibr53487rbv847bev4 ...
- ✓ Compiled /admin/login/jwrvbo3uibr53487rbv847bev4 in 1944ms
- GET /admin/login/jwrvbo3uibr53487rbv847bev4 200 in 2258ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 288ms
- ✓ Compiled /api/auth/csrf in 288ms
- GET /api/auth/csrf 200 in 732ms
- ✓ Compiled /api/auth/logout in 257ms
- POST /api/auth/logout 200 in 300ms
- ✓ Compiled /api/auth/session in 249ms
- GET /api/auth/session 200 in 293ms
- GET /api/auth/session 200 in 53ms
- GET /api/auth/csrf 200 in 52ms
- POST /api/auth/session 403 in 2000ms
- ✓ Compiled /api/email/send-verification in 322ms
- POST /api/email/send-verification 502 in 7586ms
- GET /api/auth/csrf 200 in 70ms
- POST /api/auth/logout 200 in 56ms
- POST /api/email/send-verification 502 in 7034ms
- POST /api/email/send-verification 200 in 1658ms
- POST /api/email/send-verification 200 in 1778ms
- ○ Compiling /signup ...
- ✓ Compiled /signup in 1086ms
- GET /signup 200 in 1282ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 296ms
- ✓ Compiled middleware in 5ms
- ✓ Compiled in 10ms
- GET /admin/login/jwrvbo3uibr53487rbv847bev4 200 in 336ms
- GET /api/auth/session 200 in 875ms
- GET /api/auth/session 200 in 472ms
+ ✓ Compiled /admin/login/jwrvbo3uibr53487rbv847bev4 in 2.1s
+ GET /admin/login/jwrvbo3uibr53487rbv847bev4 200 in 2453ms
+ ✓ Compiled /api/auth/csrf in 307ms
+ GET /api/auth/csrf 200 in 808ms
+ ✓ Compiled /api/auth/logout in 258ms
+ POST /api/auth/logout 200 in 302ms
+ ✓ Compiled /api/auth/session in 235ms
+ GET /api/auth/session 200 in 282ms
+ GET /api/auth/session 200 in 47ms
+ GET /api/auth/csrf 200 in 49ms
+ GET /admin/login/jwrvbo3uibr53487rbv847bev4 200 in 113ms
+ ✓ Compiled /favicon.ico in 253ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 572ms
+ POST /api/auth/session 200 in 2284ms
+ ○ Compiling /client/home ...
+ GET /api/auth/csrf 200 in 85ms
+ POST /api/auth/logout 200 in 75ms
+ ✓ Compiled /client/home in 1323ms
+ GET /api/auth/session 200 in 83ms
+ GET /api/auth/csrf 200 in 95ms
+ GET /api/auth/session 200 in 83ms
+ GET /client/home 200 in 2225ms
+ GET /api/auth/session 200 in 481ms
+ POST /api/auth/session 200 in 1069ms
+ GET /api/auth/session 200 in 445ms
  ○ Compiling /admin/home ...
- ✓ Compiled /admin/home in 3.2s
- GET /admin/home 200 in 3443ms
- GET /login?error=signup-blocked 200 in 1622ms
- GET /api/auth/session 200 in 564ms
- GET /api/auth/session 200 in 489ms
- GET /admin/home 200 in 626ms
- ○ Compiling / ...
- ✓ Compiled / in 1032ms
- GET / 200 in 1126ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 297ms
- GET /login?error=signup-blocked 200 in 150ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 297ms
- GET /admin/login/jwrvbo3uibr53487rbv847bev4 200 in 126ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 280ms
- GET /signup 200 in 63ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 291ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 258ms
-🔍 adminUpdateUserPassword called with userId: "Alj5GQMVu8NO49jRFjj6wWcyNkl1"
-🔍 Password length: 17 characters
-✅ Firebase Auth user found: {
-  uid: 'Alj5GQMVu8NO49jRFjj6wWcyNkl1',
-  email: 'gmkhoueiry@ndu.edu.lb',
-  emailVerified: false,
-  disabled: false,
-  providerData: [ { providerId: 'password', uid: 'gmkhoueiry@ndu.edu.lb' } ]
+ GET /api/auth/session 200 in 527ms
+ GET /api/auth/session 200 in 482ms
+ ✓ Compiled /admin/home in 2.1s
+ GET /api/auth/session 200 in 475ms
+ GET /admin/home 200 in 2652ms
+ GET /api/auth/session 200 in 477ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 265ms
+ GET /api/auth/session 200 in 443ms
+ GET /api/auth/session 200 in 458ms
+ GET /api/auth/session 200 in 453ms
+ GET /api/auth/session 200 in 625ms
+ GET /api/auth/session 200 in 446ms
+ GET /api/auth/session 200 in 447ms
+ GET /api/auth/session 200 in 410ms
+ GET /api/auth/session 200 in 446ms
+ GET /api/auth/session 200 in 447ms
+Error sending push notification: [Error [FirebaseError]: Expected first argument to collection() to be a CollectionReference, a DocumentReference or FirebaseFirestore] {
+  code: 'invalid-argument',
+  customData: undefined,
+  toString: [Function (anonymous)]
 }
-✅ Successfully updated password for Firebase Auth user Alj5GQMVu8NO49jRFjj6wWcyNkl1 (gmkhoueiry@ndu.edu.lb)
- POST /admin/home 200 in 913ms
- GET /admin/login/jwrvbo3uibr53487rbv847bev4 200 in 101ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 274ms
- GET /api/auth/csrf 200 in 61ms
- POST /api/auth/logout 200 in 59ms
- GET /api/auth/session 200 in 65ms
- GET /api/auth/session 200 in 73ms
- GET /api/auth/csrf 200 in 56ms
- POST /api/auth/session 403 in 1906ms
- POST /api/email/send-verification 200 in 1761ms
- GET /api/auth/csrf 200 in 54ms
- POST /api/auth/logout 200 in 46ms
- GET /api/auth/csrf 200 in 84ms
- POST /api/auth/logout 200 in 48ms
+ ⨯ [Error [FirebaseError]: Expected first argument to collection() to be a CollectionReference, a DocumentReference or FirebaseFirestore] {
+  code: 'invalid-argument',
+  customData: undefined,
+  toString: [Function (anonymous)],
+  digest: '2854757642'
+}
+ POST /admin/home 500 in 59ms
+ ✓ Compiled in 55ms
+ ✓ Compiled /admin/home in 77ms
+ GET /admin/home 200 in 808ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 266ms
+ GET /client/home 200 in 1769ms
+ GET /admin/home 200 in 895ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 257ms
+ GET /api/auth/session 200 in 455ms
+1 messages were sent successfully
+Failed to send to some devices [
+  {
+    success: false,
+    error: Error: Requested entity was not found.
+        at async sendPushNotification (src\lib\actions\notifications.ts:40:25)
+        at async sendPushNotificationServerAction (src\app\admin\actions.ts:15:9)
+      38 |         };
+      39 |
+    > 40 |         const response = await adminMessaging.sendEachForMulticast(message);
+         |                         ^
+      41 |         console.log(`${response.successCount} messages were sent successfully`);
+      42 |         
+      43 |         if (response.failureCount > 0) { {
+      errorInfo: {
+        code: 'messaging/registration-token-not-registered',
+        message: 'Requested entity was not found.'
+      },
+      codePrefix: 'messaging'
+    }
+  },
+  {
+    success: true,
+    messageId: 'projects/tradecraft-5c8mv/messages/cb04568a-a6ad-4357-a2bf-20ac44ce7f5a'
+  }
+]
+ POST /admin/home 200 in 897ms
+ GET /client/home 200 in 958ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 279ms
+ GET /api/auth/session 200 in 471ms
+ GET /api/auth/session 200 in 488ms
+ GET /api/auth/session 200 in 453ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 444ms
+ GET /api/auth/session 200 in 443ms
+ GET /api/auth/session 200 in 438ms
+ GET /api/auth/session 200 in 455ms
+ GET /api/auth/session 200 in 466ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 430ms
+ GET /api/auth/session 200 in 447ms
+ GET /api/auth/session 200 in 417ms
+ GET /api/auth/session 200 in 423ms
+1 messages were sent successfully
+Failed to send to some devices [
+  {
+    success: false,
+    error: Error: Requested entity was not found.
+        at async sendPushNotification (src\lib\actions\notifications.ts:40:25)
+        at async sendPushNotificationServerAction (src\app\admin\actions.ts:15:9)
+      38 |         };
+      39 |
+    > 40 |         const response = await adminMessaging.sendEachForMulticast(message);
+         |                         ^
+      41 |         console.log(`${response.successCount} messages were sent successfully`);
+      42 |         
+      43 |         if (response.failureCount > 0) { {
+      errorInfo: {
+        code: 'messaging/registration-token-not-registered',
+        message: 'Requested entity was not found.'
+      },
+      codePrefix: 'messaging'
+    }
+  },
+  {
+    success: true,
+    messageId: 'projects/tradecraft-5c8mv/messages/934b3c81-54cf-475d-95c2-d622513c9fc0'
+  }
+]
+ POST /admin/home 200 in 812ms
+ ✓ Compiled in 103ms
+ GET /client/home 200 in 1952ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 323ms
+ GET /admin/home 200 in 601ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 257ms
+ GET /api/auth/session 200 in 447ms
+ GET /api/auth/session 200 in 455ms
+ GET /api/auth/session 200 in 455ms
+ GET /api/auth/session 200 in 446ms
+ GET /api/auth/session 200 in 457ms
+ GET /api/auth/session 200 in 434ms
+ GET /api/auth/session 200 in 431ms
+ GET /api/auth/session 200 in 428ms
+ GET /api/auth/session 200 in 453ms
+ GET /api/auth/session 200 in 461ms
+ GET /api/auth/session 200 in 431ms
+ GET /api/auth/session 200 in 470ms
+ GET /api/auth/session 200 in 410ms
+ GET /api/auth/session 200 in 448ms
+ GET /api/auth/session 200 in 448ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 200 in 432ms
+1 messages were sent successfully
+Failed to send to some devices [
+  {
+    success: false,
+    error: Error: Requested entity was not found.
+        at async sendPushNotification (src\lib\actions\notifications.ts:40:25)
+        at async sendPushNotificationServerAction (src\app\admin\actions.ts:15:9)
+      38 |         };
+      39 |
+    > 40 |         const response = await adminMessaging.sendEachForMulticast(message);
+         |                         ^
+      41 |         console.log(`${response.successCount} messages were sent successfully`);
+      42 |         
+      43 |         if (response.failureCount > 0) { {
+      errorInfo: {
+        code: 'messaging/registration-token-not-registered',
+        message: 'Requested entity was not found.'
+      },
+      codePrefix: 'messaging'
+    }
+  },
+  {
+    success: true,
+    messageId: 'projects/tradecraft-5c8mv/messages/cae176d9-4835-4bb7-9561-97114bdfc043'
+  }
+]
+ POST /admin/home 200 in 866ms
+1 messages were sent successfully
+Failed to send to some devices [
+  {
+    success: false,
+    error: Error: Requested entity was not found.
+        at async sendPushNotification (src\lib\actions\notifications.ts:40:25)
+        at async sendPushNotificationServerAction (src\app\admin\actions.ts:15:9)
+      38 |         };
+      39 |
+    > 40 |         const response = await adminMessaging.sendEachForMulticast(message);
+         |                         ^
+      41 |         console.log(`${response.successCount} messages were sent successfully`);
+      42 |         
+      43 |         if (response.failureCount > 0) { {
+      errorInfo: {
+        code: 'messaging/registration-token-not-registered',
+        message: 'Requested entity was not found.'
+      },
+      codePrefix: 'messaging'
+    }
+  },
+  {
+    success: true,
+    messageId: 'projects/tradecraft-5c8mv/messages/0e78abbd-6cd9-4c7d-84f0-335095072e22'
+  }
+]
+ POST /admin/home 200 in 837ms
+1 messages were sent successfully
+Failed to send to some devices [
+  {
+    success: false,
+    error: Error: Requested entity was not found.
+        at async sendPushNotification (src\lib\actions\notifications.ts:40:25)
+        at async sendPushNotificationServerAction (src\app\admin\actions.ts:15:9)
+      38 |         };
+      39 |
+    > 40 |         const response = await adminMessaging.sendEachForMulticast(message);
+         |                         ^
+      41 |         console.log(`${response.successCount} messages were sent successfully`);
+      42 |         
+      43 |         if (response.failureCount > 0) { {
+      errorInfo: {
+        code: 'messaging/registration-token-not-registered',
+        message: 'Requested entity was not found.'
+      },
+      codePrefix: 'messaging'
+    }
+  },
+  {
+    success: true,
+    messageId: 'projects/tradecraft-5c8mv/messages/526b0d39-b502-4d19-b360-026c5e971159'
+  }
+]
+ POST /admin/home 200 in 1923ms
+1 messages were sent successfully
+Failed to send to some devices [
+  {
+    success: false,
+    error: Error: Requested entity was not found.
+        at async sendPushNotification (src\lib\actions\notifications.ts:40:25)
+        at async sendPushNotificationServerAction (src\app\admin\actions.ts:15:9)
+      38 |         };
+      39 |
+    > 40 |         const response = await adminMessaging.sendEachForMulticast(message);
+         |                         ^
+      41 |         console.log(`${response.successCount} messages were sent successfully`);
+      42 |         
+      43 |         if (response.failureCount > 0) { {
+      errorInfo: {
+        code: 'messaging/registration-token-not-registered',
+        message: 'Requested entity was not found.'
+      },
+      codePrefix: 'messaging'
+    }
+  },
+  {
+    success: true,
+    messageId: 'projects/tradecraft-5c8mv/messages/45636d24-08ff-4072-ac64-3578963752a5'
+  }
+]
+ POST /admin/home 200 in 2087ms
+ ○ Compiling /client/event-planner ...
+ ✓ Compiled /client/event-planner in 2s
+ GET /client/event-planner 200 in 2069ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 264ms
+ GET /api/auth/session 200 in 639ms
+ GET /admin/login/jwrvbo3uibr53487rbv847bev4 200 in 259ms
+ GET /api/auth/session 200 in 812ms
+ GET /api/auth/session 200 in 459ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1240ms
+ GET / 200 in 1590ms
+ GET /api/auth/session 200 in 608ms
+ GET /api/auth/session 200 in 504ms
+ GET /client/home 200 in 1490ms
+ GET /api/auth/session 200 in 486ms
+ GET /api/auth/session 200 in 524ms
+ GET /api/auth/session 200 in 511ms
+ GET /api/auth/session 200 in 467ms
+ GET /api/auth/session 200 in 441ms
+ GET /api/auth/session 200 in 468ms
+ GET /api/auth/csrf 200 in 93ms
+ ○ Compiling /login ...
+ GET /api/auth/session 200 in 514ms
+ POST /api/auth/logout 200 in 663ms
+ GET /api/auth/session 200 in 304ms
+ GET /api/auth/session 200 in 265ms
+ ✓ Compiled /login in 1203ms
+ GET /login 200 in 1247ms
+ GET /api/auth/session 200 in 247ms
+ GET /api/auth/session 200 in 319ms
+ GET /api/auth/session 200 in 286ms
+ GET /api/auth/session 200 in 249ms
+ GET /api/auth/session 200 in 250ms
+ GET /api/auth/session 200 in 254ms

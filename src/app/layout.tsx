@@ -26,7 +26,7 @@ function AppBody({ children }: { children: React.ReactNode }) {
     }, [translations]);
     
     useEffect(() => {
-        if ('serviceWorker' in navigator && userId) {
+        if (userId) {
             initializeNotifications(userId);
         }
     }, [userId]);
