@@ -100,7 +100,7 @@ async function initializeWebPush(userId: string) {
     const notificationTitle = payload.notification?.title || 'New Message';
     const notificationOptions = {
       body: payload.notification?.body || '',
-      icon: '/logo-app.png',
+      icon: '/logo.png',
     } as const;
     try {
       new Notification(notificationTitle, notificationOptions);

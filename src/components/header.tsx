@@ -139,7 +139,7 @@ export function AppHeader() {
     <header className="sticky top-0 z-40 flex h-24 items-center gap-4 border-b bg-background px-4 md:px-6">
       <div className="flex items-center gap-6">
         <Link href={isVendor ? "/vendor/home" : "/client/home"} className="flex items-center gap-2 font-semibold text-lg">
-            <Logo className="text-primary" width={350} height={350} src="/logo-app.png" />
+            <Logo className="text-primary" width={350} height={350} src="/logo1.png" />
         </Link>
         
         {/* Desktop Navigation */}

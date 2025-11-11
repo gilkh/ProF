@@ -63,6 +63,7 @@
   },
   "devDependencies": {
     "@capacitor/android": "^6.1.0",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^6.1.0",
     "@capacitor/core": "^6.1.0",
     "@capacitor/ios": "^6.1.0",
