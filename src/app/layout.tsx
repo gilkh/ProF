@@ -40,6 +40,28 @@ function AppBody({ children }: { children: React.ReactNode }) {
                  <link rel="icon" href="/logo-web.png" sizes="32x32" type="image/png" />
                  <link rel="icon" href="/logo-web.png" sizes="16x16" type="image/png" />
                  <link rel="apple-touch-icon" href="/logo-web.png" />
+                 {/* Ensure Capacitor bridge is available when app loads remote URL inside native WebView */}
+                 <script
+                   dangerouslySetInnerHTML={{ __html: `
+                     (function() {
+                       var d = document;
+                       function inject(src) {
+                         try {
+                           var s = d.createElement('script');
+                           s.setAttribute('src', src);
+                           s.setAttribute('type', 'text/javascript');
+                           s.async = false;
+                           d.head.appendChild(s);
+                         } catch (e) {}
+                       }
+                       if (!window.Capacitor) {
+                         inject('capacitor://localhost/capacitor.js');
+                         // Android plugin proxies
+                         inject('capacitor://localhost/capacitor-android-plugins.js');
+                       }
+                     })();
+                   `}}
+                 />
             </head>
             <body className={`${inter.variable} font-sans antialiased`}>
                 {children}

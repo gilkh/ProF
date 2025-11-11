@@ -316,3 +316,240 @@ Failed to send to some devices [
  ✓ Compiled in 51ms
  ✓ Compiled in 177ms
  GET /favicon.ico?favicon.cc977519.ico 200 in 260ms
+ ✓ Compiled in 1186ms
+ GET /client/event-planner 307 in 775ms
+ GET /login 200 in 155ms
+ ✓ Compiled in 49ms
+ ✓ Compiled middleware in 7ms
+ ✓ Compiled middleware in 1ms
+ ✓ Compiled in 1345ms
+ ✓ Compiled / in 197ms
+ GET / 200 in 859ms
+ ✓ Compiled in 856ms
+ GET / 200 in 417ms
+ ○ Compiling /_not-found/page ...
+ ✓ Compiled /_not-found/page in 1299ms
+ GET / 404 in 1468ms
+ GET / 404 in 1968ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 322ms
+ ✓ Compiled in 264ms
+ GET / 200 in 187ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 291ms
+ GET /api/auth/csrf 200 in 165ms
+ POST /api/auth/logout 200 in 172ms
+ GET /api/auth/session 200 in 158ms
+ GET /api/auth/session 200 in 167ms
+ GET /api/auth/csrf 200 in 135ms
+ POST /api/auth/session 200 in 2793ms
+ ✓ Compiled /client/home in 175ms
+ GET /client/home 200 in 1085ms
+ GET /api/auth/session 200 in 882ms
+ GET /api/auth/session 200 in 556ms
+ GET /api/auth/session 200 in 493ms
+ GET /api/auth/session 200 in 484ms
+ GET /api/auth/session 200 in 476ms
+ GET /api/auth/session 200 in 485ms
+ ○ Compiling /client/notifications ...
+ GET /api/auth/session 200 in 839ms
+ GET /api/auth/session 200 in 501ms
+ ✓ Compiled /client/notifications in 1241ms
+ GET /client/notifications 200 in 1297ms
+ GET /api/auth/session 200 in 713ms
+ GET /api/auth/session 200 in 491ms
+ GET /api/auth/session 200 in 477ms
+ GET /api/auth/session 200 in 697ms
+ GET /api/auth/session 200 in 546ms
+ GET /api/auth/session 200 in 492ms
+ GET /api/auth/session 200 in 476ms
+ GET /api/auth/session 200 in 462ms
+ GET /api/auth/session 200 in 459ms
+ ✓ Compiled middleware in 15ms
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\api\auth\session\[__metadata_id__]\route\app-paths-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\api\\auth\\session\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\client\notifications\page\server-reference-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\client\\notifications\\page\\server-reference-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\client\notifications\page\server-reference-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\client\\notifications\\page\\server-reference-manifest.json'
+}
+ ○ Compiling /client/notifications ...
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\client\notifications\page\server-reference-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\client\\notifications\\page\\server-reference-manifest.json'
+}
+ ✓ Compiled in 2.3s
+ ✓ Compiled /client/notifications in 1832ms
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.vyvaycwcrhs'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.vyvaycwcrhs'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.16tj41c4sic'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.16tj41c4sic'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.96x8b86k6ya'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.96x8b86k6ya'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.085rq3vh1cu'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.085rq3vh1cu'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\client\notifications\page\server-reference-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\client\\notifications\\page\\server-reference-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\api\auth\session\[__metadata_id__]\route\app-paths-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\api\\auth\\session\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\client\notifications\page\server-reference-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\client\\notifications\\page\\server-reference-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\client\notifications\page\server-reference-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\client\\notifications\\page\\server-reference-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.2myj3pbfo3t'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.2myj3pbfo3t'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.hc7exlx0ek'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.hc7exlx0ek'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.35c9iz59svz'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.35c9iz59svz'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.9ddp4z0egbk'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.9ddp4z0egbk'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.w5ywuf2vfq'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.w5ywuf2vfq'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.9sf430z0qf9'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.9sf430z0qf9'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.a47oww8wqt'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.a47oww8wqt'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\api\auth\session\[__metadata_id__]\route\app-paths-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\api\\auth\\session\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.4d2qctcgk1v'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.4d2qctcgk1v'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\favicon.ico\[__metadata_id__]\route\app-paths-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\favicon.ico\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\client\notifications\page\server-reference-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\client\\notifications\\page\\server-reference-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.mc1q640k12j'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.mc1q640k12j'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.e2cq5jwxhid'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.e2cq5jwxhid'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\api\auth\session\[__metadata_id__]\route\app-paths-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\api\\auth\\session\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\client\notifications\page\server-reference-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\client\\notifications\\page\\server-reference-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.ke4t2upe7k'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.ke4t2upe7k'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.sd706v85ywc'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.sd706v85ywc'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.an4zuxuoor7'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.an4zuxuoor7'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.teup7cz4jsn'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.teup7cz4jsn'
+}
