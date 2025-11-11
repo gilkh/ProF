@@ -7,7 +7,8 @@ const config: CapacitorConfig = {
   webDir: 'out',
   server: {
     url: 'https://farhetkoun.com',
-    cleartext: false
+    cleartext: false,
+    allowNavigation: ['farhetkoun.com', 'www.farhetkoun.com']
   },
   plugins: {
     FirebaseMessaging: {

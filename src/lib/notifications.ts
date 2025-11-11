@@ -18,7 +18,7 @@ declare global {
  */
 export async function initializeNotifications(userId: string) {
   try {
-    const isNative = Boolean(typeof window !== 'undefined' && window.Capacitor?.isNativePlatform);
+    const isNative = typeof window !== 'undefined' && !!window.Capacitor?.isNativePlatform?.();
 
     if (isNative) {
       await initializeNativePush(userId);
@@ -112,6 +112,7 @@ async function initializeNativePush(userId: string) {
   const Plugins = window.Capacitor?.Plugins || {};
   const FirebaseMessaging = Plugins.FirebaseMessaging;
   const PushNotifications = Plugins.PushNotifications;
+  console.log('[notifications] Capacitor detected:', !!window.Capacitor, 'Plugins:', Object.keys(Plugins || {}));
 
   // Prefer FirebaseMessaging to obtain FCM token on both Android and iOS
   if (FirebaseMessaging) {
