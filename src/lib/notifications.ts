@@ -112,46 +112,67 @@ async function initializeNativePush(userId: string) {
   const Plugins = window.Capacitor?.Plugins || {};
   const FirebaseMessaging = Plugins.FirebaseMessaging;
   const PushNotifications = Plugins.PushNotifications;
-  console.log('[notifications] Capacitor detected:', !!window.Capacitor, 'Plugins:', Object.keys(Plugins || {}));
+  const platform = window.Capacitor?.getPlatform?.() || window.Capacitor?.platform || 'unknown';
+  console.log('[notifications] Capacitor detected:', !!window.Capacitor, 'platform:', platform, 'plugins:', Object.keys(Plugins || {}));
+
+  // On Android 13+, notifications require runtime permission. Request via PushNotifications first.
+  if (PushNotifications) {
+    try {
+      const perm = await PushNotifications.requestPermissions();
+      console.log('[notifications] Push permission:', perm);
+      if (perm.receive === 'granted' || perm.receive === true) {
+        await PushNotifications.register();
+      }
+    } catch (err) {
+      console.warn('[notifications] PushNotifications.requestPermissions/register failed.', err);
+    }
+  }
 
   // Prefer FirebaseMessaging to obtain FCM token on both Android and iOS
   if (FirebaseMessaging) {
     try {
-      const perm = await FirebaseMessaging.requestPermissions();
-      if (perm.receive === 'granted' || perm.receive === true) {
-        const { token } = await FirebaseMessaging.getToken();
-        if (token) {
-          console.log('Native FCM token:', token);
-          const userRef = doc(db, 'users', userId);
-          try {
-            await updateDoc(userRef, { fcmTokens: arrayUnion(token) });
-          } catch (e) {
-            const currentUser = auth.currentUser;
-            const email = currentUser?.email || '';
-            const emailVerified = !!currentUser?.emailVerified;
-            const provider = currentUser?.providerData?.[0]?.providerId || 'password';
-            await setDoc(
-              userRef,
-              {
-                email,
-                status: 'active',
-                emailVerified,
-                provider,
-                createdAt: serverTimestamp(),
-                fcmTokens: arrayUnion(token),
-              },
-              { merge: true }
-            );
-          }
+      const { token } = await FirebaseMessaging.getToken();
+      if (token) {
+        console.log('Native FCM token:', token);
+        const userRef = doc(db, 'users', userId);
+        try {
+          await updateDoc(userRef, { fcmTokens: arrayUnion(token) });
+        } catch (e) {
+          const currentUser = auth.currentUser;
+          const email = currentUser?.email || '';
+          const emailVerified = !!currentUser?.emailVerified;
+          const provider = currentUser?.providerData?.[0]?.providerId || 'password';
+          await setDoc(
+            userRef,
+            {
+              email,
+              status: 'active',
+              emailVerified,
+              provider,
+              createdAt: serverTimestamp(),
+              fcmTokens: arrayUnion(token),
+            },
+            { merge: true }
+          );
         }
-
-        // Optional foreground listener
-        FirebaseMessaging.addListener('messageReceived', (payload: any) => {
-          console.log('Native push message received:', payload);
-        });
       } else {
-        console.log('Native push: permission not granted.');
+        console.warn('[notifications] FirebaseMessaging.getToken returned no token.');
       }
+
+      FirebaseMessaging.addListener('tokenReceived', async (ev: { token: string }) => {
+        if (!ev?.token) return;
+        console.log('Native tokenReceived:', ev.token);
+        const userRef = doc(db, 'users', userId);
+        try {
+          await updateDoc(userRef, { fcmTokens: arrayUnion(ev.token) });
+        } catch (e) {
+          await setDoc(userRef, { fcmTokens: arrayUnion(ev.token) }, { merge: true });
+        }
+      });
+
+      FirebaseMessaging.addListener('messageReceived', (payload: any) => {
+        console.log('Native push message received:', payload);
+      });
       return;
     } catch (err) {
       console.warn('[notifications] FirebaseMessaging bridge failed; falling back to PushNotifications.', err);

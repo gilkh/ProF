@@ -36,8 +36,6 @@ function AppBody({ children }: { children: React.ReactNode }) {
         <html lang={language} dir={language === 'ar' ? 'rtl' : 'ltr'} className={theme} style={{ colorScheme: theme }}>
             <head>
                  <meta name="description" content={translations.meta.description} />
-                 {/* Ensure Capacitor JS bridge is available when loading remote URL */}
-                 <script src="https://cdn.jsdelivr.net/npm/@capacitor/core@latest/dist/capacitor.js" defer></script>
                  <link rel="icon" href="/logo-web.png" type="image/png" />
                  <link rel="icon" href="/logo-web.png" sizes="32x32" type="image/png" />
                  <link rel="icon" href="/logo-web.png" sizes="16x16" type="image/png" />

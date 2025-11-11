@@ -313,3 +313,6 @@ Failed to send to some devices [
  GET /api/auth/session 200 in 249ms
  GET /api/auth/session 200 in 250ms
  GET /api/auth/session 200 in 254ms
+ ✓ Compiled in 51ms
+ ✓ Compiled in 177ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 260ms
