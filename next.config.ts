@@ -20,6 +20,27 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async headers() {
+    // Server-level CSP to allow Capacitor bridge scripts when loaded inside native WebView.
+    // Temporarily permissive during diagnostics; can be tightened after native detection is confirmed.
+    const csp = [
+      "default-src 'self' https: http: data: blob: 'unsafe-inline' 'unsafe-eval' capacitor:",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: blob: capacitor:",
+      "style-src 'self' 'unsafe-inline' https: http: capacitor:",
+      "img-src 'self' https: http: data: blob: capacitor:",
+      "connect-src * ws: wss: https: http: capacitor:",
+      "font-src 'self' https: http: data: capacitor:",
+      "media-src 'self' https: http: data: blob: capacitor:"
+    ].join('; ');
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'Content-Security-Policy', value: csp },
+        ],
+      },
+    ];
+  },
   webpack: (config, { isServer }) => {
     if (!isServer) {
       // Exclude Firebase Admin SDK from client-side bundle
