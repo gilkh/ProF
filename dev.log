@@ -591,3 +591,16 @@ Failed to send to some devices [
   path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\favicon.ico\\[__metadata_id__]\\route\\app-paths-manifest.json'
 }
  ✓ Compiled middleware in 6ms
+ ⚠ Found a change in next.config.ts. Restarting the server to apply the changes...
+   ▲ Next.js 15.3.3 (Turbopack)
+   - Local:        http://localhost:9002
+   - Network:      http://26.26.87.44:9002
+   - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Compiled middleware in 205ms
+ ✓ Ready in 1884ms
+ ⚠ Webpack is configured while Turbopack is not, which may cause problems.
+ ⚠ See instructions if you need to configure Turbopack:
+  https://nextjs.org/docs/app/api-reference/next-config-js/turbo
+

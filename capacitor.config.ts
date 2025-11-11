@@ -6,7 +6,7 @@ const config: CapacitorConfig = {
   appName: 'Farhetkoun',
   webDir: 'out',
   server: {
-    url: 'https://farhetkoun.com',
+    url: 'https://www.farhetkoun.com',
     cleartext: false,
     // Broaden temporarily to ensure all navigations stay in-app WebView
     // This helps diagnose cases where links escape to external browser.
