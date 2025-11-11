@@ -8,7 +8,9 @@ const config: CapacitorConfig = {
   server: {
     url: 'https://farhetkoun.com',
     cleartext: false,
-    allowNavigation: ['farhetkoun.com', 'www.farhetkoun.com']
+    // Broaden temporarily to ensure all navigations stay in-app WebView
+    // This helps diagnose cases where links escape to external browser.
+    allowNavigation: ['*']
   },
   plugins: {
     FirebaseMessaging: {

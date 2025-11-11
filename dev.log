@@ -553,3 +553,41 @@ Failed to send to some devices [
   syscall: 'open',
   path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.teup7cz4jsn'
 }
+ ✓ Compiled /login in 234ms
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\login\page\server-reference-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\login\\page\\server-reference-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.pnxnsd79pb'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.pnxnsd79pb'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\login\page\server-reference-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\login\\page\\server-reference-manifest.json'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.2u52eehi0dl'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.2u52eehi0dl'
+}
+[Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\static\development\_buildManifest.js.tmp.dqep5uibisl'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\static\\development\\_buildManifest.js.tmp.dqep5uibisl'
+}
+ ⨯ [Error: ENOENT: no such file or directory, open 'C:\Users\Gilbert\Documents\GitHub\ProF\.next\server\app\favicon.ico\[__metadata_id__]\route\app-paths-manifest.json'] {
+  errno: -4058,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: 'C:\\Users\\Gilbert\\Documents\\GitHub\\ProF\\.next\\server\\app\\favicon.ico\\[__metadata_id__]\\route\\app-paths-manifest.json'
+}
+ ✓ Compiled middleware in 6ms
