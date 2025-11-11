@@ -1,7 +1,7 @@
 
 'use server';
 
-import { adminDb, adminAuth, adminMessaging } from '@/lib/firebase-admin';
+import { adminDb, adminAuth, adminMessaging, admin } from '@/lib/firebase-admin';
 import type { UserProfile } from '@/lib/types';
 
 export async function sendPushNotification(target: 'all' | 'clients' | 'vendors', title: string, body: string) {
@@ -42,6 +42,32 @@ export async function sendPushNotification(target: 'all' | 'clients' | 'vendors'
         
         if (response.failureCount > 0) {
             console.warn("Failed to send to some devices", response.responses);
+            // Clean up invalid tokens to improve future delivery reliability
+            const tokensArray = message.tokens as string[];
+            const invalidTokenIndices = response.responses
+              .map((r, idx) => ({ idx, error: r.error }))
+              .filter(r => !!r.error && (
+                r.error?.code === 'messaging/invalid-registration-token' ||
+                r.error?.code === 'messaging/registration-token-not-registered'
+              ))
+              .map(r => r.idx);
+
+            const tokensToRemove = invalidTokenIndices.map(i => tokensArray[i]);
+            if (tokensToRemove.length) {
+              console.warn('Pruning invalid tokens:', tokensToRemove);
+              for (const t of tokensToRemove) {
+                try {
+                  const snap = await adminDb.collection('users').where('fcmTokens', 'array-contains', t).get();
+                  const batch = adminDb.batch();
+                  snap.docs.forEach(doc => {
+                    batch.update(doc.ref, { fcmTokens: admin.firestore.FieldValue.arrayRemove(t) });
+                  });
+                  await batch.commit();
+                } catch (pruneErr) {
+                  console.warn('Failed to prune token', t, pruneErr);
+                }
+              }
+            }
         }
 
         return { success: true, message: `${response.successCount} notifications sent.` };
