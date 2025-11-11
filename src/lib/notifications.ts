@@ -122,6 +122,22 @@ async function initializeNativePush(userId: string) {
       console.log('[notifications] Push permission:', perm);
       if (perm.receive === 'granted' || perm.receive === true) {
         await PushNotifications.register();
+
+        // Ensure default notification channel exists (Android >= 8)
+        try {
+          await PushNotifications.createChannel({
+            id: 'general',
+            name: 'General',
+            description: 'Default notification channel',
+            importance: 5, // high
+            visibility: 1, // public
+            lights: true,
+            vibration: true,
+          });
+          console.log('[notifications] Created/ensured default notification channel: general');
+        } catch (chErr) {
+          console.warn('[notifications] Failed to create default notification channel.', chErr);
+        }
       }
     } catch (err) {
       console.warn('[notifications] PushNotifications.requestPermissions/register failed.', err);
