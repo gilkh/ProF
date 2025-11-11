@@ -14,8 +14,8 @@ self.addEventListener('push', (event) => {
     const title = notification.title || data.title || 'New Notification';
     const options = {
       body: notification.body || data.body || '',
-      icon: notification.icon || '/logo.png',
-      badge: notification.badge || '/logo.png',
+      icon: notification.icon || '/logo-app.png',
+      badge: notification.badge || '/logo-app.png',
       data: data.data || {},
       // Actions can be added if needed
       // actions: [{ action: 'open', title: 'Open' }]

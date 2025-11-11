@@ -8,7 +8,7 @@ interface LogoProps extends Omit<HTMLAttributes<HTMLDivElement>, 'className'> {
   src?: string;
 }
 
-export function Logo({ className, width = 600, height = 600, src = "/logo.png", ...props }: LogoProps) {
+export function Logo({ className, width = 600, height = 600, src = "/logo-app.png", ...props }: LogoProps) {
   return (
     <div className={className} {...props}>
       <Image
