@@ -46,6 +46,20 @@ export function ClientHome() {
     const [featuredItems, setFeaturedItems] = useState<ServiceOrOffer[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    // Debug instrumentation state
+    const [notifDebug, setNotifDebug] = useState<{
+        platform?: string;
+        isNative?: boolean;
+        hasCapacitor?: boolean;
+        plugins?: string[];
+        permission?: any;
+        token?: string;
+        tokenError?: string;
+        backendUpdate?: string;
+        listeners?: string[];
+        steps: string[];
+    }>({ steps: [] });
+
     useEffect(() => {
         async function loadDashboardData() {
             if (!userId) {
@@ -76,6 +90,88 @@ export function ClientHome() {
         }
         loadDashboardData();
     }, [userId, isAuthLoading]);
+
+    // Notification debug: run as soon as client home mounts with a user
+    useEffect(() => {
+        let unsubWeb: any = null;
+        async function runNotificationDiag() {
+            if (!userId) return;
+            const steps: string[] = [];
+            try {
+                const hasCapacitor = typeof window !== 'undefined' && !!(window as any).Capacitor;
+                const platform = hasCapacitor ? ((window as any).Capacitor.getPlatform?.() || (window as any).Capacitor.platform || 'unknown') : 'web';
+                const isNative = !!(window as any).Capacitor?.isNativePlatform?.();
+                const plugins = hasCapacitor ? Object.keys(((window as any).Capacitor.Plugins) || {}) : [];
+                steps.push(`[env] platform=${platform} isNative=${isNative} hasCapacitor=${hasCapacitor} plugins=${plugins.join(',')}`);
+                setNotifDebug(d => ({ ...d, platform, isNative, hasCapacitor, plugins, steps: [...steps] }));
+
+                // Web permission check (even in WebView this API may exist)
+                if (typeof Notification !== 'undefined') {
+                    try {
+                        const perm = await Notification.requestPermission();
+                        steps.push(`[perm] Notification.requestPermission -> ${perm}`);
+                        setNotifDebug(d => ({ ...d, permission: perm, steps: [...steps] }));
+                    } catch (e: any) {
+                        steps.push(`[perm] Notification.requestPermission error: ${e?.message || String(e)}`);
+                        setNotifDebug(d => ({ ...d, steps: [...steps] }));
+                    }
+                }
+
+                // Attach foreground listeners to surface incoming payloads
+                try {
+                    const listeners: string[] = [];
+                    const cap = (window as any).Capacitor;
+                    const FM = cap?.Plugins?.FirebaseMessaging;
+                    const PN = cap?.Plugins?.PushNotifications;
+                    if (FM?.addListener) {
+                        FM.addListener('messageReceived', (payload: any) => {
+                            setNotifDebug(d => ({ ...d, steps: [...d.steps, `[recv:FM] ${JSON.stringify(payload)}`] }));
+                        });
+                        FM.addListener('tokenReceived', (e: any) => {
+                            setNotifDebug(d => ({ ...d, steps: [...d.steps, `[token:FM] ${e?.token}`], token: e?.token }));
+                        });
+                        listeners.push('FirebaseMessaging.messageReceived', 'FirebaseMessaging.tokenReceived');
+                    }
+                    if (PN?.addListener) {
+                        PN.addListener('pushNotificationReceived', (n: any) => {
+                            setNotifDebug(d => ({ ...d, steps: [...d.steps, `[recv:PN] ${JSON.stringify(n)}`] }));
+                        });
+                        PN.addListener('registration', (t: any) => {
+                            setNotifDebug(d => ({ ...d, steps: [...d.steps, `[token:PN] ${t?.value}`], token: t?.value }));
+                        });
+                        PN.addListener('registrationError', (err: any) => {
+                            setNotifDebug(d => ({ ...d, steps: [...d.steps, `[err:PN] ${JSON.stringify(err)}`], tokenError: JSON.stringify(err) }));
+                        });
+                        listeners.push('PushNotifications.pushNotificationReceived', 'PushNotifications.registration', 'PushNotifications.registrationError');
+                    }
+                    setNotifDebug(d => ({ ...d, listeners, steps: [...d.steps, `[listeners] attached: ${listeners.join(', ') || 'none'}`] }));
+                } catch (e: any) {
+                    steps.push(`[listeners] error: ${e?.message || String(e)}`);
+                    setNotifDebug(d => ({ ...d, steps: [...steps] }));
+                }
+
+                // Trigger the app's initialization flow (uses web or native depending on platform)
+                try {
+                    const { initializeNotifications } = await import('@/lib/notifications');
+                    steps.push('[init] initializeNotifications(...) start');
+                    setNotifDebug(d => ({ ...d, steps: [...steps] }));
+                    await initializeNotifications(userId);
+                    steps.push('[init] initializeNotifications(...) done');
+                    setNotifDebug(d => ({ ...d, steps: [...steps] }));
+                } catch (e: any) {
+                    steps.push(`[init] initializeNotifications error: ${e?.message || String(e)}`);
+                    setNotifDebug(d => ({ ...d, steps: [...steps], tokenError: e?.message || String(e) }));
+                }
+            } catch (e: any) {
+                steps.push(`[fatal] ${e?.message || String(e)}`);
+                setNotifDebug(d => ({ ...d, steps: [...steps] }));
+            }
+        }
+        runNotificationDiag();
+        return () => {
+            try { if (unsubWeb) unsubWeb(); } catch {}
+        };
+    }, [userId]);
     
     const { specialOffers, featuredServices } = useMemo(() => ({
         specialOffers: featuredItems.filter(i => i.type === 'offer').slice(0, 2),
@@ -86,6 +182,53 @@ export function ClientHome() {
 
     return (
         <div className="space-y-8">
+            {/* DEBUG PANEL: visible diagnostics for push notifications on mobile APK */}
+            {userId && (
+                <Card className="border-red-500 border-2 bg-red-50">
+                    <CardHeader>
+                        <CardTitle>Push Diagnostics (Temporary)</CardTitle>
+                        <CardDescription>Visible only during troubleshooting. Reinstall APK and log in to see live status.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-xs break-words space-y-1">
+                            <div><b>User:</b> {userId}</div>
+                            <div><b>Platform:</b> {notifDebug.platform} | <b>isNative:</b> {String(notifDebug.isNative)} | <b>hasCapacitor:</b> {String(notifDebug.hasCapacitor)}</div>
+                            <div><b>Plugins:</b> {(notifDebug.plugins || []).join(', ') || 'none'}</div>
+                            <div><b>Permission:</b> {String(notifDebug.permission ?? 'unknown')}</div>
+                            <div><b>Token:</b> {notifDebug.token || 'none'}</div>
+                            {notifDebug.tokenError && <div className="text-red-600"><b>Token Error:</b> {notifDebug.tokenError}</div>}
+                            {notifDebug.backendUpdate && <div><b>Backend:</b> {notifDebug.backendUpdate}</div>}
+                            <div><b>Listeners:</b> {(notifDebug.listeners || []).join(', ') || 'none'}</div>
+                            <div className="mt-2"><b>Steps:</b></div>
+                            <ol className="list-decimal ml-5 space-y-1 max-h-64 overflow-auto">
+                                {(notifDebug.steps || []).map((s, i) => (
+                                    <li key={i}>{s}</li>
+                                ))}
+                            </ol>
+                        </div>
+                        <div className="mt-3 flex gap-2">
+                            <Button size="sm" onClick={() => {
+                                setNotifDebug({ steps: [] });
+                                // re-run
+                                const evt = new Event('click');
+                                // trigger useEffect by transient state change
+                                setTimeout(() => setNotifDebug(d => ({ ...d })), 0);
+                            }}>Clear</Button>
+                            <Button size="sm" onClick={async () => {
+                                try {
+                                    const { initializeNotifications } = await import('@/lib/notifications');
+                                    setNotifDebug(d => ({ ...d, steps: [...d.steps, '[manual] initializeNotifications triggered'] }));
+                                    await initializeNotifications(userId!);
+                                    setNotifDebug(d => ({ ...d, steps: [...d.steps, '[manual] initializeNotifications done'] }));
+                                } catch (e: any) {
+                                    setNotifDebug(d => ({ ...d, steps: [...d.steps, `[manual] error: ${e?.message || String(e)}`] }));
+                                }
+                            }}>Retry Registration</Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            )}
+
             <Card className="bg-gradient-to-br from-primary/10 to-transparent border-primary/20 shadow-lg">
                 <CardHeader>
                     <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
