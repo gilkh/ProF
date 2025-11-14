@@ -9,7 +9,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { ServiceCard } from './service-card';
 import { OfferCard } from './offer-card';
 import Link from 'next/link';
-import { Calendar, Compass, Heart, Star, Tag, ArrowRight, MessageSquare, Wallet, Camera, Building2, Cake as CakeIcon, UtensilsCrossed, Video, Music, Headphones, Brush, Flower, Car, Shirt, PartyPopper } from 'lucide-react';
+import { Calendar, Compass, Heart, Star, Tag, ArrowRight, MessageSquare, Wallet, Camera, Building2, Cake as CakeIcon, UtensilsCrossed, Video, Music, Headphones, Brush, Flower, Car, Shirt, PartyPopper, Grid } from 'lucide-react';
 import type { CarouselApi } from '@/components/ui/carousel';
 import { useEffect, useState, useMemo, memo } from 'react';
 import type { Booking, ServiceOrOffer, UserProfile, SponsoredBanner, VendorProfile } from '@/lib/types';
@@ -73,6 +73,7 @@ export function ClientHome() {
     const [topVendors, setTopVendors] = useState<VendorProfile[]>([]);
     const [vendorCarouselApi, setVendorCarouselApi] = useState<CarouselApi | null>(null);
     const [picksCarouselApi, setPicksCarouselApi] = useState<CarouselApi | null>(null);
+    const [selectedTab, setSelectedTab] = useState<'categories' | 'event-types'>('categories');
 
     // Debug instrumentation state
     const [notifDebug, setNotifDebug] = useState<{
@@ -326,25 +327,11 @@ export function ClientHome() {
                 />
             </div>
             
-            <div className="rounded-2xl bg-accent/3 backdrop-blur-sm border border-primary/40 p-3 sm:p-4">
-                <Tabs defaultValue="categories">
-                    <div className="flex items-center justify-between mb-3">
-                        <p className="text-xs sm:text-sm text-muted-foreground">Browse by category or event type</p>
-                        <TabsList className="rounded-full bg-gradient-to-br from-white/10 to-white/3 backdrop-blur-lg border border-primary/40 p-2 shadow-lg ring-1 ring-primary/10">
-                            <TabsTrigger value="categories" className="rounded-full px-5 py-2 text-sm sm:text-base font-semibold transition data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow">
-                                Categories
-                            </TabsTrigger>
-                            <TabsTrigger value="event-types" className="rounded-full px-5 py-2 text-sm sm:text-base font-semibold transition data-[state=active]:bg-gradient-to-br data-[state=active]:from-primary data-[state=active]:to-primary/80 data-[state=active]:text-primary-foreground data-[state=active]:shadow">
-                                Event Types
-                            </TabsTrigger>
-                        </TabsList>
-                    </div>
-                    <TabsContent value="categories">
-            <div className="space-y-4">
-                <div>
-                    <h2 className="text-2xl font-bold">Categories</h2>
-                    <p className="text-muted-foreground">Explore by service type</p>
-                </div>
+            <div className="rounded-2xl bg-accent/3 backdrop-blur-sm border border-primary/40 p-3 sm:p-4 flex items-center gap-3">
+                <div className="flex-1 pt-0 sm:pt-1 px-2 sm:px-3 pb-3">
+                    <Tabs value={selectedTab}>
+                        <TabsContent value="categories">
+            <div className="space-y-2">
                 {/* Mobile: fun, compact tiles (3 per row) */}
                 <div className="grid grid-cols-4 gap-2 sm:hidden">
                     {[
@@ -406,14 +393,10 @@ export function ClientHome() {
                     ))}
                 </div>
             </div>
-                    </TabsContent>
+                        </TabsContent>
 
-                    <TabsContent value="event-types">
-            <div className="space-y-4">
-                <div>
-                    <h2 className="text-2xl font-bold">Event Types</h2>
-                    <p className="text-muted-foreground">Get inspired and start planning</p>
-                </div>
+                        <TabsContent value="event-types">
+            <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2 md:grid-cols-2">
                     {[
                         { label: 'Birthdays', emoji: '🎂', q: 'Birthday Party' },
@@ -447,14 +430,45 @@ export function ClientHome() {
                     ))}
                 </div>
             </div>
-                    </TabsContent>
-                </Tabs>
+                        </TabsContent>
+                    </Tabs>
+                </div>
+                <div className={`w-12 sm:w-14 ml-1 sm:ml-2 shrink-0 z-10 rounded-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg p-2 ${selectedTab === 'categories' ? 'pt-3' : selectedTab === 'event-types' ? 'pb-3' : ''} flex flex-col gap-2 items-center`}>
+                    <div className="flex flex-col items-center">
+                        <button
+                            onClick={() => setSelectedTab('categories')}
+                            aria-label="Categories"
+                            className={`${selectedTab === 'categories' ? 'bg-primary text-primary-foreground h-14 -mt-2' : 'border border-primary text-primary h-10'} w-10 rounded-full flex items-center justify-center`}
+                        >
+                            <div className="flex flex-col items-center justify-center">
+                                {selectedTab === 'categories' && (
+                                    <span className="text-[7px] uppercase tracking-wide">Cats</span>
+                                )}
+                                <Grid className="h-4 w-4 mt-0.5" />
+                            </div>
+                        </button>
+                    </div>
+                    <div className="flex flex-col items-center">
+                        <button
+                            onClick={() => setSelectedTab('event-types')}
+                            aria-label="Event Types"
+                            className={`${selectedTab === 'event-types' ? 'bg-primary text-primary-foreground h-14 -mb-2' : 'border border-primary text-primary h-10'} w-10 rounded-full flex items-center justify-center`}
+                        >
+                            <div className="flex flex-col items-center justify-center">
+                                <Calendar className="h-4 w-4" />
+                                {selectedTab === 'event-types' && (
+                                    <span className="text-[7px] uppercase tracking-wide mt-0.5">types</span>
+                                )}
+                            </div>
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-2xl font-bold">Featured Vendors</h2>
-                    <Link href="/client/explore"><Button variant="link">View All</Button></Link>
+                    <h2 className="text-lg font-semibold sm:text-xl">Featured Vendors</h2>
+                    <Link href="/client/explore"><Button variant="link" size="sm" className="text-sm">View All</Button></Link>
                 </div>
                 {pageIsLoading ? (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -493,8 +507,7 @@ export function ClientHome() {
 
             <div className="space-y-4">
                 <div>
-                    <h2 className="text-2xl font-bold">Editorial Picks</h2>
-                    <p className="text-muted-foreground">Curated highlights for you</p>
+                    <h2 className="text-lg font-semibold sm:text-xl">Editorial Picks</h2>
                 </div>
                 {pageIsLoading ? (
                     <div className="grid grid-cols-2 gap-3">
@@ -537,8 +550,7 @@ export function ClientHome() {
 
             <div className="space-y-6">
                 <div>
-                    <h2 className="text-2xl font-bold">Offers & Promotions</h2>
-                    <p className="text-muted-foreground">Limited-time packages and deals</p>
+                    <h2 className="text-lg font-semibold sm:text-xl">Offers & Promotions</h2>
                 </div>
                  {pageIsLoading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -556,8 +568,7 @@ export function ClientHome() {
 
             <div className="space-y-6">
                 <div>
-                    <h2 className="text-2xl font-bold">Featured Services</h2>
-                    <p className="text-muted-foreground">Top-rated professionals to make your event unforgettable.</p>
+                    <h2 className="text-lg font-semibold sm:text-xl">Featured Services</h2>
                 </div>
                  {pageIsLoading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -575,8 +586,7 @@ export function ClientHome() {
 
             <div className="space-y-4">
                 <div>
-                    <h2 className="text-2xl font-bold">Planning Tools</h2>
-                    <p className="text-muted-foreground">Plan, budget, and manage your event</p>
+                    <h2 className="text-lg font-semibold sm:text-xl">Planning Tools</h2>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <Link href="/client/event-planner">
