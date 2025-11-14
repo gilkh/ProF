@@ -437,3 +437,320 @@ Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` sho
  GET /api/auth/session 200 in 429ms
  ✓ Compiled in 149ms
  ✓ Compiled in 144ms
+ GET /login 200 in 134ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 159ms
+ GET /_next/internal/helpers.ts 404 in 134ms
+ GET /_next/static/runtime.ts 404 in 138ms
+ GET /api/auth/session 200 in 573ms
+ GET /api/auth/session 200 in 484ms
+ GET /client/home 200 in 1530ms
+ GET /api/auth/session 200 in 507ms
+ GET /api/auth/session 200 in 454ms
+ GET /api/auth/session 200 in 459ms
+ GET /placeholder.png 404 in 126ms
+ GET /api/auth/session 200 in 446ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 200 in 456ms
+ GET /api/auth/session 200 in 465ms
+ GET /api/auth/session 200 in 451ms
+ GET /api/auth/session 200 in 457ms
+ GET /api/auth/session 200 in 799ms
+ GET /api/auth/session 200 in 430ms
+ GET /api/auth/session 200 in 511ms
+ GET /api/auth/session 200 in 442ms
+ GET /api/auth/session 200 in 440ms
+ GET /api/auth/session 200 in 447ms
+ ✓ Compiled in 220ms
+ GET /client/home 200 in 1296ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 195ms
+ GET /_next/internal/helpers.ts 404 in 73ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 293ms
+ GET /_next/static/runtime.ts 404 in 156ms
+ GET /api/auth/session 200 in 573ms
+ GET /api/auth/session 200 in 482ms
+ GET /api/auth/session 200 in 431ms
+ GET /api/auth/session 200 in 435ms
+ GET /placeholder.png 404 in 125ms
+ GET /api/auth/session 200 in 502ms
+ GET /api/auth/session 200 in 438ms
+ GET /api/auth/session 200 in 430ms
+ GET /api/auth/session 200 in 430ms
+ GET /api/auth/session 200 in 435ms
+ GET /api/auth/session 200 in 432ms
+ GET /api/auth/session 200 in 458ms
+ GET /api/auth/session 200 in 427ms
+ GET /api/auth/session 200 in 427ms
+ GET /api/auth/session 200 in 420ms
+ GET /api/auth/session 200 in 446ms
+ GET /api/auth/session 200 in 433ms
+ ✓ Compiled in 194ms
+ ✓ Compiled in 171ms
+ ✓ Compiled in 168ms
+ ⨯ ./src/components/service-card.tsx:138:6
+Parsing ecmascript source code failed
+[0m [90m 136 |[39m[0m
+[0m [90m 137 |[39m   [36mreturn[39m ([0m
+[0m[31m[1m>[22m[39m[90m 138 |[39m     [33m<[39m[33mCard[39m className[33m=[39m[32m"flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 rounded-xl group border border-primary/10 bg-white/95"[39m onMouseEnter[33m=[39m{handleMouseEnter} onMouseLeave[33m=[39m{handleMouseLeave}[33m>[39m[0m
+[0m [90m     |[39m      [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 139 |[39m       [0m
+[0m [90m 140 |[39m         [33m<[39m[33mCardHeader[39m className[33m=[39m[32m"p-0 relative overflow-hidden"[39m[33m>[39m[0m
+[0m [90m 141 |[39m             [33m<[39m[33mdiv[39m className[33m=[39m[32m"relative w-full h-48 overflow-hidden"[39m[33m>[39m[0m
+
+Unexpected token `Card`. Expected jsx identifier
+
+
+ ○ Compiling /_error ...
+ ✓ Compiled in 531ms
+ ✓ Compiled /_error in 1270ms
+ GET /client/home 500 in 1770ms
+ GET /client/home 200 in 895ms
+ GET /client/home 200 in 1174ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 182ms
+ GET /_next/internal/helpers.ts 404 in 135ms
+ GET /_next/static/runtime.ts 404 in 148ms
+ GET /favicon.ico 200 in 294ms
+ GET /_next/internal/helpers.ts 404 in 164ms
+ GET /_next/static/runtime.ts 404 in 192ms
+ GET /client/home 200 in 796ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 213ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 322ms
+ GET /_next/internal/helpers.ts 404 in 154ms
+ GET /_next/static/runtime.ts 404 in 118ms
+ GET /api/auth/session 200 in 653ms
+ GET /api/auth/session 200 in 508ms
+ GET /api/auth/session 200 in 610ms
+ GET /api/auth/session 200 in 440ms
+ GET /placeholder.png 404 in 149ms
+ GET /api/auth/session 200 in 439ms
+ GET /api/auth/session 200 in 432ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 450ms
+ GET /api/auth/session 200 in 416ms
+ GET /api/auth/session 200 in 466ms
+ GET /api/auth/session 200 in 448ms
+ GET /api/auth/session 200 in 421ms
+ GET /api/auth/session 200 in 450ms
+ GET /api/auth/session 200 in 433ms
+ GET /api/auth/session 200 in 446ms
+ GET /api/auth/session 200 in 576ms
+ ✓ Compiled in 127ms
+ ✓ Compiled in 150ms
+ ✓ Compiled in 124ms
+ ✓ Compiled in 162ms
+ ✓ Compiled in 158ms
+ GET /client/bookings 200 in 74ms
+ GET /api/auth/session 200 in 609ms
+ GET /client/home 200 in 160ms
+ GET /api/auth/session 200 in 458ms
+ GET /placeholder.png 404 in 115ms
+ GET /api/auth/session 200 in 466ms
+ GET /api/auth/session 200 in 427ms
+ GET /api/auth/session 200 in 434ms
+ GET /api/auth/session 200 in 446ms
+ GET /api/auth/session 200 in 441ms
+ GET /api/auth/session 200 in 452ms
+ GET /api/auth/session 200 in 448ms
+ GET /api/auth/session 200 in 424ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 420ms
+ GET /api/auth/session 200 in 445ms
+ GET /api/auth/session 200 in 446ms
+ ✓ Compiled in 177ms
+ ✓ Compiled in 175ms
+ GET /client/home 200 in 1796ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 230ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 318ms
+ GET /_next/internal/helpers.ts 404 in 103ms
+ GET /_next/static/runtime.ts 404 in 147ms
+ GET /api/auth/session 200 in 506ms
+ GET /api/auth/session 200 in 452ms
+ GET /api/auth/session 200 in 503ms
+ GET /api/auth/session 200 in 473ms
+ GET /placeholder.png 404 in 120ms
+ GET /api/auth/session 200 in 460ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 200 in 450ms
+ GET /api/auth/session 200 in 400ms
+ GET /api/auth/session 200 in 473ms
+ GET /api/auth/session 200 in 467ms
+ GET /api/auth/session 200 in 460ms
+ GET /api/auth/session 200 in 462ms
+ GET /api/auth/session 200 in 478ms
+ GET /api/auth/session 200 in 433ms
+ GET /api/auth/session 200 in 438ms
+ ✓ Compiled in 162ms
+ ✓ Compiled in 147ms
+ ✓ Compiled in 144ms
+ ✓ Compiled in 188ms
+ ✓ Compiled in 126ms
+ ✓ Compiled in 246ms
+ ⨯ ReferenceError: Tabs is not defined
+    at ClientHome (src\components\client-home.tsx:330:17)
+  328 |             
+  329 |             <div className="relative rounded-2xl bg-accent/3 backdrop-blur-sm border border-primary/40 p-3 sm:p-4">
+> 330 |                 <Tabs value={selectedTab}>
+      |                 ^
+  331 |                     <div className="flex items-center justify-between mb-3">
+  332 |                         <p className="text-xs sm:text-sm text-muted-foreground">Browse by category or event type</p>
+  333 |                         <TabsList className="hidden rounded-full bg-gradient-to-br from-white/10 to-white/3 backdrop-blur-lg border border-primary/40 p-2 shadow-lg ring-1 ring-primary/10"> {
+  digest: '2423682218'
+}
+ GET /client/home 500 in 1974ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 191ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 319ms
+ GET /_next/internal/helpers.ts 404 in 197ms
+ GET /favicon.ico 200 in 343ms
+ GET /_next/static/runtime.ts 404 in 247ms
+ ✓ Compiled in 179ms
+ ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+ GET /client/home 200 in 1074ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 127ms
+ GET /_next/internal/helpers.ts 404 in 137ms
+ GET /_next/static/runtime.ts 404 in 164ms
+ GET /api/auth/session 200 in 469ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 290ms
+ GET /api/auth/session 200 in 473ms
+ GET /api/auth/session 200 in 473ms
+ GET /api/auth/session 200 in 427ms
+ GET /placeholder.png 404 in 132ms
+ GET /api/auth/session 200 in 486ms
+ GET /api/auth/session 200 in 424ms
+ GET /api/auth/session 200 in 441ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 200 in 451ms
+ GET /api/auth/session 200 in 445ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 439ms
+ GET /api/auth/session 200 in 419ms
+ GET /api/auth/session 200 in 485ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 425ms
+ ✓ Compiled /client/explore in 40ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:73)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                                                         ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /client/explore?eventType=Baby+Shower 200 in 104ms
+ GET /api/auth/session 200 in 544ms
+ GET /api/auth/session 200 in 457ms
+ GET /client/home 200 in 62ms
+ GET /api/auth/session 200 in 444ms
+ GET /api/auth/session 200 in 461ms
+ GET /placeholder.png 404 in 107ms
+ GET /api/auth/session 200 in 444ms
+ GET /api/auth/session 200 in 402ms
+ GET /api/auth/session 200 in 452ms
+ GET /api/auth/session 200 in 491ms
+ GET /api/auth/session 200 in 446ms
+ GET /api/auth/session 200 in 407ms
+ GET /api/auth/session 200 in 422ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 200 in 464ms
+ GET /api/auth/session 200 in 444ms
+ GET /api/auth/session 200 in 408ms
+ GET /api/auth/session 200 in 421ms
+ ✓ Compiled in 190ms
+ ✓ Compiled in 157ms
+ ✓ Compiled in 148ms
+ ✓ Compiled in 195ms
+ ✓ Compiled in 170ms
+ ✓ Compiled in 169ms
+ ✓ Compiled in 185ms
+ ✓ Compiled in 134ms
+ ✓ Compiled in 181ms
+Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
+ ⨯ TypeError: Cannot read properties of null (reading 'useState')
+    at LanguageProvider (src\hooks\use-language.tsx:18:56)
+  16 |
+  17 | export function LanguageProvider({ children }: { children: ReactNode }) {
+> 18 |   const [language, rawSetLanguage] = useState<Language>('en');
+     |                                                        ^
+  19 |
+  20 |   useEffect(() => {
+  21 |     try { {
+  digest: '1918973821'
+}
+Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
+[TypeError: Cannot read properties of null (reading 'use')]
+Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+See https://react.dev/link/invalid-hook-call for tips about how to debug and fix this problem.
+[TypeError: Cannot read properties of null (reading 'use')]
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1079ms
+ GET /client/home 500 in 1931ms
+ ✓ Compiled in 185ms
+ ✓ Compiled in 133ms
+ ✓ Compiled in 183ms
+ ✓ Compiled in 177ms
+ ✓ Compiled in 133ms
+ ✓ Compiled in 151ms
+ GET /client/home 200 in 1909ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 227ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 292ms
+ GET /_next/internal/helpers.ts 404 in 122ms
+ GET /_next/static/runtime.ts 404 in 139ms
+ GET /api/auth/session 200 in 492ms
+ GET /api/auth/session 200 in 559ms
+ GET /api/auth/session 200 in 510ms
+ GET /api/auth/session 200 in 451ms
+ GET /placeholder.png 404 in 121ms
+ GET /api/auth/session 200 in 493ms
+ GET /api/auth/session 200 in 440ms
+ GET /api/auth/session 200 in 447ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 200 in 476ms
+ GET /api/auth/session 200 in 419ms
+ GET /api/auth/session 200 in 429ms
+ GET /api/auth/session 200 in 434ms
+ GET /api/auth/session 200 in 453ms
+ GET /api/auth/session 200 in 452ms
+ GET /api/auth/session 200 in 428ms
+ GET /api/auth/session 200 in 438ms
+ ✓ Compiled in 127ms
+ ✓ Compiled in 159ms
+ ✓ Compiled in 158ms
+ ✓ Compiled in 165ms
+ ✓ Compiled in 185ms
+ GET /placeholder.png 404 in 131ms
+ ✓ Compiled in 138ms
+ GET /placeholder.png 404 in 74ms
+ ✓ Compiled in 166ms
+ ✓ Compiled in 147ms
+ ✓ Compiled in 123ms
+ ✓ Compiled in 154ms
+ ✓ Compiled in 174ms
+ ✓ Compiled in 170ms

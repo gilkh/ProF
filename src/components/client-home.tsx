@@ -327,8 +327,8 @@ export function ClientHome() {
                 />
             </div>
             
-            <div className="rounded-2xl bg-accent/3 backdrop-blur-sm border border-primary/40 p-3 sm:p-4 flex items-center gap-3">
-                <div className="flex-1 pt-0 sm:pt-1 px-2 sm:px-3 pb-3">
+            <div className="rounded-2xl bg-primary/5 p-3 sm:p-4 flex items-center gap-1">
+                <div className="flex-1 rounded-2xl pt-0 sm:pt-1 px-2 sm:px-3 pb-3">
                     <Tabs value={selectedTab}>
                         <TabsContent value="categories">
             <div className="space-y-2">
@@ -409,7 +409,7 @@ export function ClientHome() {
                         { label: 'Photoshoots', emoji: '📸', q: 'Other' },
                     ].map((e) => (
                         <Link key={e.label} href={`/client/explore?eventType=${encodeURIComponent(e.q)}`}>
-                            <div className="relative h-16 px-3 flex items-center justify-start">
+                            <div className="relative h-16 px-3 flex items-center justify-start bg-white rounded-xl">
                                 <div className="flex items-center gap-2">
                                     <div className="relative tilt-mini">
                                         <span className="text-xl">{e.emoji}</span>
@@ -433,7 +433,7 @@ export function ClientHome() {
                         </TabsContent>
                     </Tabs>
                 </div>
-                <div className={`w-12 sm:w-14 ml-1 sm:ml-2 shrink-0 z-10 rounded-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg p-2 ${selectedTab === 'categories' ? 'pt-3' : selectedTab === 'event-types' ? 'pb-3' : ''} flex flex-col gap-2 items-center`}>
+                <div className={`w-11 sm:w-12 shrink-0 z-10 rounded-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg p-2 ${selectedTab === 'categories' ? 'pt-3' : selectedTab === 'event-types' ? 'pb-3' : ''} flex flex-col gap-2 items-center`}>
                     <div className="flex flex-col items-center">
                         <button
                             onClick={() => setSelectedTab('categories')}
