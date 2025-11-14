@@ -1,7 +1,7 @@
 
 import { collection, doc, getDoc, setDoc, updateDoc, getDocs, query, where, DocumentData, deleteDoc, addDoc, serverTimestamp, orderBy, onSnapshot, limit, increment, writeBatch, runTransaction, arrayUnion, arrayRemove, getCountFromServer, deleteField } from 'firebase/firestore';
 import { db, auth } from './firebase';
-import type { UserProfile, VendorProfile, Service, Offer, QuoteRequest, Booking, SavedTimeline, ServiceOrOffer, VendorCode, Chat, ChatMessage, UpgradeRequest, VendorAnalyticsData, PlatformAnalytics, Review, LineItem, VendorInquiry, AppNotification, QuestionTemplate, TemplateResponse, QuestionTemplateMessage, TimeSlot, DayAvailability, ServiceAvailability, VendorAvailability, AvailabilitySlot, MeetingProposal, MeetingType, MeetingProposalStatus, Report } from './types';
+import type { UserProfile, VendorProfile, Service, Offer, QuoteRequest, Booking, SavedTimeline, ServiceOrOffer, VendorCode, Chat, ChatMessage, UpgradeRequest, VendorAnalyticsData, PlatformAnalytics, Review, LineItem, VendorInquiry, AppNotification, QuestionTemplate, TemplateResponse, QuestionTemplateMessage, TimeSlot, DayAvailability, ServiceAvailability, VendorAvailability, AvailabilitySlot, MeetingProposal, MeetingType, MeetingProposalStatus, Report, SponsoredBanner } from './types';
 import { formatItemForMessage, formatQuoteResponseMessage, parseForwardedMessage, formatMeetingProposalMessage, formatMeetingStatusMessage } from './utils';
 import { dataCache, cacheKeys } from './cache';
 import { subMonths, format, startOfMonth, addDays, addMonths, startOfDay, subDays } from 'date-fns';
@@ -578,6 +578,49 @@ export const getServicesAndOffers = async (vendorId?: string, options?: { count?
             return [];
         }
         throw e;
+    }
+}
+
+export async function getSponsoredBanners(): Promise<SponsoredBanner[]> {
+    try {
+        const q = query(collection(db, 'banners'));
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(doc => {
+            const d = doc.data() as DocumentData;
+            return {
+                id: doc.id,
+                image: d.image || d.bannerImage || '',
+                vendorId: d.vendorId || '',
+                vendorName: d.vendorName || 'Vendor',
+                title: d.title || '',
+                ctaLabel: d.ctaLabel || 'View Package',
+                ctaHref: d.ctaHref || (d.vendorId ? `/vendor/${d.vendorId}` : undefined),
+            } as SponsoredBanner;
+        });
+    } catch (e) {
+        console.warn('Error fetching sponsored banners:', e);
+        return [];
+    }
+}
+
+export async function getTopVendors(options?: { count?: number }): Promise<VendorProfile[]> {
+    const count = options?.count ?? 10;
+    try {
+        const snapshot = await getDocs(collection(db, 'vendors'));
+        const vendors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as VendorProfile[];
+        const tierWeight: Record<VendorProfile['accountTier'], number> = { free: 0, vip1: 1, vip2: 2, vip3: 3 };
+        const sorted = vendors
+            .filter(v => v.status === 'active')
+            .sort((a, b) => {
+                const aScore = (a.rating || 0) * 100 + (a.reviewCount || 0) * 2 + tierWeight[a.accountTier] * 50;
+                const bScore = (b.rating || 0) * 100 + (b.reviewCount || 0) * 2 + tierWeight[b.accountTier] * 50;
+                return bScore - aScore;
+            })
+            .slice(0, count);
+        return sorted;
+    } catch (e) {
+        console.warn('Error fetching top vendors:', e);
+        return [];
     }
 }
 

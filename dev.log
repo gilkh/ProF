@@ -8,14 +8,432 @@
    - Environments: .env.local
 
  ✓ Starting...
- ✓ Compiled middleware in 242ms
- ✓ Ready in 1740ms
+ ✓ Compiled middleware in 128ms
+ ✓ Ready in 1455ms
  ⚠ Webpack is configured while Turbopack is not, which may cause problems.
  ⚠ See instructions if you need to configure Turbopack:
   https://nextjs.org/docs/app/api-reference/next-config-js/turbo
 
- ○ Compiling / ...
- ✓ Compiled / in 2.9s
- GET / 200 in 3595ms
- ✓ Compiled /favicon.ico in 358ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 658ms
+ ○ Compiling /client/home ...
+ ✓ Compiled /client/home in 2.5s
+ GET /client/home 200 in 4961ms
+ ✓ Compiled /favicon.ico in 292ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 570ms
+ ✓ Compiled /api/auth/session in 277ms
+ GET /api/auth/session 200 in 794ms
+ GET /api/auth/session 200 in 443ms
+ GET /api/auth/session 200 in 439ms
+ GET /api/auth/session 200 in 444ms
+ GET /api/auth/session 200 in 492ms
+ ○ Compiling /_not-found/page ...
+ GET /client/home 200 in 951ms
+ ✓ Compiled /_not-found/page in 994ms
+ GET /api/auth/session 200 in 503ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1069ms
+ GET /placeholder.png 404 in 1111ms
+ GET /_next/internal/helpers.ts 404 in 78ms
+ GET /_next/static/runtime.ts 404 in 74ms
+ GET /api/auth/session 200 in 869ms
+ GET /api/auth/session 200 in 440ms
+ GET /api/auth/session 200 in 460ms
+ GET /api/auth/session 200 in 441ms
+ GET /api/auth/session 200 in 708ms
+ GET /api/auth/session 200 in 496ms
+ GET /api/auth/session 200 in 474ms
+ GET /api/auth/session 200 in 480ms
+ GET /api/auth/session 200 in 435ms
+ GET /api/auth/session 200 in 449ms
+ ✓ Compiled in 222ms
+ ○ Compiling /client/explore ...
+ ✓ Compiled /client/explore in 1035ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /client/explore 200 in 1127ms
+ GET /api/auth/session 200 in 1025ms
+ GET /api/auth/session 200 in 461ms
+ ○ Compiling /client/bookings ...
+ GET /api/auth/session 200 in 461ms
+ ✓ Compiled /client/bookings in 999ms
+ GET /client/bookings 200 in 1035ms
+ GET /api/auth/session 200 in 457ms
+ GET /api/auth/session 200 in 438ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 472ms
+ GET /api/auth/session 200 in 461ms
+ GET /api/auth/session 200 in 445ms
+ GET /api/auth/session 200 in 432ms
+ GET /api/auth/session 200 in 420ms
+ GET /api/auth/session 200 in 467ms
+ GET /api/auth/session 200 in 454ms
+ GET /api/auth/session 200 in 446ms
+ GET /api/auth/session 200 in 451ms
+ GET /api/auth/session 200 in 426ms
+ GET /api/auth/session 200 in 555ms
+ GET /api/auth/session 200 in 456ms
+ GET /api/auth/session 200 in 450ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 200 in 441ms
+ GET /api/auth/session 200 in 451ms
+ GET /api/auth/session 200 in 464ms
+ GET /api/auth/session 200 in 450ms
+ GET /api/auth/session 200 in 434ms
+ GET /api/auth/session 200 in 474ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /client/explore 200 in 73ms
+ GET /api/auth/session 200 in 465ms
+ GET /api/auth/session 200 in 525ms
+ GET /api/auth/session 200 in 420ms
+ GET /api/auth/session 200 in 427ms
+ GET /api/auth/session 200 in 416ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 421ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 431ms
+ GET /api/auth/session 200 in 397ms
+ GET /api/auth/session 200 in 445ms
+ GET /api/auth/session 200 in 434ms
+ GET /api/auth/session 200 in 409ms
+ GET /api/auth/session 200 in 418ms
+ GET /api/auth/session 200 in 421ms
+ GET /api/auth/session 200 in 416ms
+ GET /client/home 200 in 141ms
+ GET /api/auth/session 200 in 440ms
+ GET /api/auth/session 200 in 439ms
+ GET /api/auth/session 200 in 404ms
+ GET /api/auth/session 200 in 431ms
+ GET /api/auth/session 200 in 442ms
+ GET /api/auth/session 200 in 422ms
+ GET /api/auth/session 200 in 451ms
+ GET /api/auth/session 200 in 432ms
+ GET /api/auth/session 200 in 447ms
+ GET /api/auth/session 200 in 450ms
+ GET /api/auth/session 200 in 422ms
+ GET /api/auth/session 200 in 427ms
+ GET /api/auth/session 200 in 427ms
+ GET /api/auth/session 200 in 434ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 200 in 431ms
+ GET /api/auth/session 200 in 431ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 35ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 35ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 38ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 38ms
+ GET /api/auth/session 429 in 35ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 38ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 38ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 35ms
+ GET /api/auth/session 429 in 38ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 35ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 38ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 38ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 38ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 35ms
+ GET /api/auth/session 429 in 34ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 59ms
+ GET /placeholder.png 404 in 99ms
+ GET /api/auth/session 429 in 90ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 38ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 35ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /client/explore 200 in 110ms
+ GET /api/auth/session 429 in 67ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 67ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 38ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 35ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 36ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/session 429 in 35ms
+ GET /client/home 200 in 83ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 129ms
+ GET /placeholder.png 404 in 144ms
+ GET /api/auth/session 429 in 73ms
+ GET /api/auth/session 429 in 64ms
+ GET /api/auth/session 429 in 68ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 66ms
+ GET /api/auth/session 429 in 67ms
+ GET /api/auth/session 429 in 65ms
+ GET /api/auth/session 429 in 65ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 51ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:71)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                                                       ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /client/explore?category=Photography+%26+Videography 200 in 70ms
+ GET /client/home 200 in 55ms
+ GET /api/auth/session 200 in 610ms
+ GET /placeholder.png 404 in 110ms
+ GET /api/auth/session 200 in 510ms
+ GET /api/auth/session 200 in 442ms
+ GET /api/auth/session 200 in 442ms
+ GET /api/auth/session 200 in 439ms
+ GET /api/auth/session 200 in 465ms
+ GET /api/auth/session 200 in 452ms
+ GET /api/auth/session 200 in 432ms
+ GET /api/auth/session 200 in 439ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 200 in 428ms
+ GET /api/auth/session 200 in 423ms
+ GET /api/auth/session 200 in 455ms
+ ✓ Compiled in 141ms
+ ✓ Compiled in 193ms
+ GET /api/auth/session 200 in 814ms
+ GET /api/auth/session 200 in 463ms
+ GET /api/auth/session 200 in 753ms
+ GET /api/auth/session 200 in 445ms
+ GET /api/auth/session 200 in 490ms
+ GET /api/auth/session 200 in 447ms
+ GET /api/auth/session 200 in 472ms
+ GET /api/auth/session 200 in 699ms
+ GET /api/auth/session 200 in 412ms
+ GET /api/auth/session 200 in 488ms
+ GET /api/auth/session 200 in 428ms
+ GET /api/auth/session 200 in 447ms
+ GET /placeholder.png 404 in 89ms
+ GET /placeholder.png 404 in 71ms
+ GET /placeholder.png 404 in 63ms
+ GET /placeholder.png 404 in 75ms
+ GET /placeholder.png 404 in 68ms
+ GET /placeholder.png 404 in 78ms
+ ✓ Compiled in 152ms
+ ✓ Compiled in 158ms
+ GET /api/auth/session 200 in 562ms
+ GET /api/auth/session 200 in 477ms
+ GET /api/auth/session 200 in 463ms
+ GET /api/auth/session 200 in 468ms
+ GET /api/auth/session 200 in 420ms
+ GET /api/auth/session 200 in 458ms
+ GET /api/auth/session 200 in 445ms
+ GET /api/auth/session 200 in 451ms
+ GET /api/auth/session 200 in 447ms
+ GET /api/auth/session 200 in 488ms
+ GET /api/auth/session 200 in 451ms
+ GET /api/auth/session 200 in 445ms
+ ✓ Compiled in 118ms
+ GET /placeholder.png 404 in 153ms
+ GET /api/auth/session 200 in 562ms
+ GET /api/auth/session 200 in 465ms
+ GET /api/auth/session 200 in 479ms
+ GET /api/auth/session 200 in 432ms
+ GET /api/auth/session 200 in 451ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 421ms
+ GET /api/auth/session 200 in 433ms
+ GET /api/auth/session 200 in 429ms
+ GET /api/auth/session 200 in 426ms
+ GET /api/auth/session 200 in 459ms
+ GET /api/auth/session 200 in 422ms
+ GET /placeholder.png 404 in 72ms
+ GET /placeholder.png 404 in 290ms
+ GET /placeholder.png 404 in 139ms
+ GET /placeholder.png 404 in 145ms
+ ✓ Compiled in 158ms
+ GET /placeholder.png 404 in 70ms
+ ✓ Compiled in 207ms
+ ✓ Compiled in 169ms
+ ✓ Compiled in 178ms
+ ✓ Compiled in 218ms
+ ✓ Compiled in 181ms
+ ✓ Compiled in 147ms
+ ✓ Compiled in 175ms
+ ✓ Compiled in 151ms
+ ✓ Compiled in 156ms
+ ○ Compiling /login ...
+ ✓ Compiled /login in 1243ms
+ GET /login 200 in 1594ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 182ms
+ GET /_next/internal/helpers.ts 404 in 124ms
+ GET /_next/static/runtime.ts 404 in 132ms
+ GET /api/auth/session 200 in 603ms
+ GET /api/auth/session 200 in 481ms
+ GET /client/home 200 in 1634ms
+ GET /api/auth/session 200 in 527ms
+ GET /api/auth/session 200 in 463ms
+ GET /api/auth/session 200 in 435ms
+ GET /placeholder.png 404 in 110ms
+ GET /api/auth/session 200 in 546ms
+ GET /api/auth/session 200 in 438ms
+ GET /api/auth/session 200 in 430ms
+ GET /api/auth/session 200 in 453ms
+ GET /api/auth/session 200 in 473ms
+ GET /api/auth/session 200 in 443ms
+ GET /api/auth/session 200 in 447ms
+ GET /api/auth/session 200 in 413ms
+ GET /api/auth/session 200 in 447ms
+ GET /api/auth/session 200 in 448ms
+ GET /api/auth/session 200 in 446ms
+ GET /api/auth/session 200 in 447ms
+ GET /login 200 in 137ms
+ GET /.well-known/appspecific/com.chrome.devtools.json 404 in 173ms
+ GET /_next/internal/helpers.ts 404 in 119ms
+ GET /_next/static/runtime.ts 404 in 127ms
+ GET /api/auth/session 200 in 565ms
+ GET /api/auth/session 200 in 473ms
+ GET /client/home 200 in 904ms
+ GET /api/auth/session 200 in 500ms
+ GET /api/auth/session 200 in 453ms
+ GET /api/auth/session 200 in 438ms
+ GET /placeholder.png 404 in 119ms
+ GET /api/auth/session 200 in 487ms
+ GET /api/auth/session 200 in 447ms
+ GET /api/auth/session 200 in 448ms
+ GET /api/auth/session 200 in 451ms
+ GET /api/auth/session 200 in 453ms
+ GET /api/auth/session 200 in 449ms
+ GET /api/auth/session 200 in 443ms
+ GET /api/auth/session 200 in 445ms
+ GET /api/auth/session 200 in 425ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 200 in 431ms
+ GET /api/auth/session 200 in 429ms
+ ✓ Compiled in 149ms
+ ✓ Compiled in 144ms

@@ -61,7 +61,7 @@ const INCLUSIONS_MAP: Record<ServiceCategory, { key: keyof ServiceInclusions, la
 }
 
 
-export function ClientDashboard() {
+export function ClientDashboard({ initialCategory, initialEventType }: { initialCategory?: string; initialEventType?: string }) {
   const [allItems, setAllItems] = useState<ServiceOrOffer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -86,6 +86,15 @@ export function ClientDashboard() {
     }
     loadItems();
   }, [])
+
+  useEffect(() => {
+    if (initialCategory) {
+      setSelectedCategory(initialCategory as ServiceCategory | 'All Categories');
+    }
+    if (initialEventType) {
+      setSelectedEventType(initialEventType as EventType | 'All Event Types');
+    }
+  }, [initialCategory, initialEventType])
   
   const filteredItems = useMemo(() => {
     return allItems

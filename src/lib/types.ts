@@ -391,6 +391,16 @@ export interface AppNotification {
     createdAt: Date;
 }
 
+export interface SponsoredBanner {
+  id: string;
+  image: string;
+  vendorId: string;
+  vendorName: string;
+  title?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+}
+
 // Question Template Types
 export type QuestionType = 'text' | 'number' | 'select' | 'multiselect' | 'date' | 'boolean';
 

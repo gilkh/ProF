@@ -164,16 +164,17 @@ html {
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 4px;
+  height: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: hsl(var(--muted-foreground));
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -235,3 +236,147 @@ html {
   background-color: hsl(var(--secondary)) !important;
   color: hsl(var(--secondary-foreground)) !important;
 }
+
+@keyframes floatY {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+.float-slow {
+  animation: floatY 4s ease-in-out infinite;
+}
+
+@keyframes sparklePulse {
+  0% { opacity: 0.08; }
+  50% { opacity: 0.2; }
+  100% { opacity: 0.08; }
+}
+
+.sparkle-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+  animation: sparklePulse 3s ease-in-out infinite;
+}
+
+.tilt-hover {
+  transform: perspective(700px) rotateX(0deg) rotateY(0deg) scale(1);
+  transition: transform 300ms ease, box-shadow 300ms ease;
+}
+
+.tilt-hover:hover {
+  transform: perspective(700px) rotateX(3deg) rotateY(6deg) scale(1.02);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+@keyframes bounceMini {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+.bounce-slow {
+  animation: bounceMini 3s ease-in-out infinite;
+}
+
+@keyframes pulseMini {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+.pulse-slow {
+  animation: pulseMini 3.2s ease-in-out infinite;
+}
+
+@keyframes flickerMini {
+  0% { opacity: 0.8; transform: translateY(-1px) scale(1); }
+  50% { opacity: 0.5; transform: translateY(-2px) scale(0.95); }
+  100% { opacity: 0.8; transform: translateY(-1px) scale(1); }
+}
+
+.flame-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff9e2c;
+  box-shadow: 0 0 8px rgba(255, 158, 44, 0.6);
+  animation: flickerMini 1.6s ease-in-out infinite;
+}
+
+@keyframes rotateMini {
+  0% { transform: rotate(0deg); }
+  50% { transform: rotate(8deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.tilt-mini {
+  transition: transform 200ms ease;
+}
+.tilt-mini:hover {
+  transform: rotate(2deg);
+}
+
+.spark-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ffd700;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+  animation: sparklePulse 2.4s ease-in-out infinite;
+}
+
+.flash-overlay {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.85);
+  animation: flashPulse 3.5s ease-in-out infinite;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-animate {
+  background-size: 200% 200%;
+  animation: gradientMove 6s ease infinite;
+}
+
+@keyframes spinOrbit {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.orbit {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  transform: translate(-50%, -50%) rotate(0deg);
+  animation: spinOrbit 6s linear infinite;
+}
+
+.orbit.fast { animation-duration: 4s; }
+.orbit.slow { animation-duration: 8s; }
+
+.orbit-dot {
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--orbit-color, #ffd700);
+  transform: translateX(-50%);
+  box-shadow: 0 0 6px var(--orbit-color, #ffd700);
+}
+
+.orbit-gold { --orbit-color: #ffd700; }
+.orbit-cyan { --orbit-color: #06b6d4; }
+.orbit-pink { --orbit-color: #f472b6; }
+.orbit-lime { --orbit-color: #84cc16; }
