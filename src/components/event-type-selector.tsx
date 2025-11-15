@@ -11,15 +11,17 @@ import { eventTypes, type EventType } from '@/lib/types';
 import { cn } from '@/lib/utils';
 
 interface EventTypeSelectorProps {
-  selectedEventTypes: EventType[] | 'any';
-  onSelectionChange: (eventTypes: EventType[] | 'any') => void;
+  value: EventType[] | 'any';
+  onChange: (eventTypes: EventType[] | 'any') => void;
+  appendTypes?: EventType[];
   placeholder?: string;
   className?: string;
 }
 
 export function EventTypeSelector({
-  selectedEventTypes,
-  onSelectionChange,
+  value,
+  onChange,
+  appendTypes = [],
   placeholder = "Select event types...",
   className
 }: EventTypeSelectorProps) {
@@ -28,12 +30,13 @@ export function EventTypeSelector({
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const filteredEventTypes = eventTypes.filter(eventType =>
+  const fullList = Array.from(new Set([...(eventTypes as EventType[]), ...appendTypes]));
+  const filteredEventTypes = fullList.filter(eventType =>
     eventType.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const isAnySelected = selectedEventTypes === 'any';
-  const selectedArray = Array.isArray(selectedEventTypes) ? selectedEventTypes : [];
+  const isAnySelected = value === 'any';
+  const selectedArray = Array.isArray(value) ? value : [];
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -49,29 +52,29 @@ export function EventTypeSelector({
 
   const handleToggleEventType = (eventType: EventType) => {
     if (isAnySelected) {
-      onSelectionChange([eventType]);
+      onChange([eventType]);
     } else {
       const newSelection = selectedArray.includes(eventType)
         ? selectedArray.filter(t => t !== eventType)
         : [...selectedArray, eventType];
-      onSelectionChange(newSelection.length === 0 ? 'any' : newSelection);
+      onChange(newSelection.length === 0 ? 'any' : newSelection);
     }
   };
 
   const handleSelectAny = () => {
-    onSelectionChange('any');
+    onChange('any');
   };
 
   const handleRemoveEventType = (eventType: EventType) => {
     if (!isAnySelected) {
       const newSelection = selectedArray.filter(t => t !== eventType);
-      onSelectionChange(newSelection.length === 0 ? 'any' : newSelection);
+      onChange(newSelection.length === 0 ? 'any' : newSelection);
     }
   };
 
   const getDisplayText = () => {
     if (isAnySelected) {
-      return 'Any Event Type';
+      return 'All Event Types';
     }
     if (selectedArray.length === 0) {
       return placeholder;
@@ -135,7 +138,7 @@ export function EventTypeSelector({
             </div>
             
             <div className="max-h-60 overflow-y-auto">
-              {/* Any Event Type option */}
+              {/* All Event Types option */}
               <div
                 className={cn(
                   'flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-accent',
@@ -143,7 +146,7 @@ export function EventTypeSelector({
                 )}
                 onClick={handleSelectAny}
               >
-                <span className="font-medium text-primary">Any Event Type</span>
+                <span className="font-medium text-primary">All Event Types</span>
                 {isAnySelected && <Check className="h-4 w-4 text-primary" />}
               </div>
               

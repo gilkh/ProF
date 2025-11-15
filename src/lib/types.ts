@@ -3,9 +3,53 @@
 export type ServiceType = 'service' | 'offer';
 export type ServiceCategory = 'Venues' | 'Catering & Sweets' | 'Entertainment' | 'Lighting & Sound' | 'Photography & Videography' | 'Decoration' | 'Beauty & Grooming' | 'Transportation' | 'Invitations & Printables' | 'Rentals & Furniture' | 'Security and Crowd Control';
 export type Location = 'Beirut' | 'Mount Lebanon' | 'North Lebanon' | 'South Lebanon' | 'Nabatieh' | 'Beqaa' | 'Baalbek-Hermel' | 'Akkar';
-export type EventType = 'Wedding' | 'Birthday Party' | 'Corporate Event' | 'Baby Shower' | 'Graduation' | 'Anniversary' | 'Engagement' | 'Bridal Shower' | 'Holiday Party' | 'Conference' | 'Product Launch' | 'Charity Event' | 'Reunion' | 'Retirement Party' | 'Housewarming' | 'Other';
+export type LocationGeneral = 'Lebanon' | Location;
+export type EventType =
+  | 'Wedding'
+  | 'Birthday Party'
+  | 'Corporate Event'
+  | 'Baby Shower'
+  | 'Graduation'
+  | 'Anniversary'
+  | 'Engagement'
+  | 'Bridal Shower'
+  | 'Holiday Party'
+  | 'Conference'
+  | 'Product Launch'
+  | 'Charity Event'
+  | 'Reunion'
+  | 'Retirement Party'
+  | 'Housewarming'
+  | 'Other'
+  | 'Baptism'
+  | 'Communion'
+  | 'Confirmation'
+  | 'Eid'
+  | 'Christmas'
+  | 'Easter'
+  | 'Ramadan'
+  | 'Gender Reveal'
+  | 'Newborn Celebration'
+  | 'Sweet 16'
+  | 'Workshop'
+  | 'Seminar'
+  | 'Company Party'
+  | 'Business Dinner';
 
 export const locations: Location[] = ['Beirut', 'Mount Lebanon', 'North Lebanon', 'South Lebanon', 'Nabatieh', 'Beqaa', 'Baalbek-Hermel', 'Akkar'];
+export const locationGenerals: LocationGeneral[] = ['Lebanon', ...locations];
+export type LocationDetail = string;
+export const locationDetails: Record<LocationGeneral, LocationDetail[]> = {
+  Lebanon: [],
+  Beirut: ['Achrafieh', 'Hamra', 'Verdun', 'Downtown', 'Ain Mreisseh'],
+  'Mount Lebanon': ['Metn', 'Keserwan', 'Baabda', 'Chouf', 'Aley'],
+  'North Lebanon': ['Tripoli', 'Zgharta', 'Batroun', 'Koura', 'Bcharre'],
+  'South Lebanon': ['Sidon', 'Tyre', 'Jezzine'],
+  Nabatieh: ['Nabatieh', 'Bint Jbeil', 'Marjayoun', 'Hasbaya'],
+  Beqaa: ['Zahle', 'West Beqaa', 'Rashaya'],
+  'Baalbek-Hermel': ['Baalbek', 'Hermel'],
+  Akkar: ['Halba', 'Qoubaiyat', 'Tripoli North'],
+};
 
 export const eventTypes: EventType[] = ['Wedding', 'Birthday Party', 'Corporate Event', 'Baby Shower', 'Graduation', 'Anniversary', 'Engagement', 'Bridal Shower', 'Holiday Party', 'Conference', 'Product Launch', 'Charity Event', 'Reunion', 'Retirement Party', 'Housewarming', 'Other'];
 
@@ -67,7 +111,9 @@ export interface BaseService {
   image: string;
   media?: MediaItem[];
   inclusions?: ServiceInclusions;
-  location: Location;
+  location: LocationGeneral;
+  detailedLocation?: string;
+  coords?: { lat: number; lon: number };
   status: 'pending' | 'approved' | 'rejected';
   rejectionReason?: string;
   eventTypes?: EventType[] | 'any';

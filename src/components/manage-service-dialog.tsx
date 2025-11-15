@@ -17,7 +17,7 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useToast } from '@/hooks/use-toast';
-import type { ServiceOrOffer, Service, Offer, VendorProfile, MediaItem, ServiceCategory, Location, EventType } from '@/lib/types';
+import type { ServiceOrOffer, Service, Offer, VendorProfile, MediaItem, ServiceCategory, LocationGeneral, LocationDetail, EventType } from '@/lib/types';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { DollarSign, Loader2, ImagePlus, X, Video } from 'lucide-react';
 import { createServiceOrOffer, getVendorProfile, updateServiceOrOffer } from '@/lib/services';
@@ -27,7 +27,7 @@ import { format } from 'date-fns';
 import { ScrollArea } from './ui/scroll-area';
 import Image from 'next/image';
 import { Separator } from './ui/separator';
-import { locations } from '@/lib/types';
+import { locationGenerals } from '@/lib/types';
 import { EventTypeSelector } from './event-type-selector';
 
 interface ManageServiceDialogProps {
@@ -86,6 +86,80 @@ export function ManageServiceDialog({ children, service, onListingUpdate }: Mana
   const [dates, setDates] = React.useState<Date[] | undefined>([]);
   const [media, setMedia] = React.useState<MediaItem[]>([]);
   const [selectedEventTypes, setSelectedEventTypes] = React.useState<EventType[] | 'any'>('any');
+  const [generalLocation, setGeneralLocation] = React.useState<LocationGeneral | undefined>(undefined);
+  const [detailLocation, setDetailLocation] = React.useState<LocationDetail | ''>('');
+  const [coords, setCoords] = React.useState<{ lat: number; lon: number } | undefined>(undefined);
+
+  const LOCATION_DETAILS: Record<LocationGeneral, LocationDetail[]> = {
+    Lebanon: [],
+    Beirut: ['Achrafieh', 'Hamra', 'Verdun', 'Downtown', 'Ain Mreisseh'],
+    'Mount Lebanon': ['Metn', 'Keserwan', 'Baabda', 'Chouf', 'Aley'],
+    'North Lebanon': ['Tripoli', 'Zgharta', 'Batroun', 'Koura', 'Bcharre'],
+    'South Lebanon': ['Sidon', 'Tyre', 'Jezzine'],
+    Nabatieh: ['Nabatieh', 'Bint Jbeil', 'Marjayoun', 'Hasbaya'],
+    Beqaa: ['Zahle', 'West Beqaa', 'Rashaya'],
+    'Baalbek-Hermel': ['Baalbek', 'Hermel'],
+    Akkar: ['Halba', 'Qoubaiyat', 'Tripoli North'],
+  };
+
+  function haversine(lat1: number, lon1: number, lat2: number, lon2: number) {
+    const toRad = (v: number) => (v * Math.PI) / 180;
+    const R = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  }
+
+  function nearestRegionForCoords(lat: number, lon: number): LocationGeneral {
+    const centers: Record<LocationGeneral, { lat: number; lon: number }> = {
+      Lebanon: { lat: 33.9, lon: 35.5 },
+      Beirut: { lat: 33.8938, lon: 35.5018 },
+      'Mount Lebanon': { lat: 33.965, lon: 35.617 },
+      'North Lebanon': { lat: 34.436, lon: 35.836 },
+      'South Lebanon': { lat: 33.562, lon: 35.378 },
+      Nabatieh: { lat: 33.368, lon: 35.485 },
+      Beqaa: { lat: 33.846, lon: 35.901 },
+      'Baalbek-Hermel': { lat: 34.005, lon: 36.218 },
+      Akkar: { lat: 34.592, lon: 36.079 },
+    };
+    let best: { region: LocationGeneral; dist: number } | null = null;
+    (Object.keys(centers) as LocationGeneral[]).forEach((region) => {
+      const d = haversine(lat, lon, centers[region].lat, centers[region].lon);
+      if (!best || d < best.dist) best = { region, dist: d };
+    });
+    return best!.region;
+  }
+
+  function useMyLocation() {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        setCoords({ lat, lon });
+        const region = nearestRegionForCoords(lat, lon);
+        setGeneralLocation(region);
+        getCityName(lat, lon).then((city) => {
+          if (city) setDetailLocation(city);
+        });
+      },
+      () => {},
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
+  }
+
+  async function getCityName(lat: number, lon: number): Promise<string | undefined> {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
+      const data = await res.json();
+      const a = data?.address || {};
+      return a.city || a.town || a.village || a.municipality || a.county || a.state_district || a.state;
+    } catch {
+      return undefined;
+    }
+  }
 
 
   React.useEffect(() => {
@@ -101,6 +175,8 @@ export function ManageServiceDialog({ children, service, onListingUpdate }: Mana
         setType(service?.type || 'offer');
         setMedia(service?.media || []);
         setSelectedEventTypes(service?.eventTypes || 'any');
+        setGeneralLocation(service?.location || vendorProfile?.location || undefined);
+        setDetailLocation(service?.detailedLocation || '');
         if (service?.type === 'offer' && service.availableDates) {
             setDates(service.availableDates.map(d => new Date(d)));
         } else {
@@ -120,7 +196,6 @@ export function ManageServiceDialog({ children, service, onListingUpdate }: Mana
     const formData = new FormData(event.currentTarget);
     const title = formData.get('title') as string;
     const category = formData.get('category') as ServiceCategory;
-    const location = formData.get('location') as Location;
     const description = formData.get('description') as string;
     
     const finalMedia = media.map((item, index) => ({ ...item, isThumbnail: index === 0 }));
@@ -129,7 +204,9 @@ export function ManageServiceDialog({ children, service, onListingUpdate }: Mana
         const baseData: Partial<ServiceOrOffer> = {
             title,
             category,
-            location,
+            location: (generalLocation as LocationGeneral) || (vendorProfile?.location as any),
+            detailedLocation: detailLocation || undefined,
+            coords,
             description,
             vendorId,
             vendorName: vendorProfile.businessName,
@@ -291,18 +368,32 @@ export function ManageServiceDialog({ children, service, onListingUpdate }: Mana
                     </SelectContent>
                     </Select>
                 </div>
-                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="location" className="text-right">
-                    Location
-                    </Label>
-                    <Select name="location" defaultValue={service?.location || vendorProfile?.location}>
-                        <SelectTrigger className="col-span-3">
-                            <SelectValue placeholder="Select a location" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {locations.map(loc => <SelectItem key={loc} value={loc}>{loc}</SelectItem>)}
-                        </SelectContent>
-                    </Select>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label className="text-right">Location</Label>
+                    <div className="col-span-3 grid grid-cols-2 gap-2">
+                        <Select value={generalLocation} onValueChange={(v) => { setGeneralLocation(v as LocationGeneral); setDetailLocation(''); }}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select region (e.g., Beirut, Lebanon)" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {locationGenerals.map((loc) => (
+                                    <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Select value={detailLocation} onValueChange={(v) => setDetailLocation(v)} disabled={!generalLocation || LOCATION_DETAILS[generalLocation].length === 0}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select detailed area" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {(generalLocation ? LOCATION_DETAILS[generalLocation] : []).map((d) => (
+                                    <SelectItem key={d} value={d}>{d}</SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                        <Button type="button" variant="outline" onClick={useMyLocation}>Use my location</Button>
+                        <Input placeholder="Detailed area or address" value={detailLocation} onChange={(e) => setDetailLocation(e.target.value)} />
+                    </div>
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label className="text-right">
@@ -312,6 +403,22 @@ export function ManageServiceDialog({ children, service, onListingUpdate }: Mana
                         <EventTypeSelector
                             value={selectedEventTypes}
                             onChange={setSelectedEventTypes}
+                            appendTypes={[
+                                'Baptism',
+                                'Communion',
+                                'Confirmation',
+                                'Eid',
+                                'Christmas',
+                                'Easter',
+                                'Ramadan',
+                                'Gender Reveal',
+                                'Newborn Celebration',
+                                'Sweet 16',
+                                'Workshop',
+                                'Seminar',
+                                'Company Party',
+                                'Business Dinner'
+                            ]}
                         />
                     </div>
                 </div>

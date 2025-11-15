@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Star, Edit, Heart, HeartCrack, Send, Video, ShieldCheck, MapPin } from 'lucide-react';
+import { Star, Edit, Heart, HeartCrack, Send, Video, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import { QuoteRequestDialog } from './quote-request-dialog';
 import { ManageServiceDialog } from './manage-service-dialog';
@@ -135,10 +135,10 @@ export function ServiceCard({ service, role, onListingUpdate }: ServiceCardProps
 
 
   return (
-    <Card className="flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 rounded-xl group" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <Card className="glass-panel flex flex-col overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 rounded-2xl group" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       
         <CardHeader className="p-0 relative overflow-hidden">
-            <div className="relative w-full h-48 overflow-hidden">
+            <div className="relative w-full h-40 overflow-hidden">
                 {autoScrollEnabled && imageItems.length > 1 ? (
                     // Auto-scrolling image display with slide animation
                     <div className="relative w-full h-full overflow-hidden">
@@ -179,7 +179,7 @@ export function ServiceCard({ service, role, onListingUpdate }: ServiceCardProps
                             {mediaItems.map((mediaItem, index) => (
                             <CarouselItem key={index}>
                                 <Link href={`/client/service/${service.id}`}>
-                                    <div className="relative h-48 w-full">
+                                    <div className="relative h-40 w-full">
                                         {mediaItem.type === 'image' ? (
                                             <Image
                                                 src={mediaItem.url}
@@ -241,46 +241,46 @@ export function ServiceCard({ service, role, onListingUpdate }: ServiceCardProps
             </Badge>
           )}
         </CardHeader>
-        <div className="p-4 flex-grow flex flex-col">
-          <Link href={`/client/service/${service.id}`} className="flex-grow">
-            <h3 className="text-xl font-bold leading-tight mb-2">{service.title}</h3>
-             <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-4">
-                <MapPin className="h-4 w-4" />
-                <span>{service.location}</span>
-            </div>
-          <p className="text-sm text-muted-foreground mb-4 line-clamp-2">{service.description}</p>
-          </Link>
-          <div className="mt-auto pt-4 border-t border-dashed">
-            <Link href={`/vendor/${service.vendorId}`} className="group/vendor" onClick={e => e.stopPropagation()}>
-                <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10 border-2 border-background ring-2 ring-primary">
-                    <AvatarImage src={service.vendorAvatar} alt={service.vendorName} />
-                    <AvatarFallback>{service.vendorName.substring(0,2)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                        <div className="flex items-center gap-1.5">
-                            <p className="font-semibold text-sm group-hover/vendor:underline">{service.vendorName}</p>
-                            {service.vendorVerification === 'verified' && <ShieldCheck className="h-4 w-4 text-green-600" />}
-                            {service.vendorVerification === 'trusted' && <ShieldCheck className="h-4 w-4 text-blue-600" />}
-                        </div>
-                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                            <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                            <span className="font-bold">{(service.rating || 0).toFixed(1)}</span>
-                            <span>({service.reviewCount || 0} {t.reviews})</span>
-                        </div>
-                    </div>
-                </div>
+        <div className="p-3 flex-grow flex flex-col">
+          <div className="flex items-center justify-between mb-3">
+            <Link href={`/vendor/${service.vendorId}`} className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+              <Avatar className="h-9 w-9 border-2 border-background ring-2 ring-primary rounded-full">
+                <AvatarImage src={service.vendorAvatar} alt={service.vendorName} />
+                <AvatarFallback>{service.vendorName.substring(0,2)}</AvatarFallback>
+              </Avatar>
+              <div className="flex items-center gap-1">
+                <p className="font-semibold text-sm">{service.vendorName}</p>
+                {service.vendorVerification === 'verified' && <ShieldCheck className="h-4 w-4 text-green-600" />}
+                {service.vendorVerification === 'trusted' && <ShieldCheck className="h-4 w-4 text-blue-600" />}
+              </div>
             </Link>
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+              <span className="font-bold">{(service.rating || 0).toFixed(1)}</span>
+              <span>({service.reviewCount || 0})</span>
+            </div>
           </div>
+          <Link href={`/client/service/${service.id}`} className="flex-grow">
+            <h3 className="glass-text text-base font-semibold leading-tight mb-2">{service.title}</h3>
+            <div className="flex flex-wrap gap-1 mb-2">
+              {(service.eventTypes === 'any' ? ['All Event Types'] : Array.isArray(service.eventTypes) ? service.eventTypes : []).slice(0,3).map((et) => (
+                <Badge key={et} variant="outline" className="text-[10px] py-0.5 px-2">{et}</Badge>
+              ))}
+              {Array.isArray(service.eventTypes) && service.eventTypes.length > 3 && (
+                <Badge variant="secondary" className="text-[10px] py-0.5 px-2">+{service.eventTypes.length - 3} more</Badge>
+              )}
+            </div>
+            <p className="glass-text text-xs line-clamp-2">{service.description}</p>
+          </Link>
         </div>
       
-      <CardFooter className="p-4 pt-2 flex justify-between items-center bg-muted/50">
+      <CardFooter className="p-3 pt-2 flex justify-between items-center bg-muted/50">
         <div>
-          <p className="text-lg font-semibold text-primary">{t.priceLabel}</p>
+          <p className="text-sm font-semibold text-primary">{t.priceLabel}</p>
         </div>
         {role === 'client' ? (
           <QuoteRequestDialog service={service}>
-            <Button size="lg">{translations.common.getAQuote}</Button>
+            <Button size="sm">{translations.common.getAQuote}</Button>
           </QuoteRequestDialog>
         ) : (
           <ManageServiceDialog service={service} onListingUpdate={onListingUpdate}>

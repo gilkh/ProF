@@ -327,7 +327,7 @@ export function ClientHome() {
                 />
             </div>
             
-            <div className="rounded-2xl bg-primary/5 p-3 sm:p-4 flex items-center gap-1">
+            <div className="rounded-2xl bg-primary/5 liquid-glass p-3 sm:p-4 flex items-center gap-1">
                 <div className="flex-1 rounded-2xl pt-0 sm:pt-1 px-2 sm:px-3 pb-3">
                     <Tabs value={selectedTab}>
                         <TabsContent value="categories">
@@ -350,7 +350,7 @@ export function ClientHome() {
                     ].map((c, i) => (
                         <Link key={c.label} href={`/client/explore?category=${encodeURIComponent(c.q)}`} aria-label={c.label} className="group">
                             <div className="flex flex-col items-center gap-1 p-2 rounded-xl transition duration-200">
-                                <div className="h-12 w-12 rounded-xl border border-red-200 bg-white flex items-center justify-center hover:border-red-300 group-active:bg-red-50 group-active:border-red-300 active:scale-95 pulse-slow">
+                                <div className="h-12 w-12 rounded-xl liquid-glass-solid flex items-center justify-center active:scale-95">
                                     <c.Icon className="h-5 w-5 text-red-500 group-active:text-red-600" />
                                 </div>
                                 <div className="text-[11px] font-medium">{c.label}</div>
@@ -376,7 +376,7 @@ export function ClientHome() {
                         { label: 'Decoration', emoji: '🎈', q: 'Decoration', image: 'https://images.unsplash.com/photo-1532438764749-f600a4f478f1?q=80&w=1200&auto=format&fit=crop' },
                     ].map((c) => (
                         <Link key={c.label} href={`/client/explore?category=${encodeURIComponent(c.q)}`}>
-                            <Card className="group overflow-hidden hover:shadow-md transition transform hover:scale-[1.02] animate-scale-in">
+                            <Card className="group overflow-hidden hover:shadow-md transition transform hover:scale-[1.02] animate-scale-in liquid-glass">
                                 <div className="relative h-36">
                                     <img loading="lazy" src={c.image} alt={c.label} className="h-full w-full object-cover" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
@@ -409,7 +409,7 @@ export function ClientHome() {
                         { label: 'Photoshoots', emoji: '📸', q: 'Other' },
                     ].map((e) => (
                         <Link key={e.label} href={`/client/explore?eventType=${encodeURIComponent(e.q)}`}>
-                            <div className="relative h-16 px-3 flex items-center justify-start bg-white rounded-xl">
+                            <div className="relative h-16 px-3 flex items-center justify-start liquid-glass-solid rounded-xl">
                                 <div className="flex items-center gap-2">
                                     <div className="relative tilt-mini">
                                         <span className="text-xl">{e.emoji}</span>
@@ -433,7 +433,7 @@ export function ClientHome() {
                         </TabsContent>
                     </Tabs>
                 </div>
-                <div className={`w-11 sm:w-12 shrink-0 z-10 rounded-full bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-lg p-2 ${selectedTab === 'categories' ? 'pt-3' : selectedTab === 'event-types' ? 'pb-3' : ''} flex flex-col gap-2 items-center`}>
+                <div className={`w-11 sm:w-12 shrink-0 z-10 rounded-full liquid-glass p-2 ${selectedTab === 'categories' ? 'pt-3' : selectedTab === 'event-types' ? 'pb-3' : ''} flex flex-col gap-2 items-center`}>
                     <div className="flex flex-col items-center">
                         <button
                             onClick={() => setSelectedTab('categories')}
