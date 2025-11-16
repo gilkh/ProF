@@ -12,7 +12,11 @@ import { getBookingsForVendor, getVendorQuoteRequests, getServicesAndOffers, get
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
 import { RequestUpgradeDialog } from '@/components/request-upgrade-dialog';
-import { VendorAnalyticsChart } from '@/components/vendor-analytics-chart';
+import dynamic from 'next/dynamic';
+const VendorAnalyticsChart = dynamic(() => import('@/components/vendor-analytics-chart').then(m => m.VendorAnalyticsChart), {
+  ssr: false,
+  loading: () => <div className="h-64 w-full"><Skeleton className="h-full w-full" /></div>
+});
 
 const StatCard = memo(({ title, value, icon: Icon, linkHref, linkText, isLoading }: { title: string, value: string | number, icon: React.ElementType, linkHref?: string, linkText?: string, isLoading: boolean }) => (
     <Card>
@@ -136,7 +140,7 @@ export default function VendorHomePage() {
             </CardHeader>
         </Card>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 content-auto">
             <StatCard 
                 title="Active Listings"
                 value={listings.length}
@@ -162,7 +166,7 @@ export default function VendorHomePage() {
             />
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-5">
+        <div className="grid gap-8 lg:grid-cols-5 content-auto">
             <div className="lg:col-span-3">
                  <VendorAnalyticsChart data={analyticsData} isLoading={pageIsLoading} />
             </div>

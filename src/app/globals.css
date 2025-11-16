@@ -28,7 +28,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255,90,90,0.18), rgba(255,0,0,0.05));
+  background: linear-gradient(180deg, rgba(255,90,90,0.03), rgba(255,0,0,0.015));
   mix-blend-mode: overlay;
   pointer-events: none;
 }
@@ -55,7 +55,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255,90,90,0.18), rgba(255,0,0,0.05));
+  background: linear-gradient(180deg, rgba(255,90,90,0.03), rgba(255,0,0,0.015));
   mix-blend-mode: overlay;
   pointer-events: none;
 }
@@ -86,7 +86,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255,90,90,0.18), rgba(255,0,0,0.05));
+  background: linear-gradient(180deg, rgba(255,90,90,0.03), rgba(255,0,0,0.015));
   mix-blend-mode: overlay;
   pointer-events: none;
 }
@@ -113,7 +113,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255,90,90,0.18), rgba(255,0,0,0.05));
+  background: linear-gradient(180deg, rgba(255,90,90,0.03), rgba(255,0,0,0.015));
   mix-blend-mode: overlay;
   pointer-events: none;
 }
@@ -282,6 +282,7 @@ html {
   overflow-x: hidden !important;
   width: 100% !important;
   max-width: 100% !important;
+  contain: layout paint size;
 }
 
 /* Fix for chat messages container */
@@ -321,6 +322,17 @@ html {
     padding-left: 1rem;
     padding-right: 1rem;
   }
+}
+
+/* Render performance utilities */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 600px;
+}
+
+.paint-optimized {
+  will-change: transform;
+  contain: layout paint;
 }
 
 /* Backdrop blur support */
@@ -537,7 +549,7 @@ html {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255,90,90,0.18), rgba(255,0,0,0.05));
+  background: linear-gradient(180deg, rgba(255,90,90,0.03), rgba(255,0,0,0.015));
   mix-blend-mode: overlay;
   pointer-events: none;
 }
@@ -564,7 +576,7 @@ html {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255,90,90,0.10), rgba(255,0,0,0.04));
+  background: linear-gradient(180deg, rgba(255,90,90,0.03), rgba(255,0,0,0.015));
   mix-blend-mode: overlay;
   pointer-events: none;
 }
