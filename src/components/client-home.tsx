@@ -349,11 +349,11 @@ export function ClientHome() {
                         { label: 'Decoration', q: 'Decoration', Icon: PartyPopper },
                     ].map((c, i) => (
                         <Link key={c.label} href={`/client/explore?category=${encodeURIComponent(c.q)}`} aria-label={c.label} className="group">
-                            <div className="flex flex-col items-center gap-1 p-2 rounded-xl transition duration-200">
+                            <div className="flex flex-col items-center gap-1.5 p-2 rounded-xl transition duration-200">
                                 <div className="h-12 w-12 rounded-xl liquid-glass-solid flex items-center justify-center active:scale-95">
                                     <c.Icon className="h-5 w-5 text-red-500 group-active:text-red-600" />
                                 </div>
-                                <div className="text-[11px] font-medium">{c.label}</div>
+                                <div className="glass-text text-[12px] font-semibold leading-tight text-center">{c.label}</div>
                             </div>
                         </Link>
                     ))}
@@ -409,22 +409,20 @@ export function ClientHome() {
                         { label: 'Photoshoots', emoji: '📸', q: 'Other' },
                     ].map((e) => (
                         <Link key={e.label} href={`/client/explore?eventType=${encodeURIComponent(e.q)}`}>
-                            <div className="relative h-16 px-3 flex items-center justify-start liquid-glass-solid rounded-xl">
-                                <div className="flex items-center gap-2">
-                                    <div className="relative tilt-mini">
-                                        <span className="text-xl">{e.emoji}</span>
-                                        {e.label === 'Birthdays' && (
-                                            <span className="absolute -top-2 -right-2 flame-dot" />
-                                        )}
-                                        {e.label === 'Engagements' && (
-                                            <span className="absolute -top-2 -right-2 spark-dot" />
-                                        )}
-                                        {e.label === 'Photoshoots' && (
-                                            <span className="flash-overlay" style={{ right: '-6px', top: '-6px' }} />
-                                        )}
-                                    </div>
-                                    <div className="text-sm font-semibold">{e.label}</div>
+                            <div className="relative h-20 px-3 liquid-glass-solid rounded-xl flex flex-col items-center justify-center text-center">
+                                <div className="relative tilt-mini mb-1">
+                                    <span className="text-2xl">{e.emoji}</span>
+                                    {e.label === 'Birthdays' && (
+                                        <span className="absolute -top-2 -right-2 flame-dot" />
+                                    )}
+                                    {e.label === 'Engagements' && (
+                                        <span className="absolute -top-2 -right-2 spark-dot" />
+                                    )}
+                                    {e.label === 'Photoshoots' && (
+                                        <span className="flash-overlay" style={{ right: '-6px', top: '-6px' }} />
+                                    )}
                                 </div>
+                                <div className="glass-text text-sm font-semibold leading-tight">{e.label}</div>
                             </div>
                         </Link>
                     ))}
@@ -438,7 +436,7 @@ export function ClientHome() {
                         <button
                             onClick={() => setSelectedTab('categories')}
                             aria-label="Categories"
-                            className={`${selectedTab === 'categories' ? 'bg-primary text-primary-foreground h-14 -mt-2' : 'border border-primary text-primary h-10'} w-10 rounded-full flex items-center justify-center`}
+                            className={`${selectedTab === 'categories' ? 'bg-primary text-primary-foreground h-14 -mt-2' : 'border border-primary text-primary h-10'} w-10 rounded-[20px] flex items-center justify-center`}
                         >
                             <div className="flex flex-col items-center justify-center">
                                 {selectedTab === 'categories' && (
@@ -452,7 +450,7 @@ export function ClientHome() {
                         <button
                             onClick={() => setSelectedTab('event-types')}
                             aria-label="Event Types"
-                            className={`${selectedTab === 'event-types' ? 'bg-primary text-primary-foreground h-14 -mb-2' : 'border border-primary text-primary h-10'} w-10 rounded-full flex items-center justify-center`}
+                            className={`${selectedTab === 'event-types' ? 'bg-primary text-primary-foreground h-14 -mb-2' : 'border border-primary text-primary h-10'} w-10 rounded-[20px] flex items-center justify-center`}
                         >
                             <div className="flex flex-col items-center justify-center">
                                 <Calendar className="h-4 w-4" />

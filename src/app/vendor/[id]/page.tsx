@@ -10,7 +10,9 @@ export default async function VendorPublicProfilePage({ params }: { params: { id
       getServicesAndOffers(params.id) // Fetch only this vendor's listings
   ]);
 
-  return <VendorPublicProfile vendor={vendor} listings={listings} />;
+  const safeVendor = vendor ? JSON.parse(JSON.stringify(vendor)) : null;
+  const safeListings = JSON.parse(JSON.stringify(listings));
+  return <VendorPublicProfile vendor={safeVendor as any} listings={safeListings as any} />;
 }
 
 export async function generateStaticParams() {

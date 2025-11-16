@@ -197,17 +197,19 @@ export function AppHeader() {
               </Popover>
             </div>
 
-            <Link href={isVendor ? "/vendor/messages" : "/client/messages"}>
-                <Button variant="ghost" size="icon" aria-label="Messages" className="relative">
-                    <MessageSquare className="h-6 w-6" />
-                    {hasUnreadMessages && (
-                      <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                      </span>
-                    )}
-                </Button>
-            </Link>
+            <div className="hidden lg:block">
+              <Link href={isVendor ? "/vendor/messages" : "/client/messages"}>
+                  <Button variant="ghost" size="icon" aria-label="Messages" className="relative">
+                      <MessageSquare className="h-6 w-6" />
+                      {hasUnreadMessages && (
+                        <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                        </span>
+                      )}
+                  </Button>
+              </Link>
+            </div>
 
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>

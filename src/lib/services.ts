@@ -412,11 +412,12 @@ export async function getVendorProfile(vendorId: string): Promise<VendorProfile 
         const docRef = doc(db, 'vendors', vendorId);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            const data = docSnap.data();
+            const raw = docSnap.data();
+            const data = toPlain(raw);
             return {
                 id: docSnap.id,
                 ...data,
-                createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date()
+                createdAt: toDate(data.createdAt)
             } as VendorProfile;
         }
     } catch (e) {
@@ -542,10 +543,10 @@ export const getServicesAndOffers = async (vendorId?: string, options?: { count?
             getDocs(collection(db, 'vendors'))
         ]);
 
-        const vendorsData = new Map(vendorsSnapshot.docs.map(doc => [doc.id, doc.data() as Omit<VendorProfile, 'id'>]));
+        const vendorsData = new Map(vendorsSnapshot.docs.map(doc => [doc.id, toPlain(doc.data()) as Omit<VendorProfile, 'id'>]));
 
         const services = servicesSnapshot.docs.map(doc => {
-            const data = doc.data() as DocumentData as Omit<Service, 'id'>;
+            const data = toPlain(doc.data()) as DocumentData as Omit<Service, 'id'>;
             const vendor = vendorsData.get(data.vendorId);
             return { 
                 id: doc.id, 
@@ -556,7 +557,7 @@ export const getServicesAndOffers = async (vendorId?: string, options?: { count?
             } as Service;
         });
         const offers = offersSnapshot.docs.map(doc => {
-            const data = doc.data() as DocumentData as Omit<Offer, 'id'>;
+            const data = toPlain(doc.data()) as DocumentData as Omit<Offer, 'id'>;
             const vendor = vendorsData.get(data.vendorId);
             return { 
                 id: doc.id, 
@@ -579,6 +580,15 @@ export const getServicesAndOffers = async (vendorId?: string, options?: { count?
         }
         throw e;
     }
+}
+
+function toPlain(value: any): any {
+    if (value === null || typeof value !== 'object') return value;
+    if (typeof (value as any)?.toDate === 'function') return (value as any).toDate();
+    if (Array.isArray(value)) return value.map(v => toPlain(v));
+    const out: any = {};
+    for (const k of Object.keys(value)) out[k] = toPlain((value as any)[k]);
+    return out;
 }
 
 export async function getSponsoredBanners(): Promise<SponsoredBanner[]> {
@@ -607,7 +617,7 @@ export async function getTopVendors(options?: { count?: number }): Promise<Vendo
     const count = options?.count ?? 10;
     try {
         const snapshot = await getDocs(collection(db, 'vendors'));
-        const vendors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as VendorProfile[];
+        const vendors = snapshot.docs.map(doc => ({ id: doc.id, ...toPlain(doc.data()) })) as VendorProfile[];
         const tierWeight: Record<VendorProfile['accountTier'], number> = { free: 0, vip1: 1, vip2: 2, vip3: 3 };
         const sorted = vendors
             .filter(v => v.status === 'active')
@@ -636,9 +646,9 @@ export async function getServiceOrOfferById(id: string): Promise<ServiceOrOffer 
         let item: ServiceOrOffer | null = null;
         
         if (serviceDoc.exists()) {
-            item = { id: serviceDoc.id, ...serviceDoc.data(), type: 'service' } as Service;
+            item = { id: serviceDoc.id, ...toPlain(serviceDoc.data()), type: 'service' } as Service;
         } else if (offerDoc.exists()) {
-            item = { id: offerDoc.id, ...offerDoc.data(), type: 'offer' } as Offer;
+            item = { id: offerDoc.id, ...toPlain(offerDoc.data()), type: 'offer' } as Offer;
         }
         
         if (!item) {
@@ -650,7 +660,7 @@ export async function getServiceOrOfferById(id: string): Promise<ServiceOrOffer 
         
         // Enhance item with vendor data if available
         if (vendorDoc.exists()) {
-            const vendorData = vendorDoc.data();
+            const vendorData = toPlain(vendorDoc.data());
             item.vendorVerification = vendorData.verification || 'none';
             item.vendorAvatar = vendorData.avatar || item.vendorAvatar;
         }

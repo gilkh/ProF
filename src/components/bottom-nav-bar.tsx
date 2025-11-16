@@ -26,6 +26,7 @@ export function BottomNavBar() {
   
     const clientLinks = [
         { href: '/client/home', label: t.home, icon: Home },
+        { href: '/client/messages', label: t.messages, icon: MessageSquare },
         { href: '/client/explore', label: t.explore, icon: Compass },
         { href: '/client/bookings', label: t.bookings, icon: Calendar },
         { href: '/client/event-planner', label: t.planner, icon: PenTool },
@@ -33,6 +34,7 @@ export function BottomNavBar() {
 
     const vendorLinks = [
         { href: '/vendor/home', label: t.home, icon: Home },
+        { href: '/vendor/messages', label: t.messages, icon: MessageSquare },
         { href: '/vendor/manage-services', label: t.services, icon: Briefcase },
         { href: '/vendor/client-requests', label: t.requests, icon: Users, 'data-testid': 'requests-link' },
         { href: '/vendor/bookings', label: t.bookings, icon: Calendar },
@@ -73,8 +75,14 @@ export function BottomNavBar() {
             )}
             {...props}
           >
-            <div className="relative">
-                <Icon className="h-6 w-6" />
+            <div className={cn('relative', href.endsWith('/explore') ? '' : '')}>
+                {href.endsWith('/explore') ? (
+                  <div className="h-12 w-12 -translate-y-2 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg">
+                    <Icon className="h-6 w-6" />
+                  </div>
+                ) : (
+                  <Icon className="h-6 w-6" />
+                )}
                 {label === t.requests && pendingRequests > 0 && (
                     <Badge className="absolute -top-1 -right-2 h-4 w-4 shrink-0 justify-center rounded-full p-1 text-[10px]">
                         {pendingRequests}
@@ -87,7 +95,7 @@ export function BottomNavBar() {
                     </span>
                  )}
             </div>
-            <span className="text-[10px]">{label}</span>
+            <span className={cn('text-[10px]', href.endsWith('/explore') ? '-mt-3' : '')}>{label}</span>
           </Link>
         ))}
       </div>

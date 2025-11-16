@@ -35,7 +35,7 @@ export function QuestionTemplateBubble({
 
   return (
     <Card className={cn(
-      "max-w-md w-full shadow-lg",
+      "max-w-[70.3125%] sm:max-w-md w-full shadow-lg",
       isOwnMessage ? "border-primary/30" : "border-muted"
     )}>
       <CardHeader className="pb-3">
@@ -129,7 +129,7 @@ export function TemplateResponseBubble({
 
   return (
     <Card className={cn(
-      "max-w-md w-full shadow-lg border-green-200 bg-green-50",
+      "max-w-[70.3125%] sm:max-w-md w-full shadow-lg border-green-200 bg-green-50",
       isOwnMessage && "border-primary/30"
     )}>
       <CardHeader className="pb-3">

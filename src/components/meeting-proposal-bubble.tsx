@@ -80,7 +80,7 @@ export function MeetingProposalBubble({ message, isOwnMessage }: { message: Chat
   };
 
   return (
-    <div className="bg-background border-2 border-primary/30 rounded-lg p-4 max-w-md w-full shadow-lg">
+    <div className="bg-background border-2 border-primary/30 rounded-lg p-4 w-full max-w-[70.3125%] shadow-lg">
       <div className="flex items-center gap-3 mb-3 border-b pb-3">
         <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary">
           <Clock className="h-5 w-5" />
@@ -189,7 +189,7 @@ export function MeetingStatusBubble({ message }: { message: ChatMessage }) {
   const formattedDate = proposal?.dateTime ? format(parseISO(proposal.dateTime), 'PPP p') : null;
 
   return (
-    <div className="bg-background border-2 border-primary/20 rounded-lg p-3 max-w-xs w-full shadow-md">
+    <div className="bg-background border-2 border-primary/20 rounded-lg p-3 w-full max-w-[70.3125%] shadow-md">
       <div className="flex items-center gap-2">
         {icon}
         <p className="text-sm">

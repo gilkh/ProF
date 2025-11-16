@@ -35,19 +35,19 @@ function ForwardedItemBubble({ item, timestamp }: { item: ForwardedItem, timesta
         return null;
     }
     return (
-    <div className="bg-background border-2 border-primary/30 rounded-lg p-3 max-w-xs w-full shadow-md">
-            <Link href={`/client/${item.itemType}/${item.itemId}`} className="block">
+    <div className="bg-background border-2 border-primary/30 rounded-lg p-3 w-full max-w-[70.3125%] shadow-md overflow-hidden">
+            <Link href={`/client/${item.itemType}/${item.itemId}`} className="block w-full max-w-full overflow-hidden">
                 <div className="relative aspect-video rounded-md overflow-hidden mb-2">
                     <Image src={item.image!} alt={item.title} layout="fill" className="object-cover" />
                 </div>
-                <h4 className="font-bold text-sm">{item.title}</h4>
-                <p className="text-xs text-muted-foreground">by {item.vendorName}</p>
-                <p className="text-sm font-semibold text-primary mt-1">
-                    {item.price ? `$${item.price}` : 'Custom Quote'}
+                <h4 className="font-bold text-sm break-words break-all">{item.title}</h4>
+                <p className="text-xs text-muted-foreground break-words">by {item.vendorName}</p>
+                <p className="text-sm font-semibold text-primary mt-1 break-words">
+                    {item.price ? `${item.price}` : 'Custom Quote'}
                 </p>
             </Link>
-                <div className="mt-3 bg-muted rounded-md p-2 border border-primary/20">
-                <p className="text-sm text-foreground">{item.userMessage}</p>
+                <div className="mt-3 bg-muted rounded-md p-2 border border-primary/20 overflow-hidden">
+                <p className="text-sm text-foreground break-words break-all overflow-hidden">{item.userMessage}</p>
             </div>
             {timestamp && (
                 <div className="mt-2 text-xs text-muted-foreground text-right">{format(new Date(timestamp), 'p')}</div>
@@ -58,7 +58,7 @@ function ForwardedItemBubble({ item, timestamp }: { item: ForwardedItem, timesta
 
 function QuoteRequestBubble({ item, timestamp }: { item: ForwardedItem, timestamp?: Date }) {
     return (
-    <div className="bg-background border-2 border-primary/40 rounded-lg p-4 max-w-md w-full shadow-lg">
+    <div className="bg-background border-2 border-primary/40 rounded-lg p-4 w-full max-w-[70.3125%] shadow-lg overflow-hidden">
             <div className="flex items-center gap-3 mb-3 border-b pb-3">
                 <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary">
                     <PencilRuler className="h-5 w-5" />
@@ -72,7 +72,7 @@ function QuoteRequestBubble({ item, timestamp }: { item: ForwardedItem, timestam
             <div className="space-y-3 text-sm">
                 <div className="flex items-start gap-3">
                     <p className="text-muted-foreground font-medium w-24">Message</p>
-                    <p className="flex-1">"{item.userMessage}"</p>
+                    <p className="flex-1 break-words break-all overflow-hidden">"{item.userMessage}"</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -124,7 +124,7 @@ function QuoteResponseBubble({ item, isOwnMessage, timestamp }: { item: Forwarde
   }
 
     return (
-        <div className="bg-background border-2 border-primary/30 rounded-lg p-4 max-w-md w-full shadow-lg">
+        <div className="bg-background border-2 border-primary/30 rounded-lg p-4 w-full max-w-[70.3125%] shadow-lg overflow-hidden">
       <div className="flex items-center gap-3 mb-3 border-b pb-3">
         <div className="flex items-center justify-center h-10 w-10 rounded-full bg-green-600/10 text-green-700">
           <Check className="h-5 w-5" />
@@ -148,8 +148,8 @@ function QuoteResponseBubble({ item, isOwnMessage, timestamp }: { item: Forwarde
         <p>${item.total?.toFixed(2)}</p>
       </div>
       {item.userMessage && (
-        <div className="text-sm text-muted-foreground bg-muted p-2 rounded-md">
-            <p>"{item.userMessage}"</p>
+        <div className="text-sm text-muted-foreground bg-muted p-2 rounded-md overflow-hidden">
+            <p className="break-words break-all overflow-hidden">"{item.userMessage}"</p>
         </div>
       )}
       {!isOwnMessage && (
@@ -176,7 +176,7 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
     const templateMessage = parseQuestionTemplateMessage(message.text);
     if (templateMessage) {
         return (
-            <div className={cn('flex w-full', isOwnMessage ? 'justify-end' : 'justify-start')}>
+            <div className={cn('flex w-full min-w-0 overflow-hidden', isOwnMessage ? 'justify-end' : 'justify-start')}>
                 <QuestionTemplateBubble 
                     templateMessage={templateMessage}
                     chatId={chat?.id || ''}
@@ -195,7 +195,7 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
     const responseMessage = parseTemplateResponseMessage(message.text);
     if (responseMessage) {
         return (
-            <div className={cn('flex w-full', isOwnMessage ? 'justify-end' : 'justify-start')}>
+            <div className={cn('flex w-full min-w-0 overflow-hidden', isOwnMessage ? 'justify-end' : 'justify-start')}>
                 <TemplateResponseBubble 
                     responseData={responseMessage}
                     isOwnMessage={isOwnMessage}
@@ -209,7 +209,7 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
     const meetingProposal = parseMeetingProposalMessage(message.text);
     if (meetingProposal) {
         return (
-            <div className={cn('flex w-full', isOwnMessage ? 'justify-end' : 'justify-start')}>
+            <div className={cn('flex w-full min-w-0 overflow-hidden', isOwnMessage ? 'justify-end' : 'justify-start')}>
                 <MeetingProposalBubble 
                     message={message}
                     isOwnMessage={isOwnMessage}
@@ -222,7 +222,7 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
     const meetingStatus = parseMeetingStatusMessage(message.text);
     if (meetingStatus) {
         return (
-            <div className={cn('flex w-full', isOwnMessage ? 'justify-end' : 'justify-start')}>
+            <div className={cn('flex w-full min-w-0 overflow-hidden', isOwnMessage ? 'justify-end' : 'justify-start')}>
                 <MeetingStatusBubble 
                     message={message}
                 />
@@ -234,7 +234,7 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
     const portfolioMention = parsePortfolioMentionMessage(message.text);
     if (portfolioMention) {
         return (
-            <div className={cn('flex w-full', isOwnMessage ? 'justify-end' : 'justify-start')}>
+            <div className={cn('flex w-full min-w-0 overflow-hidden', isOwnMessage ? 'justify-end' : 'justify-start')}>
                 <PortfolioMentionBubble data={portfolioMention} isOwnMessage={isOwnMessage} timestamp={message.timestamp} />
             </div>
         );
@@ -245,68 +245,72 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
     if (forwardedItem) {
         if(forwardedItem.isQuoteResponse) {
              return (
-                 <div className={cn('flex w-full', isOwnMessage ? 'justify-end' : 'justify-start')}>
+                 <div className={cn('flex w-full min-w-0 overflow-hidden', isOwnMessage ? 'justify-end' : 'justify-start')}>
                      <QuoteResponseBubble item={forwardedItem} isOwnMessage={isOwnMessage} timestamp={message.timestamp} />
                 </div>
             )
         }
          if (forwardedItem.isQuoteRequest && !isOwnMessage) {
             return (
-                <div className="flex justify-start w-full">
+                <div className="flex justify-start w-full min-w-0 overflow-hidden">
                      <QuoteRequestBubble item={forwardedItem} timestamp={message.timestamp} />
                 </div>
             )
         }
         return (
-             <div className={cn("flex items-end gap-2", isOwnMessage && "justify-end")}>
+             <div className={cn("flex items-end gap-2 min-w-0 w-full overflow-hidden", isOwnMessage && "justify-end")}> 
                  {!isOwnMessage && (
                     (role === 'client' && otherParticipant?.id) ? (
                       <Link href={`/vendor/${otherParticipant.id}`}>
-                        <Avatar className="h-8 w-8 self-start">
+                        <Avatar className="h-8 w-8 self-start flex-shrink-0">
                             <AvatarImage src={otherParticipant?.avatar} />
                             <AvatarFallback>{otherParticipant?.name?.substring(0,2)}</AvatarFallback>
                         </Avatar>
                       </Link>
                     ) : (
-                      <Avatar className="h-8 w-8 self-start">
+                      <Avatar className="h-8 w-8 self-start flex-shrink-0">
                           <AvatarImage src={otherParticipant?.avatar} />
                           <AvatarFallback>{otherParticipant?.name?.substring(0,2)}</AvatarFallback>
                       </Avatar>
                     )
                 )}
-                <ForwardedItemBubble item={forwardedItem} timestamp={message.timestamp} />
+                <div className="flex-1 min-w-0 overflow-hidden">
+                    <ForwardedItemBubble item={forwardedItem} timestamp={message.timestamp} />
+                </div>
              </div>
         )
     }
 
     return (
-        <div className={cn("flex items-end gap-2", isOwnMessage && "justify-end")}>
+        <div className={cn("flex items-end gap-2 min-w-0 w-full overflow-hidden", isOwnMessage && "justify-end")}> 
             {!isOwnMessage && (
                 (role === 'client' && otherParticipant?.id) ? (
                   <Link href={`/vendor/${otherParticipant.id}`}>
-                    <Avatar className="h-8 w-8">
+                    <Avatar className="h-8 w-8 flex-shrink-0">
                         <AvatarImage src={sender?.avatar} />
                         <AvatarFallback>{sender?.name?.substring(0,2)}</AvatarFallback>
                     </Avatar>
                   </Link>
                 ) : (
-                  <Avatar className="h-8 w-8">
+                  <Avatar className="h-8 w-8 flex-shrink-0">
                       <AvatarImage src={sender?.avatar} />
                       <AvatarFallback>{sender?.name?.substring(0,2)}</AvatarFallback>
                   </Avatar>
                 )
             )}
-                <div
-                className={cn(
-                    "max-w-xs rounded-lg p-3 whitespace-pre-wrap border relative",
-                    isOwnMessage ? "bg-primary text-primary-foreground border-primary/40" : "bg-muted border-primary/10"
-                )}
-            >
-                <p className="text-sm">{message.text}</p>
-                <div className="mt-1 text-xs text-muted-foreground text-right">{format(new Date(message.timestamp), 'p')}</div>
-            </div>
+                <div className="flex-1 min-w-0 overflow-hidden">
+                    <div
+                        className={cn(
+                            "w-full max-w-[70.3125%] rounded-lg p-3 whitespace-pre-wrap break-words border relative",
+                            isOwnMessage ? "bg-primary text-primary-foreground border-primary/40" : "bg-muted border-primary/10"
+                        )}
+                    >
+                        <p className="text-sm break-all sm:break-words">{message.text}</p>
+                        <div className="mt-1 text-xs text-muted-foreground text-right">{format(new Date(message.timestamp), 'p')}</div>
+                    </div>
+                </div>
             {isOwnMessage && (
-                <Avatar className="h-8 w-8">
+                <Avatar className="h-8 w-8 hidden sm:block flex-shrink-0">
                     <AvatarImage src={sender?.avatar} />
                     <AvatarFallback>{sender?.name?.substring(0,2)}</AvatarFallback>
                 </Avatar>
@@ -378,10 +382,9 @@ export function MessagingPanel() {
   // Auto-scroll to bottom of messages
   useEffect(() => {
     if (scrollAreaRef.current) {
-      const scrollElement = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollElement) {
-        scrollElement.scrollTo({ top: scrollElement.scrollHeight, behavior: 'smooth' });
-      }
+      const viewport = scrollAreaRef.current.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement | null;
+      const el = viewport ?? (scrollAreaRef.current as unknown as HTMLElement);
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     }
   }, [messages]);
 
@@ -472,23 +475,23 @@ export function MessagingPanel() {
 
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full w-full max-w-full flex-col overflow-hidden">
        {!isAdmin && (
-        <div className="flex-shrink-0 border-b p-4">
+        <div className="flex-shrink-0 border-b p-3 sm:p-4">
             <h2 className="text-xl font-semibold">Messages</h2>
-            <div className="relative mt-4">
+            <div className="relative mt-4 hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input placeholder="Search messages..." className="pl-10" />
             </div>
         </div>
        )}
-      <div className="flex flex-grow overflow-hidden">
+      <div className="flex flex-grow overflow-hidden min-w-0 w-full">
         <aside className={cn(
-            "h-full w-full flex-col border-r sm:flex",
+            "h-full w-full flex-col border-r sm:flex min-w-0",
             isAdmin ? "sm:w-1/2 md:w-1/3" : "sm:w-1/3",
             showChatList ? 'flex' : 'hidden'
         )}>
-            <ScrollArea>
+            <ScrollArea className="pb-0 sm:pb-0">
             <div className="flex flex-col">
                 {isLoading ? (
                     <div className="p-4 space-y-4">
@@ -506,7 +509,7 @@ export function MessagingPanel() {
                                 key={chat.id}
                                 onClick={() => handleSelectChat(chat)}
                                 className={cn(
-                                'flex items-center gap-3 p-4 text-left transition-colors hover:bg-muted/50 w-full',
+                                'flex items-center gap-3 p-3 sm:p-4 text-left transition-colors hover:bg-muted/50 w-full',
                                 selectedChat?.id === chat.id && 'bg-muted'
                                 )}
                             >
@@ -544,7 +547,7 @@ export function MessagingPanel() {
         </aside>
 
         <div className={cn(
-            "flex-grow flex-col h-full bg-slate-50",
+            "flex-grow flex-col h-full bg-slate-50 min-h-0 min-w-0 w-full max-w-full",
             showChatWindow ? 'flex' : 'hidden sm:flex'
             )}>
             {selectedChat ? (
@@ -633,14 +636,14 @@ export function MessagingPanel() {
                         </div>
                     )}
                 </div>
-                <ScrollArea className="flex-grow p-4" ref={scrollAreaRef}>
-                    <div className="flex flex-col gap-4">
+                <div className="flex-grow overflow-y-auto overflow-x-clip min-w-0 w-full max-w-[100vw] flex flex-col" ref={scrollAreaRef}>
+                    <div className="flex flex-col gap-4 pb-40 sm:pb-4 p-3 sm:p-4 w-full max-w-full">
                     {messages.map((message) => (
                         <ChatBubble key={message.id} message={message} isOwnMessage={message.senderId === userId} chat={selectedChat} role={role} />
                     ))}
                     </div>
-                </ScrollArea>
-                <div className="flex-shrink-0 border-t p-4 bg-background">
+                </div>
+                <div className="fixed bottom-16 left-0 right-0 z-50 bg-background border-t p-3 sm:static sm:bottom-auto sm:left-auto sm:right-auto sm:z-auto sm:bg-background sm:border-t sm:p-4" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
                     {isAdmin ? (
                          <div className="text-center text-sm text-muted-foreground">Admin view is read-only</div>
                     ) : (
@@ -652,7 +655,7 @@ export function MessagingPanel() {
                                             <FileText className="h-4 w-4 mr-2" />
                                             Manage Templates
                                         </Button>
-                                    </Link>
+                                        </Link>
                                 ) : <div />}
                                 <div className="flex items-center gap-2">
                                     {role === 'vendor' && (

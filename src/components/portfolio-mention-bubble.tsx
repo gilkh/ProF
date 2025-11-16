@@ -12,7 +12,7 @@ export function PortfolioMentionBubble({ data, timestamp, isOwnMessage }: { data
   const profileHref = `/vendor/${data.vendorId}#gallery-${categorySlug}`;
 
   return (
-    <div className="bg-background border-2 border-primary/30 rounded-lg p-3 max-w-xs w-full shadow-md">
+    <div className="bg-background border-2 border-primary/30 rounded-lg p-3 w-full max-w-[70.3125%] shadow-md">
       <Link href={profileHref} className="block">
         <div className="relative aspect-square rounded-md overflow-hidden mb-2">
           {data.media.type === "image" ? (
