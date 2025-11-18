@@ -1611,27 +1611,32 @@ export async function moderateMedia(ownerId: string, listingType: 'service' | 'o
 
 export function getChatsForUser(userId: string | undefined, callback: (chats: Chat[]) => void): () => void {
     let q;
-    if (userId) {
-        q = query(collection(db, 'chats'), where('participantIds', 'array-contains', userId));
-    } else {
-        q = query(collection(db, 'chats'), orderBy('lastMessageTimestamp', 'desc'));
-    }
+    q = query(collection(db, 'chats'), orderBy('lastMessageTimestamp', 'desc'));
     
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
         let chats = querySnapshot.docs.map(doc => {
             const data = doc.data();
             const lastMessageTimestamp = data.lastMessageTimestamp ? toDate(data.lastMessageTimestamp) : (data.createdAt ? toDate(data.createdAt) : new Date());
+            const participantsRaw = Array.isArray(data.participants) ? data.participants : [];
             return {
                 id: doc.id,
                 ...data,
                 lastMessageTimestamp,
-                participants: data.participants.map((p: any) => ({ ...p, verification: p.verification || 'none' })),
+                participants: participantsRaw.map((p: any) => ({ ...p, verification: p.verification || 'none' })),
             } as Chat;
         });
 
+        if (userId) {
+            chats = chats.filter(c =>
+                (Array.isArray((c as any).participantIds) && (c as any).participantIds.includes(userId)) ||
+                (Array.isArray(c.participants) && c.participants.some(p => p?.id === userId))
+            );
+        }
         chats.sort((a, b) => b.lastMessageTimestamp.getTime() - a.lastMessageTimestamp.getTime());
 
         callback(chats);
+    }, () => {
+        callback([]);
     });
 
     return unsubscribe;

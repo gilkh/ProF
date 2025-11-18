@@ -34,24 +34,11 @@ import {
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu"
 import { ResetPasswordDialog } from '@/components/reset-password-dialog';
+import { AdminAnalyticsChart } from '@/components/admin-analytics-chart';
 import { AdminStatCard } from '@/components/admin-stat-card';
-import dynamic from 'next/dynamic';
-const AdminAnalyticsChart = dynamic(() => import('@/components/admin-analytics-chart').then(m => m.AdminAnalyticsChart), {
-  ssr: false,
-  loading: () => <div className="h-80 w-full"><Skeleton className="h-full w-full" /></div>
-});
-const MessagingPanel = dynamic(() => import('@/components/messaging-panel').then(m => m.MessagingPanel), {
-  ssr: false,
-  loading: () => <div className="h-full w-full"><Skeleton className="h-full w-full" /></div>
-});
-const AdminListingDetailView = dynamic(() => import('@/components/admin-listing-detail-view').then(m => m.AdminListingDetailView), {
-  ssr: false,
-  loading: () => <Skeleton className="h-9 w-24" />
-});
-const AdminReportsPage = dynamic(() => import('@/app/admin/reports/page'), {
-  ssr: false,
-  loading: () => <div className="p-4"><Skeleton className="h-40 w-full" /></div>
-});
+import { MessagingPanel } from '@/components/messaging-panel';
+import { AdminListingDetailView } from '@/components/admin-listing-detail-view';
+import AdminReportsPage from '@/app/admin/reports/page';
 import { AdminEmailTest } from '@/components/admin/admin-email-test';
 import AdminEmailVerification from '@/components/admin/admin-email-verification';
 import Link from 'next/link';
@@ -939,14 +926,12 @@ export default function AdminHomePage() {
                                             {item.media && item.media.length > 0 && (
                                                 <div className="flex gap-1">
                                                     {item.media.slice(0, 3).map((media, idx) => (
-                                                        <div key={idx} className="relative w-6 h-6 rounded border overflow-hidden bg-muted">
+                                                        <div key={idx} className="w-6 h-6 rounded border overflow-hidden bg-muted">
                                                             {media.type === 'image' ? (
-                                                                <Image 
+                                                                <img 
                                                                     src={media.url} 
                                                                     alt="" 
-                                                                    fill 
-                                                                    sizes="24px"
-                                                                    className="object-cover"
+                                                                    className="w-full h-full object-cover"
                                                                 />
                                                             ) : (
                                                                 <div className="w-full h-full bg-black/80 flex items-center justify-center">

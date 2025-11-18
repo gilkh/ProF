@@ -9,7 +9,6 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { ServiceCard } from './service-card';
 import { OfferCard } from './offer-card';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Calendar, Compass, Heart, Star, Tag, ArrowRight, MessageSquare, Wallet, Camera, Building2, Cake as CakeIcon, UtensilsCrossed, Video, Music, Headphones, Brush, Flower, Car, Shirt, PartyPopper, Grid } from 'lucide-react';
 import type { CarouselApi } from '@/components/ui/carousel';
 import { useEffect, useState, useMemo, memo } from 'react';
@@ -237,7 +236,7 @@ export function ClientHome() {
     }, [picksCarouselApi]);
 
     return (
-        <div className="space-y-8 content-auto">
+        <div className="space-y-8">
             
 
             <Card className="relative overflow-hidden border-0 shadow-none">
@@ -260,7 +259,7 @@ export function ClientHome() {
                 </CardHeader>
             </Card>
 
-            <div className="space-y-0 -mt-10 content-auto">
+            <div className="space-y-0 -mt-10">
                 {pageIsLoading ? (
                     <Skeleton className="h-40 w-full rounded-xl" />
                 ) : (
@@ -271,7 +270,7 @@ export function ClientHome() {
                                     {(banners.length ? banners : featuredItems).map((b, i) => (
                                         <CarouselItem key={(b as any).id ?? i}>
                                             <div className="relative h-56 sm:h-72 w-full">
-                                                <Image src={(b as any).image || (b as any).media?.[0]?.url || (b as any).imageUrl || ''} alt={(b as any).title || (b as any).vendorName || 'Sponsored'} fill priority={false} sizes="(max-width: 640px) 100vw, 100vw" className="object-cover" />
+                                                <img src={(b as any).image || (b as any).media?.[0]?.url || (b as any).imageUrl || ''} alt={(b as any).title || (b as any).vendorName || 'Sponsored'} className="h-full w-full object-cover" />
                                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                                                 <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
                                                     <div>
@@ -301,7 +300,7 @@ export function ClientHome() {
                 )}
             </div>
 
-            <div className="grid grid-cols-3 gap-1 content-auto">
+            <div className="grid grid-cols-3 gap-1">
                 <QuickTile 
                     title="Upcoming Bookings"
                     value={upcomingBookings.length}
@@ -328,7 +327,7 @@ export function ClientHome() {
                 />
             </div>
             
-            <div className="rounded-2xl bg-primary/5 liquid-glass p-3 sm:p-4 flex items-center gap-1 content-auto" style={{ ['--primary' as any]: '0 65% 45%' }}>
+            <div className="rounded-2xl bg-primary/5 liquid-glass p-3 sm:p-4 flex items-center gap-1" style={{ ['--primary' as any]: '0 65% 45%' }}>
                 <div className="flex-1 rounded-2xl pt-0 sm:pt-1 px-2 sm:px-3 pb-3">
                     <Tabs value={selectedTab}>
                         <TabsContent value="categories">
@@ -379,7 +378,7 @@ export function ClientHome() {
                         <Link key={c.label} href={`/client/explore?category=${encodeURIComponent(c.q)}`}>
                             <Card className="group overflow-hidden hover:shadow-md transition transform hover:scale-[1.02] animate-scale-in liquid-glass">
                                 <div className="relative h-36">
-                                    <Image loading="lazy" src={c.image} alt={c.label} fill sizes="(max-width: 768px) 50vw, 25vw" className="object-cover" />
+                                    <img loading="lazy" src={c.image} alt={c.label} className="h-full w-full object-cover" />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
                                     <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
                                         <div className="flex items-center gap-2 text-white">
@@ -464,7 +463,7 @@ export function ClientHome() {
                 </div>
             </div>
 
-            <div className="space-y-4 content-auto">
+            <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <h2 className="text-lg font-semibold sm:text-xl">Featured Vendors</h2>
                     <Link href="/client/explore"><Button variant="link" size="sm" className="text-sm">View All</Button></Link>
@@ -483,7 +482,7 @@ export function ClientHome() {
                                             <Card className="w-full">
                                                 <CardContent className="p-3">
                                                     <div className="flex items-center gap-3">
-                                                        <Image src={v.avatar || '/placeholder.png'} alt={v.businessName} width={40} height={40} className="rounded-full object-cover" />
+                                                        <img src={v.avatar || '/placeholder.png'} alt={v.businessName} className="h-10 w-10 rounded-full object-cover" />
                                                         <div>
                                                             <div className="text-sm font-semibold">{v.businessName}</div>
                                                             <div className="text-xs text-muted-foreground">{v.category}</div>
@@ -504,7 +503,7 @@ export function ClientHome() {
                 )}
             </div>
 
-            <div className="space-y-4 content-auto">
+            <div className="space-y-4">
                 <div>
                     <h2 className="text-lg font-semibold sm:text-xl">Editorial Picks</h2>
                 </div>
@@ -526,7 +525,7 @@ export function ClientHome() {
                                         <Link href={p.href}>
                                             <Card className="overflow-hidden">
                                                 <div className="relative h-28">
-                                                    <Image loading="lazy" src={p.image} alt={p.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                                                    <img loading="lazy" src={p.image} alt={p.title} className="h-full w-full object-cover" />
                                                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
                                                     <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between">
                                                         <div className="flex items-center gap-2 text-white">
@@ -547,7 +546,7 @@ export function ClientHome() {
             </div>
 
 
-            <div className="space-y-6 content-auto">
+            <div className="space-y-6">
                 <div>
                     <h2 className="text-lg font-semibold sm:text-xl">Offers & Promotions</h2>
                 </div>
@@ -565,7 +564,7 @@ export function ClientHome() {
                 )}
             </div>
 
-            <div className="space-y-6 content-auto">
+            <div className="space-y-6">
                 <div>
                     <h2 className="text-lg font-semibold sm:text-xl">Featured Services</h2>
                 </div>
@@ -583,7 +582,7 @@ export function ClientHome() {
                 )}
             </div>
 
-            <div className="space-y-4 content-auto">
+            <div className="space-y-4">
                 <div>
                     <h2 className="text-lg font-semibold sm:text-xl">Planning Tools</h2>
                 </div>

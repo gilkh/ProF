@@ -8,151 +8,68 @@
    - Environments: .env.local
 
  ✓ Starting...
- ✓ Compiled middleware in 91ms
- ✓ Ready in 1082ms
+ ✓ Compiled middleware in 157ms
+ ✓ Ready in 1633ms
  ⚠ Webpack is configured while Turbopack is not, which may cause problems.
  ⚠ See instructions if you need to configure Turbopack:
   https://nextjs.org/docs/app/api-reference/next-config-js/turbo
 
- ○ Compiling /client/explore ...
- ✓ Compiled /client/explore in 2.4s
-Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-    at ExplorePage (src\app\client\explore\page.tsx:5:33)
-  3 |
-  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
-> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
-    |                                 ^
-  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
-  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
-  8 | }
-Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-    at ExplorePage (src\app\client\explore\page.tsx:6:34)
-  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
-  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
-> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
-    |                                  ^
-  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
-  8 | }
-  9 |
- GET /client/explore 200 in 5176ms
- ○ Compiling /_not-found/page ...
- ✓ Compiled /_not-found/page in 1227ms
- GET /.well-known/appspecific/com.chrome.devtools.json 404 in 1300ms
- GET /_next/internal/helpers.ts 404 in 200ms
- GET /_next/static/runtime.ts 404 in 165ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 902ms
- ✓ Compiled /api/auth/session in 487ms
- GET /api/auth/session 200 in 1297ms
- GET /api/auth/session 200 in 440ms
+ ○ Compiling /admin/login/jwrvbo3uibr53487rbv847bev4 ...
+ ✓ Compiled /admin/login/jwrvbo3uibr53487rbv847bev4 in 4.3s
+ GET /admin/login/jwrvbo3uibr53487rbv847bev4 200 in 5036ms
+ ○ Compiling /api/auth/session ...
+ ✓ Compiled /api/auth/session in 530ms
+ GET /api/auth/session 200 in 2881ms
+ GET /api/auth/session 200 in 498ms
+ ✓ Compiled /api/auth/csrf in 457ms
+ GET /api/auth/csrf 200 in 561ms
+ ✓ Compiled /api/auth/logout in 386ms
+ POST /api/auth/logout 200 in 1045ms
+ GET /api/auth/session 200 in 115ms
+ GET /api/auth/session 200 in 101ms
+ GET /api/auth/csrf 200 in 97ms
+ POST /api/auth/session 200 in 1765ms
  ○ Compiling /client/home ...
- GET /api/auth/session 200 in 470ms
- GET /api/auth/session 200 in 515ms
- ✓ Compiled /client/home in 1201ms
- GET /client/home 200 in 1238ms
- GET /api/auth/session 200 in 462ms
- GET /api/auth/session 200 in 453ms
- GET /api/auth/session 200 in 427ms
- GET /api/auth/session 200 in 437ms
- GET /api/auth/session 200 in 420ms
- GET /api/auth/session 200 in 425ms
- GET /api/auth/session 200 in 451ms
- GET /api/auth/session 200 in 437ms
- GET /api/auth/session 200 in 442ms
- GET /api/auth/session 200 in 459ms
- GET /api/auth/session 200 in 448ms
- GET /api/auth/session 200 in 432ms
- GET /api/auth/session 200 in 459ms
- GET /api/auth/session 200 in 449ms
- GET /api/auth/session 200 in 440ms
- GET /api/auth/session 200 in 405ms
- GET /api/auth/session 200 in 449ms
- GET /api/auth/session 200 in 461ms
- GET /api/auth/session 200 in 448ms
- GET /api/auth/session 200 in 418ms
- GET /api/auth/session 200 in 408ms
- GET /api/auth/session 200 in 452ms
- GET /api/auth/session 200 in 433ms
- GET /api/auth/session 200 in 454ms
- GET /api/auth/session 200 in 432ms
- GET /api/auth/session 200 in 417ms
- GET /api/auth/session 200 in 420ms
- GET /api/auth/session 200 in 425ms
- GET /api/auth/session 200 in 408ms
- GET /api/auth/session 200 in 421ms
- GET /api/auth/session 200 in 408ms
- GET /api/auth/session 200 in 441ms
- GET /api/auth/session 200 in 423ms
- GET /api/auth/session 200 in 517ms
- GET /api/auth/session 200 in 452ms
- GET /placeholder.png 404 in 101ms
- GET /api/auth/session 200 in 473ms
- GET /api/auth/session 200 in 399ms
- GET /api/auth/session 200 in 409ms
- GET /api/auth/session 200 in 409ms
- GET /api/auth/session 200 in 426ms
- ✓ Compiled in 698ms
-Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-    at ExplorePage (src\app\client\explore\page.tsx:5:33)
-  3 |
-  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
-> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
-    |                                 ^
-  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
-  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
-  8 | }
-Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
-    at ExplorePage (src\app\client\explore\page.tsx:6:34)
-  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
-  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
-> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
-    |                                  ^
-  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
-  8 | }
-  9 |
- GET /client/explore 200 in 92ms
- GET /api/auth/session 200 in 528ms
- GET /api/auth/session 200 in 416ms
- GET /api/auth/session 200 in 419ms
- GET /api/auth/session 200 in 438ms
- GET /api/auth/session 200 in 405ms
- GET /api/auth/session 200 in 429ms
- GET /api/auth/session 200 in 563ms
- GET /api/auth/session 200 in 473ms
- GET /api/auth/session 200 in 537ms
- GET /api/auth/session 200 in 449ms
- GET /api/auth/session 200 in 444ms
- GET /api/auth/session 200 in 558ms
- GET /api/auth/session 200 in 455ms
- GET /api/auth/session 200 in 449ms
- GET /api/auth/session 200 in 406ms
- GET /api/auth/session 200 in 447ms
- GET /api/auth/session 200 in 422ms
- GET /api/auth/session 429 in 66ms
- GET /api/auth/session 429 in 62ms
- GET /api/auth/session 429 in 49ms
- GET /api/auth/session 429 in 47ms
- GET /api/auth/session 429 in 45ms
- GET /api/auth/session 429 in 49ms
- GET /api/auth/session 429 in 51ms
- GET /api/auth/session 429 in 54ms
- GET /api/auth/session 429 in 49ms
- GET /api/auth/session 429 in 49ms
- GET /api/auth/session 429 in 48ms
- GET /client/home 200 in 61ms
- GET /api/auth/session 429 in 93ms
- GET /api/auth/session 429 in 81ms
- GET /api/auth/session 429 in 77ms
- GET /api/auth/session 429 in 77ms
- GET /api/auth/session 429 in 77ms
- GET /api/auth/session 429 in 80ms
- GET /api/auth/session 429 in 73ms
- GET /api/auth/session 429 in 72ms
- GET /api/auth/session 429 in 94ms
- GET /placeholder.png 404 in 128ms
- GET /api/auth/session 429 in 100ms
- GET /api/auth/session 429 in 66ms
- GET /api/auth/session 429 in 52ms
- GET /api/auth/session 429 in 49ms
- ✓ Compiled in 606ms
- ✓ Compiled in 253ms
- ✓ Compiled in 129ms
+ ✓ Compiled /client/home in 2.4s
+ GET /client/home 200 in 3079ms
+ GET /api/auth/session 200 in 483ms
+ GET /api/auth/session 200 in 519ms
+ GET /api/auth/session 200 in 656ms
+ GET /api/auth/session 200 in 480ms
+ ○ Compiling /_not-found/page ...
+ GET /api/auth/session 200 in 486ms
+ ✓ Compiled /_not-found/page in 1290ms
+ GET /placeholder.png 404 in 1582ms
+ GET /api/auth/session 200 in 808ms
+ GET /api/auth/session 200 in 529ms
+ GET /api/auth/session 200 in 633ms
+ GET /api/auth/session 200 in 495ms
+ GET /api/auth/session 200 in 483ms
+ GET /api/auth/session 200 in 527ms
+ ○ Compiling /client/messages ...
+ GET /api/auth/session 200 in 485ms
+ GET /api/auth/session 200 in 567ms
+ GET /api/auth/session 200 in 530ms
+ ✓ Compiled /client/messages in 2s
+ GET /api/auth/session 200 in 467ms
+ GET /client/messages 200 in 2152ms
+ GET /api/auth/session 200 in 479ms
+ GET /api/auth/session 200 in 507ms
+ GET /api/auth/session 200 in 464ms
+ GET /api/auth/session 200 in 472ms
+ GET /api/auth/session 200 in 548ms
+ GET /api/auth/session 200 in 536ms
+ GET /api/auth/session 200 in 559ms
+ GET /api/auth/session 200 in 512ms
+ GET /api/auth/session 200 in 482ms
+ GET /api/auth/session 200 in 575ms
+ GET /api/auth/session 200 in 548ms
+ GET /api/auth/session 200 in 495ms
+ GET /api/auth/session 200 in 526ms
+ GET /api/auth/session 200 in 497ms
+ GET /api/auth/session 200 in 560ms
+ GET /api/auth/session 200 in 481ms
+ GET /api/auth/session 200 in 456ms
+ GET /api/auth/session 200 in 520ms
+ GET /api/auth/session 200 in 468ms
+ GET /api/auth/session 200 in 443ms
