@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Button } from '@/components/ui/button';
@@ -362,18 +361,18 @@ export function ClientHome() {
                 {/* Desktop/Tablet: rich image tiles */}
                 <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {[
-                        { label: 'Catering', emoji: '🍽️', q: 'Catering & Sweets', image: 'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Photography', emoji: '📸', q: 'Photography & Videography', image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Videography', emoji: '🎥', q: 'Photography & Videography', image: 'https://images.unsplash.com/photo-1484704849700-f032a568e944?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Cakes', emoji: '🎂', q: 'Catering & Sweets', image: 'https://images.unsplash.com/photo-1521302080371-727c5a1b3f5f?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Zaffe', emoji: '🎼', q: 'Entertainment', image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'DJ & Sound', emoji: '🎧', q: 'Lighting & Sound', image: 'https://images.unsplash.com/photo-1511268553-1b1a5bb2f3aa?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Makeup & Hair', emoji: '💄', q: 'Beauty & Grooming', image: 'https://images.unsplash.com/photo-1519415943484-9fa18778a0e1?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Flowers', emoji: '🌸', q: 'Decoration', image: 'https://images.unsplash.com/photo-1445404590072-16c2e99ebba9?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Venues', emoji: '🏛️', q: 'Venues', image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Cars', emoji: '🚗', q: 'Transportation', image: 'https://images.unsplash.com/photo-1493238792000-8113da709137?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Dresses', emoji: '👗', q: 'Rentals & Furniture', image: 'https://images.unsplash.com/photo-1520974691648-5f65a2ede8d9?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Decoration', emoji: '🎈', q: 'Decoration', image: 'https://images.unsplash.com/photo-1532438764749-f600a4f478f1?q=80&w=1200&auto=format&fit=crop' },
+                        { label: 'Catering', emoji: '🍽️', q: 'Catering & Sweets', image: 'https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=1200&auto=format&fit=crop' },
+                        { label: 'Photography', emoji: '📸', q: 'Photography & Videography', image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=1200&auto=format&fit=crop' },
+                        { label: 'Videography', emoji: '🎥', q: 'Photography & Videography', image: 'https://images.unsplash.com/photo-1585670210693-e7fdd16b142e?q=80&w=1200&auto=format&fit=crop' },
+                        { label: 'Cakes', emoji: '🎂', q: 'Catering & Sweets', image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1200&auto=format&fit=crop' },
+                        { label: 'Zaffe', emoji: '🎼', q: 'Entertainment', image: 'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?q=80&w=1200&auto=format&fit=crop' },
+                        { label: 'DJ & Sound', emoji: '🎧', q: 'Lighting & Sound', image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1200&auto=format&fit=crop' },
+                        { label: 'Makeup & Hair', emoji: '💄', q: 'Beauty & Grooming', image: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?q=80&w=1200&auto=format&fit=crop' },
+                        { label: 'Flowers', emoji: '🌸', q: 'Decoration', image: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?q=80&w=1200&auto=format&fit=crop' },
+                        { label: 'Venues', emoji: '🏛️', q: 'Venues', image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1200&auto=format&fit=crop' },
+                        { label: 'Cars', emoji: '🚗', q: 'Transportation', image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1200&auto=format&fit=crop' },
+                        { label: 'Dresses', emoji: '👗', q: 'Rentals & Furniture', image: 'https://images.unsplash.com/photo-1594552072238-b8a33785b261?q=80&w=1200&auto=format&fit=crop' },
+                        { label: 'Decoration', emoji: '🎈', q: 'Decoration', image: 'https://images.unsplash.com/photo-1478146059778-26028b07395a?q=80&w=1200&auto=format&fit=crop' },
                     ].map((c) => (
                         <Link key={c.label} href={`/client/explore?category=${encodeURIComponent(c.q)}`}>
                             <Card className="group overflow-hidden hover:shadow-md transition transform hover:scale-[1.02] animate-scale-in liquid-glass">
@@ -436,13 +435,13 @@ export function ClientHome() {
                         <button
                             onClick={() => setSelectedTab('categories')}
                             aria-label="Categories"
-                            className={`${selectedTab === 'categories' ? 'bg-primary text-primary-foreground h-14 -mt-2' : 'border border-primary text-primary h-10'} w-10 rounded-full flex items-center justify-center`}
+                            className={`${selectedTab === 'categories' ? 'bg-primary text-primary-foreground h-16 -mt-3' : 'border border-primary text-primary h-10'} w-10 rounded-full flex items-center justify-center transition-all duration-300`}
                         >
                             <div className="flex flex-col items-center justify-center">
                                 {selectedTab === 'categories' && (
-                                    <span className="text-[7px] uppercase tracking-wide">Cats</span>
+                                    <span className="text-[7px] uppercase tracking-wide mb-0.5 animate-in fade-in zoom-in duration-300">Cats</span>
                                 )}
-                                <Grid className="h-4 w-4 mt-0.5" />
+                                <Grid className="h-4 w-4" />
                             </div>
                         </button>
                     </div>
@@ -450,12 +449,12 @@ export function ClientHome() {
                         <button
                             onClick={() => setSelectedTab('event-types')}
                             aria-label="Event Types"
-                            className={`${selectedTab === 'event-types' ? 'bg-primary text-primary-foreground h-14 -mb-2' : 'border border-primary text-primary h-10'} w-10 rounded-full flex items-center justify-center`}
+                            className={`${selectedTab === 'event-types' ? 'bg-primary text-primary-foreground h-16 -mb-3' : 'border border-primary text-primary h-10'} w-10 rounded-full flex items-center justify-center transition-all duration-300`}
                         >
                             <div className="flex flex-col items-center justify-center">
                                 <Calendar className="h-4 w-4" />
                                 {selectedTab === 'event-types' && (
-                                    <span className="text-[7px] uppercase tracking-wide mt-0.5">types</span>
+                                    <span className="text-[7px] uppercase tracking-wide mt-0.5 animate-in fade-in zoom-in duration-300">types</span>
                                 )}
                             </div>
                         </button>

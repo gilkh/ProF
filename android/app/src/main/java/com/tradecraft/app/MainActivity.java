@@ -40,12 +40,35 @@ public class MainActivity extends BridgeActivity {
   }
 
   @Override
-  public void onStop() {
-    super.onStop();
+  public void onPause() {
+    super.onPause();
+    // Ensure cookies are persisted when app goes to background
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       CookieManager.getInstance().flush();
     } else {
       CookieSyncManager.getInstance().sync();
     }
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    // Double-check cookie persistence on stop
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      CookieManager.getInstance().flush();
+    } else {
+      CookieSyncManager.getInstance().sync();
+    }
+  }
+
+  @Override
+  public void onDestroy() {
+    // Ensure cookies are saved before app destruction
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      CookieManager.getInstance().flush();
+    } else {
+      CookieSyncManager.getInstance().sync();
+    }
+    super.onDestroy();
   }
 }

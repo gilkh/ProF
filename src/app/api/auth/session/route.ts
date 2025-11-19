@@ -101,16 +101,23 @@ export async function POST(req: Request) {
       }
     }
 
-    const expiresIn = 7 * 24 * 60 * 60 * 1000; // 7 days
+    // Set session to maximum allowed by Firebase (14 days) - we'll auto-refresh to keep it alive forever
+    const expiresIn = 14 * 24 * 60 * 60 * 1000; // 14 days (Firebase maximum)
     const sessionCookie = await adminAuth.createSessionCookie(idToken, { expiresIn });
 
     const cookieStore = await cookies();
+    
+    // Detect if request is from Capacitor WebView (via user-agent or custom header)
+    const userAgent = req.headers.get('user-agent') || '';
+    const isCapacitor = userAgent.includes('CapacitorWebView') || req.headers.get('x-capacitor-platform');
+    
     cookieStore.set({
       name: SESSION_COOKIE_NAME,
       value: sessionCookie,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      // Use 'none' for Capacitor apps accessing remote URLs, 'lax' for web
+      sameSite: isCapacitor ? 'none' : 'lax',
       path: '/',
       maxAge: Math.floor(expiresIn / 1000),
     });
