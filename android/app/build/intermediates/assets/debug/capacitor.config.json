@@ -1,0 +1,21 @@
+{
+	"appId": "com.tradecraft.app",
+	"appName": "Farhetkoun",
+	"webDir": "out",
+	"server": {
+		"url": "https://www.farhetkoun.com",
+		"cleartext": false,
+		"allowNavigation": [
+			"*"
+		]
+	},
+	"plugins": {
+		"FirebaseMessaging": {
+			"presentationOptions": [
+				"alert",
+				"badge",
+				"sound"
+			]
+		}
+	}
+}
