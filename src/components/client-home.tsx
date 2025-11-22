@@ -15,6 +15,7 @@ import type { Booking, ServiceOrOffer, UserProfile, SponsoredBanner, VendorProfi
 import { getBookingsForUser, getSavedItems, getServicesAndOffers, getUserProfile, getSponsoredBanners, getTopVendors } from '@/lib/services';
 import { Skeleton } from './ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
+import { useUserProfile, useUserBookings, useSavedItemsCount, useFeaturedItems, useBanners, useTopVendors } from '@/hooks/use-user-data';
 
 
 const MemoizedOfferCard = memo(OfferCard);
@@ -23,18 +24,18 @@ const MemoizedServiceCard = memo(ServiceCard);
 const StatCard = memo(({ title, value, icon: Icon, linkHref, linkText, isLoading }: { title: string, value: string | number, icon: React.ElementType, linkHref: string, linkText: string, isLoading: boolean }) => (
     <Card className="shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1">
-        <CardTitle className="text-sm font-medium">
-            {title}
-        </CardTitle>
-        <Icon className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">
+                {title}
+            </CardTitle>
+            <Icon className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent className="pt-0">
-        {isLoading ? <Skeleton className="h-6 w-16 mt-1" /> : <div className="text-xl font-bold">{value}</div>}
-        <Link href={linkHref}>
-            <p className="text-xs text-muted-foreground underline hover:text-primary">
-                {linkText}
-            </p>
-        </Link>
+            {isLoading ? <Skeleton className="h-6 w-16 mt-1" /> : <div className="text-xl font-bold">{value}</div>}
+            <Link href={linkHref}>
+                <p className="text-xs text-muted-foreground underline hover:text-primary">
+                    {linkText}
+                </p>
+            </Link>
         </CardContent>
     </Card>
 ));
@@ -63,13 +64,17 @@ QuickTile.displayName = 'QuickTile';
 
 export function ClientHome() {
     const { userId, isLoading: isAuthLoading } = useAuth();
-    const [user, setUser] = useState<UserProfile | null>(null);
-    const [upcomingBookings, setUpcomingBookings] = useState<Booking[]>([]);
-    const [savedItemsCount, setSavedItemsCount] = useState(0);
-    const [featuredItems, setFeaturedItems] = useState<ServiceOrOffer[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [banners, setBanners] = useState<SponsoredBanner[]>([]);
-    const [topVendors, setTopVendors] = useState<VendorProfile[]>([]);
+
+    // React Query Hooks
+    const { data: user, isLoading: isUserLoading } = useUserProfile();
+    const { data: bookings, isLoading: isBookingsLoading } = useUserBookings();
+    const { data: savedItemsCount, isLoading: isSavedLoading } = useSavedItemsCount();
+    const { data: featuredItems, isLoading: isFeaturedLoading } = useFeaturedItems();
+    const { data: banners, isLoading: isBannersLoading } = useBanners();
+    const { data: topVendors, isLoading: isVendorsLoading } = useTopVendors();
+
+    const upcomingBookings = bookings?.filter(b => b.date >= new Date()) || [];
+
     const [vendorCarouselApi, setVendorCarouselApi] = useState<CarouselApi | null>(null);
     const [picksCarouselApi, setPicksCarouselApi] = useState<CarouselApi | null>(null);
     const [selectedTab, setSelectedTab] = useState<'categories' | 'event-types'>('categories');
@@ -87,41 +92,6 @@ export function ClientHome() {
         listeners?: string[];
         steps: string[];
     }>({ steps: [] });
-
-    useEffect(() => {
-        async function loadDashboardData() {
-            if (!userId) {
-                if (!isAuthLoading) setIsLoading(false);
-                return;
-            };
-
-            setIsLoading(true);
-            try {
-                // Fetch data in parallel for better performance
-                const [userProfile, bookings, saved, featured, bannersRes, topVendorsRes] = await Promise.all([
-                    getUserProfile(userId),
-                    getBookingsForUser(userId),
-                    getSavedItems(userId, true), // Only fetch count
-                    getServicesAndOffers(undefined, 4), // Fetch 4 featured items
-                    getSponsoredBanners(),
-                    getTopVendors({ count: 12 }),
-                ]);
-                
-                setUser(userProfile)
-                setUpcomingBookings(bookings.filter(b => b.date >= new Date()));
-                setSavedItemsCount(Array.isArray(saved) ? saved.length : 0);
-                setFeaturedItems(featured);
-                setBanners(bannersRes);
-                setTopVendors(topVendorsRes);
-
-            } catch (error) {
-                console.error("Failed to load client dashboard:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        }
-        loadDashboardData();
-    }, [userId, isAuthLoading]);
 
     // Notification debug: run as soon as client home mounts with a user
     useEffect(() => {
@@ -201,16 +171,16 @@ export function ClientHome() {
         }
         runNotificationDiag();
         return () => {
-            try { if (unsubWeb) unsubWeb(); } catch {}
+            try { if (unsubWeb) unsubWeb(); } catch { }
         };
     }, [userId]);
-    
+
     const { specialOffers, featuredServices } = useMemo(() => ({
-        specialOffers: featuredItems.filter(i => i.type === 'offer').slice(0, 2),
-        featuredServices: featuredItems.filter(i => i.type === 'service').slice(0, 2)
+        specialOffers: featuredItems?.filter(i => i.type === 'offer').slice(0, 2) || [],
+        featuredServices: featuredItems?.filter(i => i.type === 'service').slice(0, 2) || []
     }), [featuredItems]);
 
-    const pageIsLoading = isLoading || isAuthLoading;
+    const pageIsLoading = isAuthLoading || isUserLoading || isBookingsLoading || isSavedLoading || isFeaturedLoading || isBannersLoading || isVendorsLoading;
 
     useEffect(() => {
         if (!vendorCarouselApi) return;
@@ -218,7 +188,7 @@ export function ClientHome() {
             try {
                 if (vendorCarouselApi.canScrollNext()) vendorCarouselApi.scrollNext();
                 else vendorCarouselApi.scrollTo(0);
-            } catch {}
+            } catch { }
         }, 3500);
         return () => clearInterval(id);
     }, [vendorCarouselApi]);
@@ -229,14 +199,14 @@ export function ClientHome() {
             try {
                 if (picksCarouselApi.canScrollNext()) picksCarouselApi.scrollNext();
                 else picksCarouselApi.scrollTo(0);
-            } catch {}
+            } catch { }
         }, 4000);
         return () => clearInterval(id);
     }, [picksCarouselApi]);
 
     return (
         <div className="space-y-8">
-            
+
 
             <Card className="relative overflow-hidden border-0 shadow-none">
                 <CardHeader className="p-0">
@@ -266,7 +236,7 @@ export function ClientHome() {
                         <div className="relative">
                             <Carousel opts={{ loop: true }}>
                                 <CarouselContent>
-                                    {(banners.length ? banners : featuredItems).map((b, i) => (
+                                    {(banners || featuredItems || []).map((b, i) => (
                                         <CarouselItem key={(b as any).id ?? i}>
                                             <div className="relative h-56 sm:h-72 w-full">
                                                 <img src={(b as any).image || (b as any).media?.[0]?.url || (b as any).imageUrl || ''} alt={(b as any).title || (b as any).vendorName || 'Sponsored'} className="h-full w-full object-cover" />
@@ -300,7 +270,7 @@ export function ClientHome() {
             </div>
 
             <div className="grid grid-cols-3 gap-1">
-                <QuickTile 
+                <QuickTile
                     title="Upcoming Bookings"
                     value={upcomingBookings.length}
                     icon={Calendar}
@@ -308,15 +278,15 @@ export function ClientHome() {
                     subtext="View your calendar"
                     isLoading={pageIsLoading}
                 />
-                <QuickTile 
+                <QuickTile
                     title="Saved Items"
-                    value={savedItemsCount}
+                    value={savedItemsCount || 0}
                     icon={Heart}
                     href="/client/saved"
                     subtext="View your favorites"
                     isLoading={pageIsLoading}
                 />
-                <QuickTile 
+                <QuickTile
                     title="Explore Services"
                     value={"50+"}
                     icon={Compass}
@@ -325,108 +295,108 @@ export function ClientHome() {
                     isLoading={pageIsLoading}
                 />
             </div>
-            
+
             <div className="rounded-2xl bg-primary/5 liquid-glass p-3 sm:p-4 flex items-center gap-1" style={{ ['--primary' as any]: '0 65% 45%' }}>
                 <div className="flex-1 rounded-2xl pt-0 sm:pt-1 px-2 sm:px-3 pb-3">
                     <Tabs value={selectedTab}>
                         <TabsContent value="categories">
-            <div className="space-y-2">
-                {/* Mobile: fun, compact tiles (3 per row) */}
-                <div className="grid grid-cols-4 gap-2 sm:hidden">
-                    {[
-                        { label: 'Catering', q: 'Catering & Sweets', Icon: UtensilsCrossed },
-                        { label: 'Photography', q: 'Photography & Videography', Icon: Camera },
-                        { label: 'Videography', q: 'Photography & Videography', Icon: Video },
-                        { label: 'Cakes', q: 'Catering & Sweets', Icon: CakeIcon },
-                        { label: 'Zaffe', q: 'Entertainment', Icon: Music },
-                        { label: 'DJ & Sound', q: 'Lighting & Sound', Icon: Headphones },
-                        { label: 'Makeup & Hair', q: 'Beauty & Grooming', Icon: Brush },
-                        { label: 'Flowers', q: 'Decoration', Icon: Flower },
-                        { label: 'Venues', q: 'Venues', Icon: Building2 },
-                        { label: 'Cars', q: 'Transportation', Icon: Car },
-                        { label: 'Dresses', q: 'Rentals & Furniture', Icon: Shirt },
-                        { label: 'Decoration', q: 'Decoration', Icon: PartyPopper },
-                    ].map((c, i) => (
-                        <Link key={c.label} href={`/client/explore?category=${encodeURIComponent(c.q)}`} aria-label={c.label} className="group">
-                            <div className="flex flex-col items-center gap-1.5 p-2 rounded-xl transition duration-200">
-                                <div className="h-12 w-12 rounded-xl liquid-glass-solid flex items-center justify-center active:scale-95">
-                                    <c.Icon className="h-5 w-5 text-red-500 group-active:text-red-600" />
+                            <div className="space-y-2">
+                                {/* Mobile: fun, compact tiles (3 per row) */}
+                                <div className="grid grid-cols-4 gap-2 sm:hidden">
+                                    {[
+                                        { label: 'Catering', q: 'Catering & Sweets', Icon: UtensilsCrossed },
+                                        { label: 'Photography', q: 'Photography & Videography', Icon: Camera },
+                                        { label: 'Videography', q: 'Photography & Videography', Icon: Video },
+                                        { label: 'Cakes', q: 'Catering & Sweets', Icon: CakeIcon },
+                                        { label: 'Zaffe', q: 'Entertainment', Icon: Music },
+                                        { label: 'DJ & Sound', q: 'Lighting & Sound', Icon: Headphones },
+                                        { label: 'Makeup & Hair', q: 'Beauty & Grooming', Icon: Brush },
+                                        { label: 'Flowers', q: 'Decoration', Icon: Flower },
+                                        { label: 'Venues', q: 'Venues', Icon: Building2 },
+                                        { label: 'Cars', q: 'Transportation', Icon: Car },
+                                        { label: 'Dresses', q: 'Rentals & Furniture', Icon: Shirt },
+                                        { label: 'Decoration', q: 'Decoration', Icon: PartyPopper },
+                                    ].map((c, i) => (
+                                        <Link key={c.label} href={`/client/explore?category=${encodeURIComponent(c.q)}`} aria-label={c.label} className="group">
+                                            <div className="flex flex-col items-center gap-1.5 p-2 rounded-xl transition duration-200">
+                                                <div className="h-12 w-12 rounded-xl liquid-glass-solid flex items-center justify-center active:scale-95">
+                                                    <c.Icon className="h-5 w-5 text-red-500 group-active:text-red-600" />
+                                                </div>
+                                                <div className="glass-text text-[12px] font-semibold leading-tight text-center">{c.label}</div>
+                                            </div>
+                                        </Link>
+                                    ))}
                                 </div>
-                                <div className="glass-text text-[12px] font-semibold leading-tight text-center">{c.label}</div>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
 
-                {/* Desktop/Tablet: rich image tiles */}
-                <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {[
-                        { label: 'Catering', emoji: '🍽️', q: 'Catering & Sweets', image: 'https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Photography', emoji: '📸', q: 'Photography & Videography', image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Videography', emoji: '🎥', q: 'Photography & Videography', image: 'https://images.unsplash.com/photo-1585670210693-e7fdd16b142e?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Cakes', emoji: '🎂', q: 'Catering & Sweets', image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Zaffe', emoji: '🎼', q: 'Entertainment', image: 'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'DJ & Sound', emoji: '🎧', q: 'Lighting & Sound', image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Makeup & Hair', emoji: '💄', q: 'Beauty & Grooming', image: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Flowers', emoji: '🌸', q: 'Decoration', image: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Venues', emoji: '🏛️', q: 'Venues', image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Cars', emoji: '🚗', q: 'Transportation', image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Dresses', emoji: '👗', q: 'Rentals & Furniture', image: 'https://images.unsplash.com/photo-1594552072238-b8a33785b261?q=80&w=1200&auto=format&fit=crop' },
-                        { label: 'Decoration', emoji: '🎈', q: 'Decoration', image: 'https://images.unsplash.com/photo-1478146059778-26028b07395a?q=80&w=1200&auto=format&fit=crop' },
-                    ].map((c) => (
-                        <Link key={c.label} href={`/client/explore?category=${encodeURIComponent(c.q)}`}>
-                            <Card className="group overflow-hidden hover:shadow-md transition transform hover:scale-[1.02] animate-scale-in liquid-glass">
-                                <div className="relative h-36">
-                                    <img loading="lazy" src={c.image} alt={c.label} className="h-full w-full object-cover" />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
-                                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                                        <div className="flex items-center gap-2 text-white">
-                                            <span className="text-xl">{c.emoji}</span>
-                                            <div className="text-sm font-semibold">{c.label}</div>
-                                        </div>
-                                        <Button size="sm" variant="secondary" className="bg-white/90 text-black hover:bg-white">Explore</Button>
-                                    </div>
+                                {/* Desktop/Tablet: rich image tiles */}
+                                <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                    {[
+                                        { label: 'Catering', emoji: '🍽️', q: 'Catering & Sweets', image: 'https://images.unsplash.com/photo-1555244162-803834f70033?q=80&w=1200&auto=format&fit=crop' },
+                                        { label: 'Photography', emoji: '📸', q: 'Photography & Videography', image: 'https://images.unsplash.com/photo-1537633552985-df8429e8048b?q=80&w=1200&auto=format&fit=crop' },
+                                        { label: 'Videography', emoji: '🎥', q: 'Photography & Videography', image: 'https://images.unsplash.com/photo-1585670210693-e7fdd16b142e?q=80&w=1200&auto=format&fit=crop' },
+                                        { label: 'Cakes', emoji: '🎂', q: 'Catering & Sweets', image: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?q=80&w=1200&auto=format&fit=crop' },
+                                        { label: 'Zaffe', emoji: '🎼', q: 'Entertainment', image: 'https://images.unsplash.com/photo-1504196606672-aef5c9cefc92?q=80&w=1200&auto=format&fit=crop' },
+                                        { label: 'DJ & Sound', emoji: '🎧', q: 'Lighting & Sound', image: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=1200&auto=format&fit=crop' },
+                                        { label: 'Makeup & Hair', emoji: '💄', q: 'Beauty & Grooming', image: 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?q=80&w=1200&auto=format&fit=crop' },
+                                        { label: 'Flowers', emoji: '🌸', q: 'Decoration', image: 'https://images.unsplash.com/photo-1561181286-d3fee7d55364?q=80&w=1200&auto=format&fit=crop' },
+                                        { label: 'Venues', emoji: '🏛️', q: 'Venues', image: 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1200&auto=format&fit=crop' },
+                                        { label: 'Cars', emoji: '🚗', q: 'Transportation', image: 'https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=1200&auto=format&fit=crop' },
+                                        { label: 'Dresses', emoji: '👗', q: 'Rentals & Furniture', image: 'https://images.unsplash.com/photo-1594552072238-b8a33785b261?q=80&w=1200&auto=format&fit=crop' },
+                                        { label: 'Decoration', emoji: '🎈', q: 'Decoration', image: 'https://images.unsplash.com/photo-1478146059778-26028b07395a?q=80&w=1200&auto=format&fit=crop' },
+                                    ].map((c) => (
+                                        <Link key={c.label} href={`/client/explore?category=${encodeURIComponent(c.q)}`}>
+                                            <Card className="group overflow-hidden hover:shadow-md transition transform hover:scale-[1.02] animate-scale-in liquid-glass">
+                                                <div className="relative h-36">
+                                                    <img loading="lazy" src={c.image} alt={c.label} className="h-full w-full object-cover" />
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                                                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                                                        <div className="flex items-center gap-2 text-white">
+                                                            <span className="text-xl">{c.emoji}</span>
+                                                            <div className="text-sm font-semibold">{c.label}</div>
+                                                        </div>
+                                                        <Button size="sm" variant="secondary" className="bg-white/90 text-black hover:bg-white">Explore</Button>
+                                                    </div>
+                                                </div>
+                                            </Card>
+                                        </Link>
+                                    ))}
                                 </div>
-                            </Card>
-                        </Link>
-                    ))}
-                </div>
-            </div>
+                            </div>
                         </TabsContent>
 
                         <TabsContent value="event-types">
-            <div className="space-y-2">
-                <div className="grid grid-cols-2 gap-2 md:grid-cols-2">
-                    {[
-                        { label: 'Birthdays', emoji: '🎂', q: 'Birthday Party' },
-                        { label: 'Newborn Celebrations', emoji: '👶', q: 'Baby Shower' },
-                        { label: 'Engagements', emoji: '💍', q: 'Engagement' },
-                        { label: 'Weddings', emoji: '💒', q: 'Wedding' },
-                        { label: 'Private Parties', emoji: '🎉', q: 'Other' },
-                        { label: 'Corporate Events', emoji: '🏢', q: 'Corporate Event' },
-                        { label: 'Graduations', emoji: '🎓', q: 'Graduation' },
-                        { label: 'Photoshoots', emoji: '📸', q: 'Other' },
-                    ].map((e) => (
-                        <Link key={e.label} href={`/client/explore?eventType=${encodeURIComponent(e.q)}`}>
-                            <div className="relative h-20 px-3 liquid-glass-solid rounded-xl flex flex-col items-center justify-center text-center">
-                                <div className="relative tilt-mini mb-1">
-                                    <span className="text-2xl">{e.emoji}</span>
-                                    {e.label === 'Birthdays' && (
-                                        <span className="absolute -top-2 -right-2 flame-dot" />
-                                    )}
-                                    {e.label === 'Engagements' && (
-                                        <span className="absolute -top-2 -right-2 spark-dot" />
-                                    )}
-                                    {e.label === 'Photoshoots' && (
-                                        <span className="flash-overlay" style={{ right: '-6px', top: '-6px' }} />
-                                    )}
+                            <div className="space-y-2">
+                                <div className="grid grid-cols-2 gap-2 md:grid-cols-2">
+                                    {[
+                                        { label: 'Birthdays', emoji: '🎂', q: 'Birthday Party' },
+                                        { label: 'Newborn Celebrations', emoji: '👶', q: 'Baby Shower' },
+                                        { label: 'Engagements', emoji: '💍', q: 'Engagement' },
+                                        { label: 'Weddings', emoji: '💒', q: 'Wedding' },
+                                        { label: 'Private Parties', emoji: '🎉', q: 'Other' },
+                                        { label: 'Corporate Events', emoji: '🏢', q: 'Corporate Event' },
+                                        { label: 'Graduations', emoji: '🎓', q: 'Graduation' },
+                                        { label: 'Photoshoots', emoji: '📸', q: 'Other' },
+                                    ].map((e) => (
+                                        <Link key={e.label} href={`/client/explore?eventType=${encodeURIComponent(e.q)}`}>
+                                            <div className="relative h-20 px-3 liquid-glass-solid rounded-xl flex flex-col items-center justify-center text-center">
+                                                <div className="relative tilt-mini mb-1">
+                                                    <span className="text-2xl">{e.emoji}</span>
+                                                    {e.label === 'Birthdays' && (
+                                                        <span className="absolute -top-2 -right-2 flame-dot" />
+                                                    )}
+                                                    {e.label === 'Engagements' && (
+                                                        <span className="absolute -top-2 -right-2 spark-dot" />
+                                                    )}
+                                                    {e.label === 'Photoshoots' && (
+                                                        <span className="flash-overlay" style={{ right: '-6px', top: '-6px' }} />
+                                                    )}
+                                                </div>
+                                                <div className="glass-text text-sm font-semibold leading-tight">{e.label}</div>
+                                            </div>
+                                        </Link>
+                                    ))}
                                 </div>
-                                <div className="glass-text text-sm font-semibold leading-tight">{e.label}</div>
                             </div>
-                        </Link>
-                    ))}
-                </div>
-            </div>
                         </TabsContent>
                     </Tabs>
                 </div>
@@ -475,7 +445,7 @@ export function ClientHome() {
                     <Card className="overflow-hidden">
                         <Carousel setApi={setVendorCarouselApi} opts={{ loop: true, align: 'start' }}>
                             <CarouselContent>
-                                {topVendors.map(v => (
+                                {(topVendors || []).map(v => (
                                     <CarouselItem key={v.id} className="basis-1/2 p-2">
                                         <Link href={`/vendor/${v.id}`}>
                                             <Card className="w-full">
@@ -549,7 +519,7 @@ export function ClientHome() {
                 <div>
                     <h2 className="text-lg font-semibold sm:text-xl">Offers & Promotions</h2>
                 </div>
-                 {pageIsLoading ? (
+                {pageIsLoading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Skeleton className="h-96 w-full rounded-xl" />
                         <Skeleton className="h-96 w-full rounded-xl" />
@@ -567,14 +537,14 @@ export function ClientHome() {
                 <div>
                     <h2 className="text-lg font-semibold sm:text-xl">Featured Services</h2>
                 </div>
-                 {pageIsLoading ? (
+                {pageIsLoading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Skeleton className="h-96 w-full rounded-xl" />
                         <Skeleton className="h-96 w-full rounded-xl" />
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                       {featuredServices.map((item) =>
+                        {featuredServices.map((item) =>
                             <MemoizedServiceCard key={item.id} service={item} role="client" />
                         )}
                     </div>

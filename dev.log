@@ -4,85 +4,3409 @@
 
    ▲ Next.js 15.3.3 (Turbopack)
    - Local:        http://localhost:9002
-   - Network:      http://26.23.1.62:9002
+   - Network:      http://26.26.87.44:9002
    - Environments: .env.local
 
  ✓ Starting...
- ✓ Compiled middleware in 121ms
- ✓ Ready in 1496ms
+ ✓ Compiled middleware in 137ms
+ ✓ Ready in 1600ms
  ⚠ Webpack is configured while Turbopack is not, which may cause problems.
  ⚠ See instructions if you need to configure Turbopack:
   https://nextjs.org/docs/app/api-reference/next-config-js/turbo
 
- ○ Compiling /client/home ...
- ✓ Compiled /client/home in 3s
- GET /client/home 200 in 6286ms
- ○ Compiling /favicon.ico ...
- GET /favicon.ico?favicon.cc977519.ico 200 in 674ms
- ✓ Compiled /favicon.ico in 709ms
- GET /api/auth/session 200 in 843ms
- GET /api/auth/session 200 in 456ms
- GET /api/auth/session 200 in 483ms
- GET /api/auth/session 200 in 468ms
- ○ Compiling /_not-found/page ...
- GET /api/auth/session 200 in 508ms
- ✓ Compiled /_not-found/page in 743ms
- GET /placeholder.png 404 in 809ms
- GET /api/auth/session 200 in 481ms
- GET /api/auth/session 200 in 430ms
- GET /api/auth/session 200 in 460ms
- GET /api/auth/session 200 in 457ms
- GET /api/auth/session 200 in 451ms
- GET /api/auth/session 200 in 459ms
- GET /api/auth/session 200 in 428ms
- GET /api/auth/session 200 in 454ms
- GET /api/auth/session 200 in 454ms
- GET /api/auth/session 200 in 433ms
- ✓ Compiled in 114ms
- GET /api/auth/session 200 in 442ms
- GET /client/home 200 in 1082ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 342ms
- ✓ Compiled in 57ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 309ms
- GET /api/auth/session 200 in 589ms
- GET /api/auth/session 200 in 455ms
- GET /api/auth/session 200 in 492ms
- GET /placeholder.png 404 in 297ms
- GET /api/auth/session 200 in 637ms
- GET /api/auth/session 200 in 449ms
+ ○ Compiling /admin/login/jwrvbo3uibr53487rbv847bev4 ...
+ ✓ Compiled /admin/login/jwrvbo3uibr53487rbv847bev4 in 2.3s
+ GET /admin/login/jwrvbo3uibr53487rbv847bev4 200 in 2634ms
+ ✓ Compiled /api/auth/session in 306ms
+ GET /api/auth/session 200 in 1922ms
+ ✓ Compiled /api/auth/csrf in 245ms
+ GET /api/auth/csrf 200 in 288ms
  GET /api/auth/session 200 in 438ms
- GET /api/auth/session 200 in 416ms
- GET /api/auth/session 200 in 442ms
- GET /api/auth/session 200 in 441ms
- GET /api/auth/session 200 in 427ms
- GET /api/auth/session 200 in 449ms
- GET /api/auth/session 200 in 428ms
- GET /api/auth/session 200 in 439ms
- GET /api/auth/session 200 in 474ms
- GET /api/auth/session 200 in 448ms
- GET /api/auth/session 200 in 423ms
- ✓ Compiled in 206ms
- ✓ Compiled /client/home in 134ms
- GET /client/home 200 in 1242ms
- GET /favicon.ico?favicon.cc977519.ico 200 in 317ms
- GET /client/home 200 in 1880ms
- GET /api/auth/session 200 in 474ms
- GET /api/auth/session 200 in 466ms
- GET /api/auth/session 200 in 463ms
- GET /api/auth/session 200 in 454ms
- GET /placeholder.png 404 in 222ms
- GET /api/auth/session 200 in 443ms
- GET /api/auth/session 200 in 446ms
- GET /api/auth/session 200 in 436ms
- GET /api/auth/session 200 in 406ms
- GET /api/auth/session 200 in 452ms
- GET /api/auth/session 200 in 457ms
+ ✓ Compiled /api/auth/logout in 231ms
+ POST /api/auth/logout 200 in 746ms
+ GET /api/auth/session 200 in 49ms
+ GET /api/auth/session 200 in 43ms
+ GET /api/auth/csrf 200 in 43ms
+ GET /api/auth/csrf 200 in 51ms
+ POST /api/auth/session 200 in 1484ms
+ POST /api/auth/session 200 in 1433ms
+ GET /api/auth/csrf 200 in 74ms
+ GET /api/auth/session 200 in 462ms
+ GET /api/auth/session 200 in 471ms
+ POST /api/auth/session 200 in 721ms
+ ○ Compiling /client/home ...
+ ✓ Compiled /client/home in 1305ms
+ GET /client/home 200 in 1961ms
+ GET /api/auth/session 200 in 467ms
+ GET /api/auth/session 200 in 426ms
  GET /api/auth/session 200 in 435ms
- GET /api/auth/session 200 in 452ms
- GET /api/auth/session 200 in 517ms
+ GET /api/auth/session 200 in 414ms
+ GET /api/auth/session 200 in 429ms
+ GET /api/auth/session 200 in 440ms
+ GET /api/auth/session 200 in 427ms
+ GET /api/auth/session 200 in 450ms
+ GET /api/auth/session 200 in 432ms
+ ○ Compiling /_not-found/page ...
+ ✓ Compiled /_not-found/page in 734ms
+ GET /placeholder.png 404 in 792ms
+ GET /api/auth/session 200 in 440ms
+ GET /api/auth/session 200 in 428ms
+ GET /api/auth/session 200 in 422ms
+ GET /api/auth/session 200 in 424ms
+ GET /api/auth/session 200 in 431ms
+ GET /api/auth/session 200 in 430ms
+ GET /api/auth/session 200 in 435ms
+ GET /api/auth/session 200 in 400ms
+ GET /api/auth/session 200 in 441ms
+ GET /api/auth/session 200 in 428ms
+ GET /api/auth/session 200 in 389ms
+ GET /api/auth/session 200 in 441ms
+ GET /api/auth/session 200 in 434ms
+ GET /api/auth/session 200 in 370ms
+ GET /api/auth/session 200 in 438ms
+ ○ Compiling /client/explore ...
+ GET /api/auth/session 200 in 447ms
+ ✓ Compiled /client/explore in 1182ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /api/auth/session 200 in 425ms
+ GET /client/explore 200 in 1274ms
+ GET /api/auth/session 200 in 445ms
+ GET /api/auth/session 200 in 417ms
+ GET /api/auth/session 200 in 373ms
+ GET /api/auth/session 200 in 441ms
+ GET /api/auth/session 200 in 403ms
+ GET /api/auth/session 200 in 416ms
+ GET /api/auth/session 200 in 423ms
+ GET /api/auth/session 200 in 400ms
+ GET /api/auth/session 200 in 418ms
+ GET /api/auth/session 200 in 408ms
+ GET /api/auth/session 200 in 432ms
+ GET /api/auth/session 200 in 419ms
+ GET /api/auth/session 200 in 387ms
+ GET /api/auth/session 200 in 378ms
+ GET /api/auth/session 200 in 392ms
+ GET /api/auth/session 200 in 404ms
+ GET /api/auth/session 200 in 386ms
+ GET /api/auth/session 200 in 419ms
+ GET /api/auth/session 200 in 392ms
+ GET /api/auth/session 200 in 411ms
+ GET /api/auth/session 200 in 400ms
+ GET /api/auth/session 200 in 381ms
+ GET /api/auth/session 200 in 397ms
+ GET /api/auth/session 200 in 414ms
+ GET /api/auth/session 200 in 415ms
+ GET /api/auth/session 200 in 403ms
+ GET /api/auth/session 200 in 390ms
+ GET /api/auth/session 200 in 369ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/csrf 200 in 52ms
+ GET /api/auth/session 429 in 65ms
+ GET /api/auth/csrf 200 in 71ms
+ GET /api/auth/session 429 in 82ms
+ GET /api/auth/csrf 200 in 89ms
+ GET /api/auth/session 429 in 106ms
+ GET /api/auth/csrf 200 in 105ms
+ GET /api/auth/session 429 in 81ms
+ GET /api/auth/csrf 200 in 96ms
+ GET /api/auth/session 429 in 78ms
+ GET /api/auth/csrf 200 in 59ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/csrf 200 in 45ms
+ POST /api/auth/session 200 in 635ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/csrf 200 in 43ms
+ POST /api/auth/session 200 in 1097ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 37ms
+ GET /api/auth/csrf 200 in 43ms
+ POST /api/auth/session 200 in 1182ms
+ POST /api/auth/session 200 in 988ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/csrf 200 in 54ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/csrf 200 in 36ms
+ POST /api/auth/session 200 in 1034ms
+ POST /api/auth/session 200 in 1299ms
+ GET /api/auth/csrf 200 in 75ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/csrf 200 in 40ms
+ POST /api/auth/session 200 in 1045ms
+ GET /api/auth/csrf 200 in 58ms
+ POST /api/auth/session 429 in 39ms
+ POST /api/auth/session 200 in 593ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/csrf 200 in 58ms
+ POST /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 55ms
+ POST /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 41ms
+ POST /api/auth/session 200 in 1052ms
+ GET /api/auth/session 429 in 55ms
+ POST /api/auth/session 200 in 1009ms
+ GET /api/auth/session 429 in 43ms
+ POST /api/auth/session 200 in 1158ms
+ POST /api/auth/session 200 in 990ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 50ms
+ ✓ Compiled in 163ms
+ ✓ Compiled in 158ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/csrf 200 in 64ms
+ GET /api/auth/session 429 in 70ms
+ GET /api/auth/csrf 200 in 79ms
+ POST /api/auth/session 429 in 81ms
+ GET /api/auth/session 429 in 89ms
+ GET /api/auth/csrf 200 in 97ms
+ POST /api/auth/session 429 in 97ms
+ GET /api/auth/session 429 in 89ms
+ GET /api/auth/csrf 200 in 110ms
+ POST /api/auth/session 429 in 115ms
+ GET /api/auth/session 429 in 113ms
+ GET /api/auth/csrf 200 in 116ms
+ POST /api/auth/session 429 in 112ms
+ GET /api/auth/session 429 in 105ms
+ POST /api/auth/session 429 in 77ms
+ GET /api/auth/csrf 200 in 86ms
+ GET /api/auth/session 429 in 83ms
+ GET /api/auth/csrf 200 in 84ms
+ POST /api/auth/session 429 in 89ms
+ GET /api/auth/session 429 in 95ms
+ GET /api/auth/csrf 200 in 98ms
+ POST /api/auth/session 429 in 90ms
+ GET /api/auth/session 429 in 94ms
+ GET /api/auth/session 429 in 76ms
+ POST /api/auth/session 429 in 84ms
+ GET /api/auth/csrf 200 in 91ms
+ GET /api/auth/session 429 in 105ms
+ GET /api/auth/csrf 200 in 109ms
+ POST /api/auth/session 429 in 129ms
+ GET /api/auth/session 429 in 147ms
+ GET /api/auth/csrf 200 in 150ms
+ POST /api/auth/session 429 in 157ms
+ GET /api/auth/session 429 in 167ms
+ GET /api/auth/csrf 429 in 169ms
+ POST /api/auth/session 429 in 147ms
+ GET /client/home 200 in 274ms
+ GET /api/auth/session 429 in 211ms
+ GET /api/auth/csrf 429 in 211ms
+ POST /api/auth/session 429 in 221ms
+ GET /api/auth/session 429 in 123ms
+ GET /api/auth/csrf 429 in 118ms
+ POST /api/auth/session 429 in 153ms
+ GET /api/auth/session 429 in 153ms
+ POST /api/auth/session 429 in 142ms
+ GET /api/auth/csrf 429 in 157ms
+ GET /api/auth/session 429 in 102ms
+ GET /api/auth/csrf 429 in 102ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/session 429 in 94ms
+ POST /api/auth/session 429 in 87ms
+ GET /api/auth/csrf 429 in 97ms
+ GET /api/auth/session 429 in 89ms
+ GET /api/auth/csrf 429 in 88ms
+ POST /api/auth/session 429 in 96ms
+ GET /api/auth/session 429 in 114ms
+ GET /api/auth/csrf 429 in 116ms
+ POST /api/auth/session 429 in 117ms
+ GET /api/auth/csrf 429 in 105ms
+ POST /api/auth/session 429 in 104ms
+ GET /api/auth/session 429 in 126ms
+ GET /api/auth/csrf 429 in 103ms
+ POST /api/auth/session 429 in 104ms
+ GET /api/auth/session 429 in 103ms
+ GET /api/auth/csrf 429 in 120ms
+ POST /api/auth/session 429 in 131ms
+ GET /api/auth/session 429 in 132ms
+ GET /api/auth/csrf 429 in 104ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/session 429 in 94ms
+ POST /api/auth/session 429 in 79ms
+ GET /api/auth/csrf 429 in 91ms
+ GET /api/auth/session 429 in 87ms
+ GET /api/auth/csrf 429 in 86ms
+ POST /api/auth/session 429 in 87ms
+ GET /api/auth/session 429 in 91ms
+ GET /api/auth/csrf 429 in 100ms
+ POST /api/auth/session 429 in 108ms
+ GET /api/auth/session 429 in 103ms
+ GET /api/auth/csrf 429 in 101ms
+ POST /api/auth/session 429 in 108ms
+ GET /api/auth/session 429 in 112ms
+ GET /api/auth/csrf 429 in 113ms
+ POST /api/auth/session 429 in 120ms
+ GET /api/auth/session 429 in 109ms
+ GET /api/auth/csrf 429 in 89ms
+ POST /api/auth/session 429 in 100ms
+ GET /api/auth/session 429 in 90ms
+ GET /api/auth/csrf 429 in 97ms
+ POST /api/auth/session 429 in 98ms
+ GET /api/auth/session 429 in 94ms
+ GET /api/auth/csrf 429 in 109ms
+ POST /api/auth/session 429 in 109ms
+ GET /api/auth/session 429 in 109ms
+ POST /api/auth/session 429 in 97ms
+ GET /api/auth/csrf 429 in 107ms
+ GET /api/auth/session 429 in 86ms
+ GET /api/auth/csrf 429 in 109ms
+ POST /api/auth/session 429 in 112ms
+ GET /api/auth/session 429 in 121ms
+ GET /api/auth/csrf 429 in 106ms
+ POST /api/auth/session 429 in 117ms
+ GET /api/auth/session 429 in 116ms
+ GET /api/auth/csrf 429 in 101ms
+ POST /api/auth/session 429 in 94ms
+ GET /api/auth/csrf 429 in 72ms
+ POST /api/auth/session 429 in 78ms
+ GET /api/auth/csrf 429 in 80ms
+ POST /api/auth/session 429 in 79ms
+ POST /api/auth/session 429 in 73ms
+ GET /api/auth/csrf 429 in 79ms
+ GET /api/auth/session 429 in 86ms
+ POST /api/auth/session 429 in 95ms
+ GET /api/auth/csrf 429 in 103ms
+ GET /api/auth/csrf 429 in 97ms
+ GET /api/auth/session 429 in 117ms
+ POST /api/auth/session 429 in 128ms
+ POST /api/auth/session 429 in 107ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 93ms
+ GET /placeholder.png 404 in 95ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/csrf 429 in 61ms
+ GET /api/auth/session 429 in 71ms
+ POST /api/auth/session 429 in 93ms
+ GET /api/auth/csrf 429 in 103ms
+ GET /api/auth/session 429 in 96ms
+ POST /api/auth/session 429 in 83ms
+ GET /api/auth/csrf 429 in 90ms
+ GET /api/auth/session 429 in 81ms
+ GET /api/auth/csrf 429 in 82ms
+ POST /api/auth/session 429 in 86ms
+ GET /api/auth/session 429 in 84ms
+ GET /api/auth/csrf 429 in 89ms
+ POST /api/auth/session 429 in 89ms
+ GET /api/auth/session 429 in 86ms
+ GET /api/auth/csrf 429 in 71ms
+ POST /api/auth/session 429 in 71ms
+ GET /api/auth/session 429 in 71ms
+ GET /api/auth/csrf 429 in 72ms
+ POST /api/auth/session 429 in 74ms
+ GET /api/auth/session 429 in 73ms
+ GET /api/auth/csrf 429 in 82ms
+ POST /api/auth/session 429 in 85ms
+ GET /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 93ms
+ POST /api/auth/session 429 in 88ms
+ GET /api/auth/session 429 in 88ms
+ POST /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 66ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 44ms
+ ✓ Compiled in 138ms
+ ✓ Compiled in 151ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/csrf 429 in 77ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/csrf 429 in 133ms
+ POST /api/auth/session 429 in 140ms
+ GET /api/auth/session 429 in 144ms
+ GET /api/auth/csrf 429 in 154ms
+ POST /api/auth/session 429 in 163ms
+ GET /api/auth/session 429 in 154ms
+ GET /api/auth/csrf 429 in 117ms
+ POST /api/auth/session 429 in 115ms
+ GET /api/auth/session 429 in 106ms
+ POST /api/auth/session 429 in 122ms
+ GET /api/auth/csrf 429 in 138ms
+ GET /api/auth/session 429 in 121ms
+ GET /api/auth/csrf 429 in 121ms
+ POST /api/auth/session 429 in 123ms
+ GET /api/auth/session 429 in 126ms
+ GET /api/auth/csrf 429 in 140ms
+ POST /api/auth/session 429 in 138ms
+ GET /api/auth/session 429 in 141ms
+ GET /api/auth/csrf 429 in 118ms
+ POST /api/auth/session 429 in 120ms
+ GET /api/auth/session 429 in 116ms
+ GET /api/auth/csrf 429 in 116ms
+ GET /api/auth/session 429 in 108ms
+ POST /api/auth/session 429 in 118ms
+ GET /api/auth/csrf 429 in 101ms
+ POST /api/auth/session 429 in 102ms
+ GET /api/auth/session 429 in 100ms
+ GET /api/auth/csrf 429 in 124ms
+ GET /api/auth/session 429 in 121ms
+ POST /api/auth/session 429 in 133ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /client/explore 200 in 168ms
+ POST /api/auth/session 429 in 143ms
+ GET /api/auth/csrf 429 in 154ms
+ GET /api/auth/session 429 in 144ms
+ GET /api/auth/csrf 429 in 107ms
+ GET /api/auth/session 429 in 114ms
+ POST /api/auth/session 429 in 140ms
+ GET /api/auth/csrf 429 in 145ms
+ GET /api/auth/session 429 in 152ms
+ POST /api/auth/session 429 in 144ms
+ GET /api/auth/csrf 429 in 129ms
+ POST /api/auth/session 429 in 129ms
+ GET /api/auth/session 429 in 127ms
+ GET /api/auth/csrf 429 in 96ms
+ POST /api/auth/session 429 in 97ms
+ GET /api/auth/session 429 in 92ms
+ GET /api/auth/csrf 429 in 81ms
+ POST /api/auth/session 429 in 82ms
+ GET /api/auth/csrf 429 in 88ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/session 429 in 106ms
+ GET /api/auth/csrf 429 in 102ms
+ POST /api/auth/session 429 in 102ms
+ GET /api/auth/session 429 in 87ms
+ POST /api/auth/session 429 in 78ms
+ GET /api/auth/csrf 429 in 87ms
+ GET /api/auth/session 429 in 73ms
+ GET /api/auth/csrf 429 in 77ms
+ POST /api/auth/session 429 in 81ms
+ GET /api/auth/session 429 in 84ms
+ POST /api/auth/session 429 in 83ms
+ GET /api/auth/csrf 429 in 90ms
+ GET /api/auth/session 429 in 95ms
+ POST /api/auth/session 429 in 89ms
+ GET /api/auth/csrf 429 in 103ms
+ GET /api/auth/session 429 in 114ms
+ GET /api/auth/csrf 429 in 103ms
+ POST /api/auth/session 429 in 111ms
+ GET /api/auth/session 429 in 134ms
+ POST /api/auth/session 429 in 127ms
+ GET /api/auth/csrf 429 in 139ms
+ GET /api/auth/session 429 in 136ms
+ GET /api/auth/csrf 429 in 148ms
+ POST /api/auth/session 429 in 150ms
+ GET /client/home 200 in 223ms
+ GET /api/auth/session 429 in 180ms
+ GET /api/auth/csrf 429 in 172ms
+ POST /api/auth/session 429 in 187ms
+ GET /api/auth/session 429 in 146ms
+ GET /api/auth/csrf 429 in 153ms
+ POST /api/auth/session 429 in 157ms
+ GET /api/auth/session 429 in 143ms
+ GET /api/auth/csrf 429 in 124ms
+ POST /api/auth/session 429 in 138ms
+ GET /api/auth/session 429 in 124ms
+ POST /api/auth/session 429 in 109ms
+ GET /api/auth/csrf 429 in 126ms
+ GET /api/auth/session 429 in 121ms
+ GET /api/auth/csrf 429 in 130ms
+ POST /api/auth/session 429 in 134ms
+ GET /api/auth/session 429 in 121ms
+ GET /api/auth/csrf 429 in 122ms
+ POST /api/auth/session 429 in 125ms
+ GET /api/auth/session 429 in 122ms
+ GET /api/auth/csrf 429 in 124ms
+ POST /api/auth/session 429 in 124ms
+ GET /api/auth/session 429 in 126ms
+ GET /api/auth/csrf 429 in 125ms
+ POST /api/auth/session 429 in 126ms
+ GET /api/auth/session 429 in 132ms
+ GET /api/auth/csrf 429 in 134ms
+ POST /api/auth/session 429 in 125ms
+ GET /api/auth/session 429 in 131ms
+ GET /api/auth/csrf 429 in 131ms
+ POST /api/auth/session 429 in 136ms
+ GET /api/auth/session 429 in 125ms
+ GET /api/auth/csrf 429 in 124ms
+ POST /api/auth/session 429 in 124ms
+ GET /api/auth/session 429 in 117ms
+ GET /api/auth/csrf 429 in 111ms
+ POST /api/auth/session 429 in 128ms
+ GET /api/auth/session 429 in 128ms
+ GET /api/auth/csrf 429 in 112ms
+ POST /api/auth/session 429 in 115ms
+ GET /api/auth/session 429 in 101ms
+ POST /api/auth/session 429 in 99ms
+ GET /api/auth/csrf 429 in 111ms
+ GET /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 97ms
+ POST /api/auth/session 429 in 98ms
+ GET /api/auth/session 429 in 117ms
+ GET /api/auth/csrf 429 in 119ms
+ POST /api/auth/session 429 in 124ms
+ GET /api/auth/session 429 in 136ms
+ POST /api/auth/session 429 in 114ms
+ GET /api/auth/csrf 429 in 127ms
+ GET /api/auth/session 429 in 99ms
+ GET /api/auth/csrf 429 in 99ms
+ POST /api/auth/session 429 in 106ms
+ GET /api/auth/session 429 in 110ms
+ GET /api/auth/csrf 429 in 110ms
+ POST /api/auth/session 429 in 114ms
+ GET /api/auth/session 429 in 94ms
+ POST /api/auth/session 429 in 85ms
+ GET /api/auth/csrf 429 in 94ms
+ GET /api/auth/session 429 in 119ms
+ GET /api/auth/csrf 429 in 107ms
+ POST /api/auth/session 429 in 121ms
+ GET /api/auth/session 429 in 108ms
+ POST /api/auth/session 429 in 85ms
+ GET /api/auth/csrf 429 in 103ms
+ GET /api/auth/session 429 in 87ms
+ GET /api/auth/csrf 429 in 90ms
+ POST /api/auth/session 429 in 97ms
+ GET /api/auth/session 429 in 82ms
+ POST /api/auth/session 429 in 70ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 74ms
+ GET /api/auth/csrf 429 in 77ms
+ GET /api/auth/session 429 in 106ms
+ GET /api/auth/csrf 429 in 119ms
+ POST /api/auth/session 429 in 119ms
+ GET /api/auth/session 429 in 111ms
+ GET /api/auth/csrf 429 in 104ms
+ POST /api/auth/session 429 in 109ms
+ GET /api/auth/session 429 in 86ms
+ POST /api/auth/session 429 in 76ms
+ GET /api/auth/csrf 429 in 86ms
+ GET /api/auth/session 429 in 61ms
+ POST /api/auth/session 429 in 59ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 92ms
+ GET /placeholder.png 404 in 130ms
+ GET /api/auth/session 429 in 92ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/csrf 429 in 64ms
+ GET /api/auth/session 429 in 70ms
+ GET /api/auth/csrf 429 in 84ms
+ POST /api/auth/session 429 in 86ms
+ GET /api/auth/session 429 in 93ms
+ GET /api/auth/csrf 429 in 124ms
+ POST /api/auth/session 429 in 123ms
+ GET /api/auth/session 429 in 116ms
+ GET /api/auth/csrf 429 in 107ms
+ POST /api/auth/session 429 in 118ms
+ GET /api/auth/session 429 in 116ms
+ POST /api/auth/session 429 in 136ms
+ GET /api/auth/csrf 429 in 153ms
+ GET /api/auth/session 429 in 132ms
+ POST /api/auth/session 429 in 123ms
+ GET /api/auth/csrf 429 in 134ms
+ GET /api/auth/session 429 in 124ms
+ POST /api/auth/session 429 in 101ms
+ GET /api/auth/csrf 429 in 114ms
+ GET /api/auth/session 429 in 109ms
+ GET /api/auth/csrf 429 in 106ms
+ POST /api/auth/session 429 in 111ms
+ GET /api/auth/session 429 in 121ms
+ GET /api/auth/csrf 429 in 149ms
+ GET /api/auth/session 429 in 139ms
+ POST /api/auth/session 429 in 154ms
+ POST /api/auth/session 429 in 97ms
+ GET /api/auth/session 429 in 91ms
+ GET /api/auth/session 429 in 80ms
+ GET /api/auth/session 429 in 70ms
+ GET /api/auth/session 429 in 65ms
+ ✓ Compiled in 26ms
+ ✓ Compiled in 80ms
+ GET /api/auth/session 429 in 78ms
+ GET /api/auth/session 429 in 73ms
+ GET /api/auth/session 429 in 93ms
+ GET /api/auth/session 429 in 86ms
+ GET /api/auth/csrf 429 in 90ms
+ GET /api/auth/session 429 in 104ms
+ POST /api/auth/session 429 in 142ms
+ GET /api/auth/csrf 429 in 148ms
+ GET /api/auth/session 429 in 142ms
+ GET /api/auth/csrf 429 in 127ms
+ POST /api/auth/session 429 in 137ms
+ GET /api/auth/session 429 in 124ms
+ GET /api/auth/csrf 429 in 111ms
+ POST /api/auth/session 429 in 108ms
+ GET /api/auth/session 429 in 100ms
+ GET /api/auth/csrf 429 in 92ms
+ POST /api/auth/session 429 in 91ms
+ GET /api/auth/session 429 in 103ms
+ GET /api/auth/csrf 429 in 123ms
+ POST /api/auth/session 429 in 127ms
+ GET /api/auth/session 429 in 134ms
+ GET /api/auth/csrf 429 in 120ms
+ POST /api/auth/session 429 in 121ms
+ GET /api/auth/session 429 in 120ms
+ POST /api/auth/session 429 in 120ms
+ GET /api/auth/csrf 429 in 133ms
+ GET /api/auth/session 429 in 121ms
+ GET /api/auth/csrf 429 in 121ms
+ POST /api/auth/session 429 in 128ms
+ GET /api/auth/session 429 in 122ms
+ GET /api/auth/csrf 429 in 133ms
+ POST /api/auth/session 429 in 133ms
+ GET /api/auth/session 429 in 132ms
+ GET /api/auth/csrf 429 in 108ms
+ POST /api/auth/session 429 in 109ms
+ GET /api/auth/session 429 in 105ms
+ GET /api/auth/csrf 429 in 140ms
+ POST /api/auth/session 429 in 148ms
+ GET /api/auth/session 429 in 137ms
+ POST /api/auth/session 429 in 111ms
+ GET /api/auth/csrf 429 in 124ms
+ GET /api/auth/session 429 in 116ms
+ GET /api/auth/csrf 429 in 110ms
+ POST /api/auth/session 429 in 112ms
+ GET /api/auth/session 429 in 121ms
+ GET /api/auth/csrf 429 in 145ms
+ POST /api/auth/session 429 in 141ms
+ GET /api/auth/session 429 in 146ms
+ GET /api/auth/csrf 429 in 143ms
+ POST /api/auth/session 429 in 140ms
+ GET /api/auth/session 429 in 148ms
+ GET /api/auth/csrf 429 in 148ms
+ POST /api/auth/session 429 in 140ms
+ GET /api/auth/session 429 in 150ms
+ GET /api/auth/csrf 429 in 148ms
+ POST /api/auth/session 429 in 154ms
+ GET /api/auth/session 429 in 154ms
+ GET /api/auth/csrf 429 in 145ms
+ POST /api/auth/session 429 in 153ms
+ GET /api/auth/session 429 in 150ms
+ GET /api/auth/csrf 429 in 149ms
+ POST /api/auth/session 429 in 145ms
+ GET /api/auth/session 429 in 125ms
+ POST /api/auth/session 429 in 109ms
+ GET /api/auth/csrf 429 in 118ms
+ GET /api/auth/session 429 in 104ms
+ GET /api/auth/csrf 429 in 130ms
+ GET /api/auth/session 429 in 142ms
+ POST /api/auth/session 429 in 144ms
+ POST /api/auth/session 429 in 153ms
+ GET /api/auth/csrf 429 in 165ms
+ GET /api/auth/session 429 in 155ms
+ GET /api/auth/csrf 429 in 159ms
+ POST /api/auth/session 429 in 166ms
+ GET /api/auth/session 429 in 170ms
+ ○ Compiling /client/settings ...
+ GET /api/auth/csrf 429 in 187ms
+ POST /api/auth/session 429 in 202ms
+ GET /api/auth/session 429 in 193ms
+ GET /api/auth/csrf 429 in 118ms
+ POST /api/auth/session 429 in 124ms
+ GET /api/auth/session 429 in 112ms
+ GET /api/auth/csrf 429 in 189ms
+ GET /api/auth/session 429 in 201ms
+ POST /api/auth/session 429 in 224ms
+ GET /api/auth/csrf 429 in 173ms
+ POST /api/auth/session 429 in 177ms
+ GET /api/auth/session 429 in 180ms
+ GET /api/auth/csrf 429 in 146ms
+ POST /api/auth/session 429 in 141ms
+ GET /api/auth/session 429 in 127ms
+ GET /api/auth/csrf 429 in 147ms
+ POST /api/auth/session 429 in 150ms
+ GET /api/auth/session 429 in 153ms
+ GET /api/auth/csrf 429 in 137ms
+ POST /api/auth/session 429 in 135ms
+ GET /api/auth/session 429 in 140ms
+ GET /api/auth/csrf 429 in 158ms
+ POST /api/auth/session 429 in 156ms
+ GET /api/auth/session 429 in 151ms
+ GET /api/auth/csrf 429 in 132ms
+ POST /api/auth/session 429 in 135ms
+ GET /api/auth/session 429 in 130ms
+ ✓ Compiled in 1809ms
+ ✓ Compiled /client/settings in 1895ms
+ GET /api/auth/csrf 429 in 174ms
+ GET /api/auth/session 429 in 150ms
+ POST /api/auth/session 429 in 188ms
+ GET /client/settings 200 in 2071ms
+ GET /api/auth/csrf 429 in 222ms
+ GET /api/auth/session 429 in 218ms
+ POST /api/auth/session 429 in 228ms
+ GET /api/auth/csrf 429 in 128ms
+ GET /api/auth/session 429 in 133ms
+ POST /api/auth/session 429 in 143ms
+ POST /api/auth/session 429 in 146ms
+ GET /api/auth/csrf 429 in 158ms
+ GET /api/auth/session 429 in 154ms
+ GET /api/auth/csrf 429 in 130ms
+ POST /api/auth/session 429 in 131ms
+ GET /api/auth/session 429 in 140ms
+ GET /api/auth/csrf 429 in 139ms
+ GET /api/auth/session 429 in 149ms
+ POST /api/auth/session 429 in 160ms
+ POST /api/auth/session 429 in 131ms
+ GET /api/auth/csrf 429 in 147ms
+ GET /api/auth/session 429 in 124ms
+ GET /api/auth/csrf 429 in 104ms
+ GET /api/auth/session 429 in 122ms
+ POST /api/auth/session 429 in 129ms
+ GET /api/auth/csrf 429 in 144ms
+ POST /api/auth/session 429 in 146ms
+ GET /api/auth/session 429 in 139ms
+ GET /api/auth/csrf 429 in 133ms
+ POST /api/auth/session 429 in 144ms
+ GET /api/auth/session 429 in 151ms
+ GET /api/auth/csrf 429 in 180ms
+ POST /api/auth/session 429 in 191ms
+ GET /api/auth/session 429 in 205ms
+ GET /api/auth/csrf 429 in 223ms
+ POST /api/auth/session 429 in 209ms
+ GET /api/auth/session 429 in 181ms
+ GET /api/auth/csrf 429 in 156ms
+ GET /api/auth/session 429 in 160ms
+ POST /api/auth/session 429 in 165ms
+ POST /api/auth/session 429 in 123ms
+ GET /api/auth/csrf 429 in 134ms
+ ✓ Compiled in 312ms
+ GET /api/auth/session 429 in 112ms
+ GET /api/auth/csrf 429 in 101ms
+ POST /api/auth/session 429 in 108ms
+ GET /api/auth/csrf 429 in 90ms
+ POST /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 77ms
+ POST /api/auth/session 429 in 77ms
+ GET /api/auth/csrf 429 in 83ms
+ POST /api/auth/session 429 in 88ms
+ POST /api/auth/session 429 in 71ms
+ GET /api/auth/session 429 in 71ms
+ GET /api/auth/session 429 in 60ms
+ GET /api/auth/session 429 in 64ms
+ GET /api/auth/csrf 429 in 50ms
+ POST /api/auth/session 429 in 72ms
+ GET /api/auth/session 429 in 67ms
+ ✓ Compiled in 156ms
+ GET /client/home 200 in 59ms
+ GET /api/auth/session 429 in 97ms
+ GET /api/auth/session 429 in 80ms
+ GET /api/auth/session 429 in 88ms
+ GET /api/auth/session 429 in 114ms
+ GET /api/auth/csrf 429 in 110ms
+ GET /api/auth/csrf 429 in 97ms
+ POST /api/auth/session 429 in 104ms
+ GET /api/auth/csrf 429 in 115ms
+ POST /api/auth/session 429 in 114ms
+ GET /api/auth/session 429 in 116ms
+ GET /api/auth/csrf 429 in 125ms
+ POST /api/auth/session 429 in 130ms
+ GET /api/auth/session 429 in 129ms
+ GET /placeholder.png 404 in 196ms
+ POST /api/auth/session 429 in 177ms
+ GET /api/auth/session 429 in 189ms
+ GET /api/auth/session 429 in 102ms
+ GET /api/auth/session 429 in 100ms
+ GET /api/auth/csrf 429 in 115ms
+ GET /api/auth/session 429 in 126ms
+ POST /api/auth/session 429 in 126ms
+ GET /api/auth/csrf 429 in 138ms
+ GET /api/auth/session 429 in 130ms
+ GET /api/auth/csrf 429 in 135ms
+ POST /api/auth/session 429 in 137ms
+ GET /api/auth/session 429 in 135ms
+ GET /api/auth/csrf 429 in 122ms
+ POST /api/auth/session 429 in 124ms
+ GET /api/auth/session 429 in 121ms
+ POST /api/auth/session 429 in 98ms
+ GET /api/auth/csrf 429 in 106ms
+ GET /api/auth/session 429 in 97ms
+ GET /api/auth/csrf 429 in 102ms
+ POST /api/auth/session 429 in 103ms
+ GET /api/auth/session 429 in 117ms
+ GET /api/auth/csrf 429 in 117ms
+ POST /api/auth/session 429 in 130ms
+ GET /api/auth/session 429 in 112ms
+ GET /api/auth/csrf 429 in 89ms
+ POST /api/auth/session 429 in 88ms
+ GET /api/auth/session 429 in 91ms
+ GET /api/auth/csrf 429 in 91ms
+ POST /api/auth/session 429 in 91ms
+ GET /api/auth/session 429 in 87ms
+ POST /api/auth/session 429 in 84ms
+ GET /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 68ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/session 429 in 64ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 62ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /client/explore 200 in 148ms
+ ✓ Compiled in 121ms
+ ○ Compiling /_error ...
+ ✓ Compiled /_error in 840ms
+ GET /api/auth/session 500 in 1152ms
+ GET /api/auth/session 500 in 134ms
+ GET /api/auth/session 500 in 127ms
+ GET /api/auth/session 500 in 103ms
+ GET /api/auth/session 500 in 96ms
+ GET /api/auth/session 500 in 93ms
+ GET /api/auth/session 500 in 90ms
+ GET /api/auth/session 500 in 121ms
+ ⨯ ./src/components/client-dashboard.tsx:482:6
+Parsing ecmascript source code failed
+[0m [90m 480 |[39m[0m
+[0m [90m 481 |[39m   [36mreturn[39m ([0m
+[0m[31m[1m>[22m[39m[90m 482 |[39m     [33m<[39m[33mdiv[39m className[33m=[39m[32m"space-y-2"[39m[33m>[39m[0m
+[0m [90m     |[39m      [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 483 |[39m       [33m<[39m[33mdiv[39m className[33m=[39m[32m"flex items-center justify-between"[39m[33m>[39m[0m
+[0m [90m 484 |[39m         [33m<[39m[33mSavedLocationsSelect[39m [33m/[39m[33m>[39m[0m
+[0m [90m 485 |[39m       [33m<[39m[33m/[39m[33mdiv[39m[33m>[39m[0m
+
+Unexpected token `div`. Expected jsx identifier
+
+
+ GET /client/explore 500 in 117ms
+ GET /api/auth/session 200 in 74ms
+ ✓ Compiled /favicon.ico in 300ms
+ GET /favicon.ico 500 in 336ms
+ ✓ Compiled in 214ms
+ ✓ Compiled /client/explore in 83ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /client/explore 200 in 1273ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 293ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/csrf 429 in 56ms
+ GET /api/auth/session 429 in 59ms
+ GET /api/auth/csrf 429 in 90ms
+ GET /api/auth/session 429 in 90ms
+ POST /api/auth/session 429 in 98ms
+ GET /api/auth/csrf 429 in 100ms
+ GET /api/auth/session 429 in 103ms
+ POST /api/auth/session 429 in 101ms
+ GET /api/auth/session 429 in 78ms
+ GET /api/auth/csrf 429 in 93ms
+ POST /api/auth/session 429 in 91ms
+ GET /api/auth/session 429 in 89ms
+ GET /api/auth/csrf 429 in 86ms
+ POST /api/auth/session 429 in 92ms
+ GET /api/auth/session 429 in 83ms
+ POST /api/auth/session 429 in 84ms
+ GET /api/auth/csrf 429 in 95ms
+ GET /api/auth/session 429 in 89ms
+ GET /api/auth/csrf 429 in 88ms
+ POST /api/auth/session 429 in 93ms
+ GET /api/auth/session 429 in 84ms
+ GET /api/auth/csrf 429 in 87ms
+ POST /api/auth/session 429 in 85ms
+ GET /api/auth/session 429 in 87ms
+ POST /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 86ms
+ GET /api/auth/session 429 in 82ms
+ GET /api/auth/csrf 429 in 85ms
+ POST /api/auth/session 429 in 93ms
+ GET /api/auth/session 429 in 94ms
+ POST /api/auth/session 429 in 78ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 76ms
+ GET /api/auth/session 429 in 72ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/csrf 429 in 71ms
+ GET /api/auth/session 429 in 80ms
+ GET /api/auth/csrf 429 in 74ms
+ POST /api/auth/session 429 in 74ms
+ GET /api/auth/session 429 in 80ms
+ GET /api/auth/csrf 429 in 95ms
+ POST /api/auth/session 429 in 96ms
+ GET /api/auth/session 429 in 97ms
+ POST /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 97ms
+ GET /api/auth/session 429 in 85ms
+ GET /api/auth/csrf 429 in 72ms
+ POST /api/auth/session 429 in 75ms
+ GET /api/auth/session 429 in 84ms
+ POST /api/auth/session 429 in 86ms
+ GET /api/auth/csrf 429 in 95ms
+ GET /api/auth/session 429 in 86ms
+ GET /api/auth/csrf 429 in 88ms
+ POST /api/auth/session 429 in 102ms
+ GET /api/auth/session 429 in 108ms
+ POST /api/auth/session 429 in 91ms
+ GET /api/auth/csrf 429 in 101ms
+ GET /api/auth/session 429 in 86ms
+ POST /api/auth/session 429 in 76ms
+ GET /api/auth/csrf 429 in 84ms
+ GET /api/auth/session 429 in 82ms
+ GET /api/auth/csrf 429 in 96ms
+ POST /api/auth/session 429 in 102ms
+ GET /api/auth/session 429 in 106ms
+ GET /api/auth/csrf 429 in 132ms
+ POST /api/auth/session 429 in 136ms
+ GET /api/auth/session 429 in 124ms
+ GET /api/auth/csrf 429 in 109ms
+ POST /api/auth/session 429 in 116ms
+ GET /api/auth/session 429 in 121ms
+ GET /api/auth/csrf 429 in 98ms
+ POST /api/auth/session 429 in 95ms
+ GET /api/auth/session 429 in 90ms
+ POST /api/auth/session 429 in 87ms
+ GET /api/auth/csrf 429 in 97ms
+ GET /api/auth/session 429 in 89ms
+ GET /api/auth/csrf 429 in 88ms
+ POST /api/auth/session 429 in 88ms
+ GET /api/auth/session 429 in 83ms
+ GET /api/auth/csrf 429 in 76ms
+ POST /api/auth/session 429 in 81ms
+ GET /api/auth/session 429 in 86ms
+ GET /api/auth/csrf 429 in 86ms
+ GET /api/auth/session 429 in 78ms
+ POST /api/auth/session 429 in 95ms
+ GET /api/auth/csrf 429 in 84ms
+ GET /api/auth/session 429 in 78ms
+ POST /api/auth/session 429 in 79ms
+ GET /api/auth/csrf 429 in 75ms
+ POST /api/auth/session 429 in 79ms
+ GET /api/auth/session 429 in 83ms
+ GET /api/auth/csrf 429 in 116ms
+ POST /api/auth/session 429 in 112ms
+ GET /api/auth/session 429 in 116ms
+ GET /api/auth/csrf 429 in 87ms
+ POST /api/auth/session 429 in 85ms
+ GET /api/auth/session 429 in 90ms
+ GET /api/auth/csrf 429 in 91ms
+ POST /api/auth/session 429 in 93ms
+ GET /api/auth/session 429 in 93ms
+ GET /api/auth/csrf 429 in 85ms
+ POST /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 82ms
+ POST /api/auth/session 429 in 78ms
+ GET /api/auth/csrf 429 in 80ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/csrf 429 in 104ms
+ POST /api/auth/session 429 in 103ms
+ GET /api/auth/session 429 in 108ms
+ GET /api/auth/csrf 429 in 89ms
+ POST /api/auth/session 429 in 86ms
+ GET /api/auth/session 429 in 81ms
+ GET /api/auth/csrf 429 in 77ms
+ POST /api/auth/session 429 in 78ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/session 429 in 64ms
+ POST /api/auth/session 429 in 74ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 67ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 87ms
+ GET /api/auth/session 429 in 72ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/csrf 429 in 85ms
+ GET /api/auth/session 429 in 90ms
+ POST /api/auth/session 429 in 100ms
+ GET /api/auth/csrf 429 in 109ms
+ GET /api/auth/session 429 in 90ms
+ GET /api/auth/csrf 429 in 101ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/session 429 in 116ms
+ POST /api/auth/session 429 in 104ms
+ GET /api/auth/csrf 429 in 114ms
+ GET /api/auth/session 429 in 108ms
+ GET /api/auth/csrf 429 in 108ms
+ POST /api/auth/session 429 in 116ms
+ GET /api/auth/session 429 in 122ms
+ GET /api/auth/csrf 429 in 140ms
+ POST /api/auth/session 429 in 149ms
+ GET /api/auth/session 429 in 141ms
+ POST /api/auth/session 429 in 126ms
+ GET /api/auth/csrf 429 in 141ms
+ GET /api/auth/session 429 in 125ms
+ GET /api/auth/csrf 429 in 126ms
+ POST /api/auth/session 429 in 129ms
+ GET /api/auth/session 429 in 126ms
+ GET /api/auth/csrf 429 in 115ms
+ POST /api/auth/session 429 in 132ms
+ GET /api/auth/session 429 in 131ms
+ POST /api/auth/session 429 in 114ms
+ GET /api/auth/csrf 429 in 128ms
+ GET /api/auth/session 429 in 101ms
+ GET /api/auth/csrf 429 in 94ms
+ GET /api/auth/session 429 in 93ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/csrf 429 in 142ms
+ POST /api/auth/session 429 in 139ms
+ GET /api/auth/session 429 in 164ms
+ GET /api/auth/csrf 429 in 193ms
+ POST /api/auth/session 429 in 188ms
+ GET /api/auth/session 429 in 185ms
+ GET /client/home 200 in 206ms
+ GET /api/auth/csrf 429 in 133ms
+ POST /api/auth/session 429 in 133ms
+ GET /api/auth/session 429 in 121ms
+ GET /api/auth/csrf 429 in 96ms
+ POST /api/auth/session 429 in 106ms
+ GET /api/auth/session 429 in 102ms
+ GET /api/auth/csrf 429 in 117ms
+ GET /api/auth/session 429 in 105ms
+ POST /api/auth/session 429 in 114ms
+ GET /api/auth/csrf 429 in 97ms
+ GET /api/auth/session 429 in 97ms
+ POST /api/auth/session 429 in 112ms
+ GET /api/auth/csrf 429 in 133ms
+ POST /api/auth/session 429 in 129ms
+ GET /api/auth/session 429 in 133ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/session 429 in 109ms
+ GET /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 80ms
+ GET /api/auth/session 429 in 68ms
+ GET /api/auth/session 429 in 73ms
+ GET /api/auth/session 429 in 76ms
+ GET /api/auth/session 429 in 65ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/session 429 in 105ms
+ GET /api/auth/session 429 in 108ms
+ GET /api/auth/session 429 in 89ms
+ GET /api/auth/session 429 in 76ms
+ GET /api/auth/session 429 in 66ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 70ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/session 429 in 71ms
+ GET /api/auth/session 429 in 92ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/session 429 in 78ms
+ GET /api/auth/session 429 in 92ms
+ GET /placeholder.png 404 in 136ms
+ GET /api/auth/session 429 in 118ms
+ GET /api/auth/session 429 in 72ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 78ms
+ GET /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 84ms
+ GET /api/auth/session 429 in 80ms
+ GET /api/auth/session 429 in 65ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 84ms
+ GET /api/auth/session 429 in 103ms
+ GET /api/auth/session 429 in 99ms
+ GET /api/auth/session 429 in 96ms
+ GET /api/auth/session 500 in 146ms
+ ✓ Compiled in 260ms
+ GET /api/auth/session 500 in 146ms
+ GET /api/auth/session 500 in 200ms
+ GET /api/auth/session 500 in 191ms
+ GET /api/auth/session 500 in 132ms
+ GET /api/auth/session 500 in 199ms
+ GET /api/auth/session 500 in 193ms
+ GET /api/auth/session 500 in 233ms
+ GET /api/auth/session 500 in 174ms
+ GET /api/auth/session 500 in 190ms
+ GET /api/auth/session 500 in 172ms
+ GET /client/home 500 in 221ms
+ GET /api/auth/session 500 in 203ms
+ GET /favicon.ico 500 in 115ms
+ ✓ Compiled in 118ms
+ GET /client/home 200 in 1055ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 277ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/csrf 429 in 60ms
+ GET /api/auth/csrf 429 in 68ms
+ GET /api/auth/session 429 in 78ms
+ POST /api/auth/session 429 in 76ms
+ GET /api/auth/csrf 429 in 78ms
+ POST /api/auth/session 429 in 88ms
+ GET /api/auth/session 429 in 95ms
+ GET /api/auth/csrf 429 in 80ms
+ POST /api/auth/session 429 in 84ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/csrf 429 in 82ms
+ POST /api/auth/session 429 in 79ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/csrf 429 in 84ms
+ POST /api/auth/session 429 in 85ms
+ GET /api/auth/session 429 in 86ms
+ GET /api/auth/csrf 429 in 94ms
+ POST /api/auth/session 429 in 95ms
+ GET /api/auth/session 429 in 91ms
+ GET /api/auth/csrf 429 in 84ms
+ POST /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 85ms
+ POST /api/auth/session 429 in 76ms
+ GET /api/auth/csrf 429 in 87ms
+ GET /api/auth/session 429 in 76ms
+ GET /api/auth/csrf 429 in 83ms
+ GET /api/auth/session 429 in 82ms
+ POST /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 79ms
+ POST /api/auth/session 429 in 80ms
+ GET /api/auth/session 429 in 82ms
+ GET /api/auth/csrf 429 in 89ms
+ POST /api/auth/session 429 in 87ms
+ GET /api/auth/session 429 in 82ms
+ GET /api/auth/session 429 in 73ms
+ POST /api/auth/session 429 in 76ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 87ms
+ GET /placeholder.png 404 in 123ms
+ GET /api/auth/session 429 in 75ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/csrf 429 in 56ms
+ GET /api/auth/session 429 in 59ms
+ POST /api/auth/session 429 in 75ms
+ GET /api/auth/csrf 429 in 82ms
+ GET /api/auth/session 429 in 106ms
+ POST /api/auth/session 429 in 122ms
+ GET /api/auth/csrf 429 in 133ms
+ GET /api/auth/session 429 in 107ms
+ POST /api/auth/session 429 in 85ms
+ GET /api/auth/csrf 429 in 92ms
+ GET /api/auth/session 429 in 88ms
+ POST /api/auth/session 429 in 94ms
+ GET /api/auth/csrf 429 in 101ms
+ GET /api/auth/session 429 in 96ms
+ POST /api/auth/session 429 in 78ms
+ GET /api/auth/csrf 429 in 88ms
+ GET /api/auth/session 429 in 82ms
+ POST /api/auth/session 429 in 76ms
+ GET /api/auth/csrf 429 in 82ms
+ GET /api/auth/session 429 in 81ms
+ GET /api/auth/csrf 429 in 93ms
+ GET /api/auth/session 429 in 84ms
+ POST /api/auth/session 429 in 100ms
+ POST /api/auth/session 429 in 78ms
+ GET /api/auth/csrf 429 in 93ms
+ GET /api/auth/session 429 in 92ms
+ GET /api/auth/session 429 in 93ms
+ POST /api/auth/session 429 in 96ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 76ms
+ GET /api/auth/session 429 in 72ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 66ms
+ GET /api/auth/csrf 429 in 88ms
+ GET /api/auth/session 429 in 106ms
+ POST /api/auth/session 429 in 113ms
+ GET /api/auth/csrf 429 in 125ms
+ GET /api/auth/session 429 in 118ms
+ GET /api/auth/csrf 429 in 130ms
+ POST /api/auth/session 429 in 132ms
+ GET /api/auth/session 429 in 160ms
+ GET /api/auth/csrf 429 in 185ms
+ POST /api/auth/session 429 in 198ms
+ GET /api/auth/session 429 in 201ms
+ GET /api/auth/csrf 429 in 180ms
+ POST /api/auth/session 429 in 205ms
+ GET /api/auth/session 429 in 166ms
+ GET /api/auth/csrf 429 in 164ms
+ POST /api/auth/session 429 in 178ms
+ GET /api/auth/session 429 in 152ms
+ GET /api/auth/csrf 429 in 134ms
+ POST /api/auth/session 429 in 138ms
+ GET /api/auth/session 429 in 127ms
+ GET /api/auth/csrf 429 in 138ms
+ POST /api/auth/session 429 in 151ms
+ GET /api/auth/session 429 in 142ms
+ GET /api/auth/csrf 429 in 132ms
+ POST /api/auth/session 429 in 130ms
+ GET /api/auth/session 429 in 108ms
+ GET /api/auth/csrf 429 in 160ms
+ POST /api/auth/session 429 in 162ms
+ GET /api/auth/session 429 in 180ms
+ ✓ Compiled /client/explore in 121ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /client/explore 200 in 223ms
+ POST /api/auth/session 429 in 170ms
+ GET /api/auth/csrf 429 in 182ms
+ GET /api/auth/session 429 in 146ms
+ GET /api/auth/csrf 429 in 132ms
+ POST /api/auth/session 429 in 154ms
+ GET /api/auth/session 429 in 160ms
+ POST /api/auth/session 429 in 144ms
+ GET /api/auth/csrf 429 in 157ms
+ GET /api/auth/session 429 in 129ms
+ GET /api/auth/csrf 429 in 106ms
+ POST /api/auth/session 429 in 114ms
+ GET /api/auth/session 429 in 121ms
+ GET /api/auth/csrf 429 in 124ms
+ POST /api/auth/session 429 in 121ms
+ GET /api/auth/session 429 in 126ms
+ GET /api/auth/csrf 429 in 142ms
+ POST /api/auth/session 429 in 160ms
+ GET /api/auth/session 429 in 187ms
+ GET /api/auth/csrf 429 in 180ms
+ POST /api/auth/session 429 in 174ms
+ GET /api/auth/session 429 in 162ms
+ GET /api/auth/csrf 429 in 164ms
+ POST /api/auth/session 429 in 163ms
+ GET /api/auth/session 429 in 140ms
+ GET /api/auth/csrf 429 in 130ms
+ POST /api/auth/session 429 in 131ms
+ GET /api/auth/session 429 in 114ms
+ GET /api/auth/csrf 429 in 80ms
+ POST /api/auth/session 429 in 83ms
+ POST /api/auth/session 429 in 66ms
+ GET /api/auth/csrf 429 in 80ms
+ GET /api/auth/csrf 429 in 74ms
+ POST /api/auth/session 429 in 72ms
+ GET /api/auth/csrf 429 in 72ms
+ POST /api/auth/session 429 in 72ms
+ POST /api/auth/session 429 in 66ms
+ GET /api/auth/session 429 in 68ms
+ GET /api/auth/session 429 in 65ms
+ GET /api/auth/session 429 in 89ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/session 429 in 74ms
+ GET /api/auth/session 429 in 85ms
+ GET /api/auth/csrf 429 in 90ms
+ GET /api/auth/session 429 in 109ms
+ GET /api/auth/csrf 429 in 116ms
+ POST /api/auth/session 429 in 136ms
+ GET /api/auth/session 429 in 136ms
+ GET /api/auth/csrf 429 in 136ms
+ POST /api/auth/session 429 in 158ms
+ GET /api/auth/session 429 in 166ms
+ GET /api/auth/csrf 429 in 168ms
+ POST /api/auth/session 429 in 180ms
+ GET /api/auth/session 429 in 157ms
+ GET /api/auth/csrf 429 in 150ms
+ POST /api/auth/session 429 in 154ms
+ GET /api/auth/session 429 in 140ms
+ GET /api/auth/csrf 429 in 132ms
+ POST /api/auth/session 429 in 146ms
+ GET /api/auth/session 429 in 127ms
+ GET /api/auth/csrf 429 in 144ms
+ POST /api/auth/session 429 in 144ms
+ GET /api/auth/session 429 in 121ms
+ POST /api/auth/session 429 in 122ms
+ GET /api/auth/csrf 429 in 141ms
+ GET /api/auth/session 429 in 116ms
+ GET /api/auth/csrf 429 in 128ms
+ POST /api/auth/session 429 in 141ms
+ GET /api/auth/session 429 in 133ms
+ GET /api/auth/csrf 429 in 143ms
+ POST /api/auth/session 429 in 142ms
+ GET /api/auth/session 429 in 132ms
+ GET /api/auth/csrf 429 in 133ms
+ POST /api/auth/session 429 in 136ms
+ GET /api/auth/session 429 in 126ms
+ GET /api/auth/csrf 429 in 129ms
+ POST /api/auth/session 429 in 131ms
+ GET /api/auth/session 429 in 120ms
+ GET /api/auth/csrf 429 in 122ms
+ POST /api/auth/session 429 in 129ms
+ GET /api/auth/session 429 in 135ms
+ ✓ Compiled in 211ms
+ GET /api/auth/csrf 429 in 126ms
+ POST /api/auth/session 429 in 124ms
+ GET /api/auth/session 429 in 122ms
+ POST /api/auth/session 429 in 114ms
+ GET /api/auth/csrf 429 in 129ms
+ GET /api/auth/session 429 in 109ms
+ GET /api/auth/csrf 429 in 118ms
+ POST /api/auth/session 429 in 126ms
+ GET /api/auth/session 429 in 145ms
+ GET /api/auth/csrf 429 in 154ms
+ POST /api/auth/session 429 in 152ms
+ GET /api/auth/session 429 in 144ms
+ GET /api/auth/csrf 429 in 137ms
+ POST /api/auth/session 429 in 143ms
+ GET /api/auth/session 429 in 140ms
+ GET /api/auth/csrf 429 in 139ms
+ POST /api/auth/session 429 in 154ms
+ GET /api/auth/session 429 in 145ms
+ GET /api/auth/csrf 429 in 177ms
+ POST /api/auth/session 429 in 219ms
+ GET /api/auth/session 429 in 221ms
+ POST /api/auth/session 429 in 179ms
+ GET /api/auth/csrf 429 in 205ms
+ GET /api/auth/session 429 in 153ms
+ ○ Compiling /client/service/[id] ...
+ GET /api/auth/csrf 429 in 168ms
+ POST /api/auth/session 429 in 178ms
+ GET /api/auth/session 429 in 209ms
+ GET /api/auth/csrf 429 in 233ms
+ POST /api/auth/session 429 in 231ms
+ GET /api/auth/session 429 in 194ms
+ GET /api/auth/csrf 429 in 191ms
+ POST /api/auth/session 429 in 200ms
+ GET /api/auth/session 429 in 190ms
+ GET /api/auth/csrf 429 in 161ms
+ POST /api/auth/session 429 in 169ms
+ GET /api/auth/session 429 in 211ms
+ GET /api/auth/csrf 429 in 230ms
+ POST /api/auth/session 429 in 239ms
+ GET /api/auth/session 429 in 183ms
+ GET /api/auth/csrf 429 in 149ms
+ POST /api/auth/session 429 in 163ms
+ GET /api/auth/session 429 in 144ms
+ POST /api/auth/session 429 in 132ms
+ GET /api/auth/session 429 in 111ms
+ GET /api/auth/session 429 in 74ms
+ GET /api/auth/session 429 in 71ms
+ GET /api/auth/session 429 in 72ms
+ GET /api/auth/session 429 in 75ms
+ GET /api/auth/session 429 in 70ms
+ GET /api/auth/session 429 in 90ms
+ GET /api/auth/session 429 in 71ms
+ GET /api/auth/session 429 in 72ms
+ GET /api/auth/session 429 in 68ms
+ GET /api/auth/session 429 in 75ms
+ ✓ Compiled /client/service/[id] in 2.5s
+ GET /api/auth/session 429 in 233ms
+ GET /api/auth/session 429 in 98ms
+ GET /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 88ms
+ GET /api/auth/session 200 in 576ms
+ GET /api/auth/session 200 in 459ms
+ GET /api/auth/session 200 in 458ms
+ GET /api/auth/session 200 in 442ms
+ GET /api/auth/session 200 in 445ms
+ GET /api/auth/session 200 in 426ms
+Error: Route "/client/service/[id]" used `params.id`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ServiceDetailPage (src\app\client\service\[id]\page.tsx:11:54)
+   9 | export default async function ServiceDetailPage({ params }: { params: { id: string } }) {
+  10 |   // Data fetching happens on the server
+> 11 |   const service = (await getServiceOrOfferById(params.id)) as Service | null;
+     |                                                      ^
+  12 |   
+  13 |   // The interactive UI is in a separate client component
+  14 |   return <ServiceDetailView service={service} id={params.id} />;
+ GET /api/auth/session 200 in 445ms
+ GET /api/auth/session 200 in 441ms
+Error: Route "/client/service/[id]" used `params.id`. `params` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ServiceDetailPage (src\app\client\service\[id]\page.tsx:14:57)
+  12 |   
+  13 |   // The interactive UI is in a separate client component
+> 14 |   return <ServiceDetailView service={service} id={params.id} />;
+     |                                                         ^
+  15 | }
+  16 |
+  17 | // This function tells Next.js which pages to pre-render at build time.
+ GET /client/service/b2v7tSxjWMpvj5U02Tkm 200 in 7669ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 294ms
  GET /api/auth/session 200 in 433ms
+ GET /api/auth/session 200 in 407ms
+ GET /api/auth/session 200 in 464ms
+ GET /api/auth/session 200 in 422ms
+ GET /api/auth/session 200 in 422ms
+ GET /api/auth/session 200 in 434ms
+ GET /api/auth/session 200 in 398ms
+ GET /api/auth/session 200 in 422ms
+ GET /api/auth/session 200 in 410ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 200 in 430ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 200 in 409ms
+ GET /api/auth/session 200 in 419ms
+ GET /api/auth/session 200 in 436ms
+ GET /api/auth/session 200 in 403ms
  GET /api/auth/session 200 in 449ms
- ✓ Compiled in 18ms
- GET /api/auth/session 200 in 449ms
- ✓ Compiled in 14ms
- ✓ Compiled in 18ms
+ GET /api/auth/session 200 in 423ms
+ GET /api/auth/session 200 in 438ms
+ GET /api/auth/session 200 in 439ms
+ GET /api/auth/session 200 in 405ms
+ GET /api/auth/session 200 in 429ms
+ GET /api/auth/session 200 in 424ms
+ GET /api/auth/session 200 in 407ms
+ GET /api/auth/session 200 in 408ms
+ GET /api/auth/session 200 in 393ms
+ GET /api/auth/session 200 in 385ms
+ GET /api/auth/session 200 in 401ms
+ GET /api/auth/session 200 in 421ms
+ GET /api/auth/session 200 in 425ms
+ GET /api/auth/session 200 in 432ms
+ GET /api/auth/session 200 in 435ms
+ GET /api/auth/session 200 in 468ms
+ ○ Compiling /client/messages ...
+ GET /api/auth/session 200 in 426ms
+ GET /api/auth/session 200 in 473ms
+ ✓ Compiled /client/messages in 1317ms
+ ⨯ ./src/components/messaging-panel.tsx:346:30
+Ecmascript file had an error
+[0m [90m 344 |[39m     [36mconst[39m { chats[33m,[39m isLoading[33m:[39m isChatsLoading } [33m=[39m useChats(userId[33m,[39m isAdmin)[33m;[39m[0m
+[0m [90m 345 |[39m     [36mconst[39m { messages[33m,[39m isLoading[33m:[39m isMessagesLoading } [33m=[39m useChatMessages(selectedChat[33m?[39m[33m.[39mid)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 346 |[39m     [36mconst[39m { youBlockedOther[33m,[39m blockedByOther } [33m=[39m useBlockStatus(userId[33m,[39m selectedChat [33m?[39m getOtherParticipant(selectedChat)[33m?[39m[33m.[39mid [33m:[39m undefined)[33m;[39m[0m
+[0m [90m     |[39m                              [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 347 |[39m[0m
+[0m [90m 348 |[39m     useEffect(() [33m=>[39m {[0m
+[0m [90m 349 |[39m         [36mif[39m ([33m![39misMobile [33m&&[39m [33m![39mselectedChat [33m&&[39m chats[33m.[39mlength [33m>[39m [35m0[39m) {[0m
+
+the name `blockedByOther` is defined multiple times
+
+
+
+./src/components/messaging-panel.tsx:344:13
+Ecmascript file had an error
+[0m [90m 342 |[39m     [36mconst[39m [mentionOpen[33m,[39m setMentionOpen] [33m=[39m useState([36mfalse[39m)[33m;[39m[0m
+[0m [90m 343 |[39m[0m
+[0m[31m[1m>[22m[39m[90m 344 |[39m     [36mconst[39m { chats[33m,[39m isLoading[33m:[39m isChatsLoading } [33m=[39m useChats(userId[33m,[39m isAdmin)[33m;[39m[0m
+[0m [90m     |[39m             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 345 |[39m     [36mconst[39m { messages[33m,[39m isLoading[33m:[39m isMessagesLoading } [33m=[39m useChatMessages(selectedChat[33m?[39m[33m.[39mid)[33m;[39m[0m
+[0m [90m 346 |[39m     [36mconst[39m { youBlockedOther[33m,[39m blockedByOther } [33m=[39m useBlockStatus(userId[33m,[39m selectedChat [33m?[39m getOtherParticipant(selectedChat)[33m?[39m[33m.[39mid [33m:[39m undefined)[33m;[39m[0m
+[0m [90m 347 |[39m[0m
+
+the name `chats` is defined multiple times
+
+
+
+./src/components/messaging-panel.tsx:354:11
+Ecmascript file had an error
+[0m [90m 352 |[39m     }[33m,[39m [chats[33m,[39m isMobile[33m,[39m selectedChat])[33m;[39m[0m
+[0m [90m 353 |[39m[0m
+[0m[31m[1m>[22m[39m[90m 354 |[39m     [36mconst[39m isLoading [33m=[39m isChatsLoading[33m;[39m [90m// Maintain compatibility with existing code structure[39m[0m
+[0m [90m     |[39m           [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 355 |[39m[0m
+[0m [90m 356 |[39m     [90m// Auto-scroll to bottom of messages[39m[0m
+[0m [90m 357 |[39m     useEffect(() [33m=>[39m {[0m
+
+the name `isLoading` is defined multiple times
+
+
+
+./src/components/messaging-panel.tsx:345:13
+Ecmascript file had an error
+[0m [90m 343 |[39m[0m
+[0m [90m 344 |[39m     [36mconst[39m { chats[33m,[39m isLoading[33m:[39m isChatsLoading } [33m=[39m useChats(userId[33m,[39m isAdmin)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 345 |[39m     [36mconst[39m { messages[33m,[39m isLoading[33m:[39m isMessagesLoading } [33m=[39m useChatMessages(selectedChat[33m?[39m[33m.[39mid)[33m;[39m[0m
+[0m [90m     |[39m             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 346 |[39m     [36mconst[39m { youBlockedOther[33m,[39m blockedByOther } [33m=[39m useBlockStatus(userId[33m,[39m selectedChat [33m?[39m getOtherParticipant(selectedChat)[33m?[39m[33m.[39mid [33m:[39m undefined)[33m;[39m[0m
+[0m [90m 347 |[39m[0m
+[0m [90m 348 |[39m     useEffect(() [33m=>[39m {[0m
+
+the name `messages` is defined multiple times
+
+
+
+./src/components/messaging-panel.tsx:346:13
+Ecmascript file had an error
+[0m [90m 344 |[39m     [36mconst[39m { chats[33m,[39m isLoading[33m:[39m isChatsLoading } [33m=[39m useChats(userId[33m,[39m isAdmin)[33m;[39m[0m
+[0m [90m 345 |[39m     [36mconst[39m { messages[33m,[39m isLoading[33m:[39m isMessagesLoading } [33m=[39m useChatMessages(selectedChat[33m?[39m[33m.[39mid)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 346 |[39m     [36mconst[39m { youBlockedOther[33m,[39m blockedByOther } [33m=[39m useBlockStatus(userId[33m,[39m selectedChat [33m?[39m getOtherParticipant(selectedChat)[33m?[39m[33m.[39mid [33m:[39m undefined)[33m;[39m[0m
+[0m [90m     |[39m             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 347 |[39m[0m
+[0m [90m 348 |[39m     useEffect(() [33m=>[39m {[0m
+[0m [90m 349 |[39m         [36mif[39m ([33m![39misMobile [33m&&[39m [33m![39mselectedChat [33m&&[39m chats[33m.[39mlength [33m>[39m [35m0[39m) {[0m
+
+the name `youBlockedOther` is defined multiple times
+
+
+ GET /client/messages 500 in 1405ms
+ ⨯ ./src/components/messaging-panel.tsx:346:30
+Ecmascript file had an error
+[0m [90m 344 |[39m     [36mconst[39m { chats[33m,[39m isLoading[33m:[39m isChatsLoading } [33m=[39m useChats(userId[33m,[39m isAdmin)[33m;[39m[0m
+[0m [90m 345 |[39m     [36mconst[39m { messages[33m,[39m isLoading[33m:[39m isMessagesLoading } [33m=[39m useChatMessages(selectedChat[33m?[39m[33m.[39mid)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 346 |[39m     [36mconst[39m { youBlockedOther[33m,[39m blockedByOther } [33m=[39m useBlockStatus(userId[33m,[39m selectedChat [33m?[39m getOtherParticipant(selectedChat)[33m?[39m[33m.[39mid [33m:[39m undefined)[33m;[39m[0m
+[0m [90m     |[39m                              [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 347 |[39m[0m
+[0m [90m 348 |[39m     useEffect(() [33m=>[39m {[0m
+[0m [90m 349 |[39m         [36mif[39m ([33m![39misMobile [33m&&[39m [33m![39mselectedChat [33m&&[39m chats[33m.[39mlength [33m>[39m [35m0[39m) {[0m
+
+the name `blockedByOther` is defined multiple times
+
+
+
+./src/components/messaging-panel.tsx:344:13
+Ecmascript file had an error
+[0m [90m 342 |[39m     [36mconst[39m [mentionOpen[33m,[39m setMentionOpen] [33m=[39m useState([36mfalse[39m)[33m;[39m[0m
+[0m [90m 343 |[39m[0m
+[0m[31m[1m>[22m[39m[90m 344 |[39m     [36mconst[39m { chats[33m,[39m isLoading[33m:[39m isChatsLoading } [33m=[39m useChats(userId[33m,[39m isAdmin)[33m;[39m[0m
+[0m [90m     |[39m             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 345 |[39m     [36mconst[39m { messages[33m,[39m isLoading[33m:[39m isMessagesLoading } [33m=[39m useChatMessages(selectedChat[33m?[39m[33m.[39mid)[33m;[39m[0m
+[0m [90m 346 |[39m     [36mconst[39m { youBlockedOther[33m,[39m blockedByOther } [33m=[39m useBlockStatus(userId[33m,[39m selectedChat [33m?[39m getOtherParticipant(selectedChat)[33m?[39m[33m.[39mid [33m:[39m undefined)[33m;[39m[0m
+[0m [90m 347 |[39m[0m
+
+the name `chats` is defined multiple times
+
+
+
+./src/components/messaging-panel.tsx:354:11
+Ecmascript file had an error
+[0m [90m 352 |[39m     }[33m,[39m [chats[33m,[39m isMobile[33m,[39m selectedChat])[33m;[39m[0m
+[0m [90m 353 |[39m[0m
+[0m[31m[1m>[22m[39m[90m 354 |[39m     [36mconst[39m isLoading [33m=[39m isChatsLoading[33m;[39m [90m// Maintain compatibility with existing code structure[39m[0m
+[0m [90m     |[39m           [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 355 |[39m[0m
+[0m [90m 356 |[39m     [90m// Auto-scroll to bottom of messages[39m[0m
+[0m [90m 357 |[39m     useEffect(() [33m=>[39m {[0m
+
+the name `isLoading` is defined multiple times
+
+
+
+./src/components/messaging-panel.tsx:345:13
+Ecmascript file had an error
+[0m [90m 343 |[39m[0m
+[0m [90m 344 |[39m     [36mconst[39m { chats[33m,[39m isLoading[33m:[39m isChatsLoading } [33m=[39m useChats(userId[33m,[39m isAdmin)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 345 |[39m     [36mconst[39m { messages[33m,[39m isLoading[33m:[39m isMessagesLoading } [33m=[39m useChatMessages(selectedChat[33m?[39m[33m.[39mid)[33m;[39m[0m
+[0m [90m     |[39m             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 346 |[39m     [36mconst[39m { youBlockedOther[33m,[39m blockedByOther } [33m=[39m useBlockStatus(userId[33m,[39m selectedChat [33m?[39m getOtherParticipant(selectedChat)[33m?[39m[33m.[39mid [33m:[39m undefined)[33m;[39m[0m
+[0m [90m 347 |[39m[0m
+[0m [90m 348 |[39m     useEffect(() [33m=>[39m {[0m
+
+the name `messages` is defined multiple times
+
+
+
+./src/components/messaging-panel.tsx:346:13
+Ecmascript file had an error
+[0m [90m 344 |[39m     [36mconst[39m { chats[33m,[39m isLoading[33m:[39m isChatsLoading } [33m=[39m useChats(userId[33m,[39m isAdmin)[33m;[39m[0m
+[0m [90m 345 |[39m     [36mconst[39m { messages[33m,[39m isLoading[33m:[39m isMessagesLoading } [33m=[39m useChatMessages(selectedChat[33m?[39m[33m.[39mid)[33m;[39m[0m
+[0m[31m[1m>[22m[39m[90m 346 |[39m     [36mconst[39m { youBlockedOther[33m,[39m blockedByOther } [33m=[39m useBlockStatus(userId[33m,[39m selectedChat [33m?[39m getOtherParticipant(selectedChat)[33m?[39m[33m.[39mid [33m:[39m undefined)[33m;[39m[0m
+[0m [90m     |[39m             [31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[31m[1m^[22m[39m[0m
+[0m [90m 347 |[39m[0m
+[0m [90m 348 |[39m     useEffect(() [33m=>[39m {[0m
+[0m [90m 349 |[39m         [36mif[39m ([33m![39misMobile [33m&&[39m [33m![39mselectedChat [33m&&[39m chats[33m.[39mlength [33m>[39m [35m0[39m) {[0m
+
+the name `youBlockedOther` is defined multiple times
+
+
+ GET /api/auth/session 200 in 707ms
+ GET /client/messages 500 in 376ms
+ GET /api/auth/session 200 in 132ms
+ GET /favicon.ico 500 in 188ms
+ GET /client/explore 500 in 274ms
+ GET /favicon.ico 500 in 145ms
+ GET /client/explore 500 in 135ms
+ GET /favicon.ico 500 in 97ms
+ ✓ Compiled in 109ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /client/explore 200 in 1116ms
+ GET /favicon.ico?favicon.cc977519.ico 200 in 272ms
+ GET /api/auth/session 200 in 415ms
+ GET /api/auth/session 200 in 438ms
+ GET /api/auth/session 200 in 435ms
+ GET /api/auth/session 200 in 450ms
+ GET /api/auth/session 200 in 413ms
+ GET /api/auth/session 200 in 404ms
+ GET /api/auth/session 200 in 432ms
+ GET /api/auth/session 200 in 437ms
+ GET /api/auth/session 200 in 401ms
+ GET /api/auth/session 200 in 422ms
+ GET /api/auth/session 200 in 424ms
+ ✓ Compiled /client/messages in 57ms
+ GET /client/messages 200 in 192ms
+ GET /api/auth/session 200 in 435ms
+ GET /api/auth/session 200 in 419ms
+ GET /api/auth/session 200 in 414ms
+ GET /api/auth/session 200 in 396ms
+ GET /api/auth/session 200 in 421ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/csrf 200 in 72ms
+ GET /api/auth/session 429 in 74ms
+ GET /api/auth/csrf 200 in 86ms
+ GET /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 200 in 99ms
+ GET /api/auth/session 429 in 91ms
+ GET /api/auth/csrf 200 in 97ms
+ GET /api/auth/session 429 in 98ms
+ GET /api/auth/csrf 200 in 90ms
+ GET /api/auth/session 429 in 100ms
+ GET /api/auth/csrf 200 in 86ms
+ GET /api/auth/session 429 in 60ms
+ GET /api/auth/csrf 200 in 47ms
+ POST /api/auth/session 200 in 652ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/csrf 200 in 57ms
+ POST /api/auth/session 200 in 1115ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/csrf 200 in 42ms
+ POST /api/auth/session 200 in 1223ms
+ POST /api/auth/session 200 in 1138ms
+ GET /api/auth/session 429 in 64ms
+ GET /api/auth/session 429 in 70ms
+ GET /api/auth/csrf 200 in 89ms
+ POST /api/auth/session 200 in 1179ms
+ POST /api/auth/session 200 in 1026ms
+ GET /api/auth/session 429 in 101ms
+ GET /api/auth/session 429 in 103ms
+ GET /api/auth/session 429 in 104ms
+ GET /api/auth/csrf 200 in 109ms
+ POST /api/auth/session 200 in 1061ms
+ GET /api/auth/session 429 in 113ms
+ GET /api/auth/session 429 in 81ms
+ GET /api/auth/session 429 in 82ms
+ GET /api/auth/csrf 200 in 87ms
+ POST /api/auth/session 200 in 600ms
+ GET /api/auth/session 429 in 122ms
+ GET /api/auth/session 429 in 123ms
+ GET /api/auth/csrf 200 in 119ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/csrf 200 in 75ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/csrf 200 in 48ms
+ POST /api/auth/session 200 in 1031ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/csrf 200 in 49ms
+ POST /api/auth/session 200 in 1036ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/csrf 200 in 45ms
+ POST /api/auth/session 429 in 60ms
+ POST /api/auth/session 200 in 1066ms
+ GET /api/auth/session 429 in 70ms
+ GET /api/auth/session 429 in 71ms
+ GET /api/auth/csrf 200 in 65ms
+ POST /api/auth/session 429 in 65ms
+ POST /api/auth/session 200 in 1049ms
+ GET /api/auth/session 429 in 82ms
+ GET /api/auth/session 429 in 95ms
+ GET /api/auth/session 429 in 91ms
+ POST /api/auth/session 200 in 1073ms
+ GET /api/auth/csrf 200 in 125ms
+ POST /api/auth/session 429 in 138ms
+ GET /api/auth/session 429 in 145ms
+ POST /api/auth/session 200 in 1047ms
+ GET /api/auth/session 429 in 147ms
+ GET /api/auth/session 429 in 157ms
+ GET /api/auth/session 429 in 167ms
+ GET /api/auth/csrf 200 in 166ms
+ POST /api/auth/session 200 in 860ms
+ POST /api/auth/session 429 in 190ms
+ GET /api/auth/session 429 in 186ms
+ GET /api/auth/session 429 in 184ms
+ GET /api/auth/session 429 in 191ms
+ GET /api/auth/csrf 200 in 181ms
+ POST /api/auth/session 429 in 187ms
+ GET /api/auth/session 429 in 181ms
+ GET /api/auth/session 429 in 165ms
+ GET /api/auth/csrf 200 in 172ms
+ POST /api/auth/session 429 in 166ms
+ GET /api/auth/session 429 in 154ms
+ GET /api/auth/session 429 in 144ms
+ GET /api/auth/csrf 200 in 150ms
+ POST /api/auth/session 429 in 145ms
+ GET /api/auth/session 429 in 142ms
+ GET /api/auth/session 429 in 142ms
+ GET /api/auth/csrf 200 in 134ms
+ POST /api/auth/session 429 in 137ms
+ GET /api/auth/session 429 in 123ms
+ GET /api/auth/csrf 200 in 145ms
+ POST /api/auth/session 429 in 143ms
+ GET /api/auth/session 429 in 145ms
+ GET /api/auth/csrf 200 in 102ms
+ POST /api/auth/session 429 in 108ms
+ GET /api/auth/csrf 200 in 89ms
+ POST /api/auth/session 429 in 99ms
+ GET /api/auth/csrf 200 in 92ms
+ POST /api/auth/session 429 in 96ms
+ POST /api/auth/session 429 in 81ms
+ GET /api/auth/csrf 200 in 92ms
+ POST /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/csrf 200 in 44ms
+ POST /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 71ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/csrf 429 in 64ms
+ GET /api/auth/session 429 in 70ms
+ GET /api/auth/csrf 429 in 114ms
+ POST /api/auth/session 429 in 126ms
+ GET /api/auth/session 429 in 117ms
+ GET /api/auth/csrf 429 in 112ms
+ POST /api/auth/session 429 in 115ms
+ GET /api/auth/session 429 in 124ms
+ POST /api/auth/session 429 in 109ms
+ GET /api/auth/csrf 429 in 123ms
+ GET /api/auth/session 429 in 110ms
+ GET /api/auth/csrf 429 in 129ms
+ POST /api/auth/session 429 in 129ms
+ GET /api/auth/session 429 in 128ms
+ POST /api/auth/session 429 in 138ms
+ GET /api/auth/session 429 in 128ms
+ GET /api/auth/csrf 429 in 158ms
+ GET /api/auth/csrf 429 in 143ms
+ POST /api/auth/session 429 in 145ms
+ GET /api/auth/session 429 in 180ms
+ GET /api/auth/csrf 429 in 130ms
+ POST /api/auth/session 429 in 136ms
+ GET /api/auth/session 429 in 130ms
+ GET /api/auth/csrf 429 in 128ms
+ POST /api/auth/session 429 in 130ms
+ GET /api/auth/session 429 in 121ms
+ GET /api/auth/csrf 429 in 104ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/session 429 in 100ms
+ GET /api/auth/csrf 429 in 96ms
+ POST /api/auth/session 429 in 97ms
+ GET /api/auth/session 429 in 99ms
+ POST /api/auth/session 429 in 93ms
+ GET /api/auth/csrf 429 in 104ms
+ GET /api/auth/session 429 in 91ms
+ GET /api/auth/csrf 429 in 83ms
+ POST /api/auth/session 429 in 91ms
+ GET /api/auth/session 429 in 91ms
+ GET /api/auth/csrf 429 in 100ms
+ POST /api/auth/session 429 in 106ms
+ GET /api/auth/session 429 in 103ms
+ GET /api/auth/csrf 429 in 83ms
+ POST /api/auth/session 429 in 97ms
+ GET /api/auth/session 429 in 84ms
+ GET /api/auth/csrf 429 in 86ms
+ POST /api/auth/session 429 in 94ms
+ GET /api/auth/session 429 in 89ms
+ GET /api/auth/csrf 429 in 116ms
+ POST /api/auth/session 429 in 119ms
+ GET /api/auth/session 429 in 117ms
+ GET /api/auth/csrf 429 in 108ms
+ POST /api/auth/session 429 in 117ms
+ GET /api/auth/session 429 in 113ms
+ POST /api/auth/session 429 in 133ms
+ GET /api/auth/csrf 429 in 141ms
+ GET /api/auth/session 429 in 133ms
+ GET /api/auth/csrf 429 in 106ms
+ POST /api/auth/session 429 in 107ms
+ GET /api/auth/session 429 in 101ms
+ POST /api/auth/session 429 in 95ms
+ GET /api/auth/csrf 429 in 108ms
+ GET /api/auth/session 429 in 99ms
+ GET /api/auth/csrf 429 in 97ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/session 429 in 111ms
+ GET /api/auth/csrf 429 in 106ms
+ POST /api/auth/session 429 in 107ms
+ GET /api/auth/session 429 in 107ms
+ POST /api/auth/session 429 in 104ms
+ GET /api/auth/csrf 429 in 117ms
+ GET /api/auth/session 429 in 109ms
+ GET /api/auth/csrf 429 in 102ms
+ POST /api/auth/session 429 in 112ms
+ GET /api/auth/session 429 in 110ms
+ POST /api/auth/session 429 in 106ms
+ GET /api/auth/csrf 429 in 116ms
+ GET /api/auth/session 429 in 98ms
+ GET /api/auth/csrf 429 in 93ms
+ POST /api/auth/session 429 in 90ms
+ GET /api/auth/session 429 in 99ms
+ GET /api/auth/csrf 429 in 107ms
+ GET /api/auth/session 429 in 105ms
+ POST /api/auth/session 429 in 119ms
+ GET /api/auth/csrf 429 in 108ms
+ POST /api/auth/session 429 in 113ms
+ GET /api/auth/session 429 in 123ms
+ POST /api/auth/session 429 in 97ms
+ GET /api/auth/csrf 429 in 110ms
+ GET /api/auth/session 429 in 99ms
+ POST /api/auth/session 429 in 109ms
+ GET /api/auth/csrf 429 in 117ms
+ GET /api/auth/session 429 in 111ms
+ GET /api/auth/csrf 429 in 106ms
+ GET /api/auth/session 429 in 103ms
+ POST /api/auth/session 429 in 115ms
+ GET /api/auth/csrf 429 in 100ms
+ POST /api/auth/session 429 in 98ms
+ GET /api/auth/session 429 in 106ms
+ GET /api/auth/csrf 429 in 99ms
+ GET /api/auth/session 429 in 87ms
+ POST /api/auth/session 429 in 103ms
+ GET /api/auth/session 429 in 77ms
+ POST /api/auth/session 429 in 77ms
+ GET /api/auth/csrf 429 in 90ms
+ POST /api/auth/session 429 in 100ms
+ GET /api/auth/session 429 in 116ms
+ GET /api/auth/csrf 429 in 109ms
+ GET /api/auth/session 429 in 120ms
+ GET /api/auth/csrf 429 in 127ms
+ POST /api/auth/session 429 in 130ms
+ GET /api/auth/session 429 in 124ms
+ POST /api/auth/session 429 in 119ms
+ GET /api/auth/csrf 429 in 137ms
+ GET /api/auth/session 429 in 139ms
+ GET /api/auth/csrf 429 in 142ms
+ POST /api/auth/session 429 in 153ms
+ GET /api/auth/session 429 in 139ms
+ GET /api/auth/csrf 429 in 131ms
+ POST /api/auth/session 429 in 141ms
+ GET /api/auth/session 429 in 134ms
+ POST /api/auth/session 429 in 122ms
+ GET /api/auth/csrf 429 in 140ms
+ GET /api/auth/session 429 in 105ms
+ POST /api/auth/session 429 in 94ms
+ GET /api/auth/csrf 429 in 101ms
+ GET /api/auth/session 429 in 112ms
+ GET /api/auth/csrf 429 in 101ms
+ POST /api/auth/session 429 in 107ms
+ GET /api/auth/session 429 in 112ms
+ POST /api/auth/session 429 in 102ms
+ GET /api/auth/csrf 429 in 112ms
+ GET /api/auth/session 429 in 101ms
+ GET /api/auth/csrf 429 in 98ms
+ POST /api/auth/session 429 in 103ms
+ GET /api/auth/session 429 in 100ms
+ GET /api/auth/csrf 429 in 101ms
+ POST /api/auth/session 429 in 111ms
+ GET /api/auth/session 429 in 87ms
+ GET /api/auth/csrf 429 in 95ms
+ POST /api/auth/session 429 in 98ms
+ GET /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 92ms
+ POST /api/auth/session 429 in 97ms
+ GET /api/auth/session 429 in 110ms
+ POST /api/auth/session 429 in 131ms
+ GET /api/auth/csrf 429 in 141ms
+ GET /api/auth/session 429 in 144ms
+ GET /api/auth/csrf 429 in 119ms
+ POST /api/auth/session 429 in 117ms
+ GET /api/auth/session 429 in 95ms
+ POST /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 97ms
+ GET /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 84ms
+ POST /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 102ms
+ GET /api/auth/csrf 429 in 110ms
+ POST /api/auth/session 429 in 112ms
+ GET /api/auth/session 429 in 110ms
+ GET /api/auth/csrf 429 in 103ms
+ POST /api/auth/session 429 in 99ms
+ GET /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 92ms
+ POST /api/auth/session 429 in 101ms
+ GET /api/auth/session 429 in 93ms
+ GET /api/auth/csrf 429 in 102ms
+ POST /api/auth/session 429 in 102ms
+ GET /api/auth/session 429 in 101ms
+ GET /api/auth/csrf 429 in 100ms
+ POST /api/auth/session 429 in 113ms
+ GET /api/auth/session 429 in 114ms
+ POST /api/auth/session 429 in 111ms
+ GET /api/auth/csrf 429 in 121ms
+ GET /api/auth/session 429 in 116ms
+ GET /api/auth/csrf 429 in 114ms
+ POST /api/auth/session 429 in 115ms
+ GET /api/auth/session 429 in 106ms
+ POST /api/auth/session 429 in 90ms
+ GET /api/auth/csrf 429 in 98ms
+ GET /api/auth/session 429 in 95ms
+ GET /api/auth/csrf 429 in 95ms
+ POST /api/auth/session 429 in 98ms
+ GET /api/auth/session 429 in 102ms
+ GET /api/auth/csrf 429 in 108ms
+ POST /api/auth/session 429 in 119ms
+ GET /api/auth/session 429 in 115ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/csrf 429 in 114ms
+ GET /api/auth/session 429 in 93ms
+ POST /api/auth/session 429 in 87ms
+ GET /api/auth/csrf 429 in 104ms
+ GET /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 85ms
+ POST /api/auth/session 429 in 92ms
+ GET /api/auth/session 429 in 91ms
+ POST /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 103ms
+ GET /api/auth/session 429 in 93ms
+ GET /api/auth/csrf 429 in 100ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/session 429 in 108ms
+ GET /api/auth/csrf 429 in 113ms
+ POST /api/auth/session 429 in 113ms
+ GET /api/auth/session 429 in 151ms
+ POST /api/auth/session 429 in 109ms
+ GET /api/auth/csrf 429 in 124ms
+ GET /api/auth/session 429 in 100ms
+ GET /api/auth/csrf 429 in 97ms
+ POST /api/auth/session 429 in 103ms
+ GET /api/auth/session 429 in 110ms
+ GET /api/auth/csrf 429 in 95ms
+ POST /api/auth/session 429 in 98ms
+ GET /api/auth/session 429 in 99ms
+ GET /api/auth/csrf 429 in 105ms
+ POST /api/auth/session 429 in 103ms
+ GET /api/auth/session 429 in 114ms
+ POST /api/auth/session 429 in 123ms
+ GET /api/auth/csrf 429 in 131ms
+ GET /api/auth/session 429 in 113ms
+ GET /api/auth/csrf 429 in 106ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/session 429 in 91ms
+ POST /api/auth/session 429 in 86ms
+ GET /api/auth/csrf 429 in 96ms
+ GET /api/auth/session 429 in 108ms
+ POST /api/auth/session 429 in 98ms
+ GET /api/auth/csrf 429 in 112ms
+ GET /api/auth/session 429 in 105ms
+ GET /api/auth/csrf 429 in 108ms
+ POST /api/auth/session 429 in 113ms
+ GET /api/auth/session 429 in 113ms
+ GET /api/auth/csrf 429 in 106ms
+ POST /api/auth/session 429 in 120ms
+ GET /api/auth/session 429 in 115ms
+ POST /api/auth/session 429 in 90ms
+ GET /api/auth/csrf 429 in 98ms
+ GET /api/auth/session 429 in 102ms
+ POST /api/auth/session 429 in 100ms
+ GET /api/auth/csrf 429 in 108ms
+ GET /api/auth/session 429 in 93ms
+ GET /api/auth/csrf 429 in 95ms
+ POST /api/auth/session 429 in 97ms
+ GET /api/auth/session 429 in 96ms
+ POST /api/auth/session 429 in 82ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/session 429 in 86ms
+ GET /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 59ms
+ GET /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 71ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 59ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 65ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/session 429 in 93ms
+ GET /api/auth/session 429 in 76ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 68ms
+ GET /api/auth/session 429 in 68ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 65ms
+ GET /api/auth/csrf 429 in 68ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/csrf 429 in 87ms
+ POST /api/auth/session 429 in 94ms
+ GET /api/auth/session 429 in 99ms
+ GET /api/auth/csrf 429 in 111ms
+ POST /api/auth/session 429 in 118ms
+ GET /api/auth/session 429 in 116ms
+ GET /api/auth/csrf 429 in 135ms
+ POST /api/auth/session 429 in 147ms
+ GET /api/auth/session 429 in 115ms
+ GET /api/auth/csrf 429 in 95ms
+ POST /api/auth/session 429 in 98ms
+ GET /api/auth/session 429 in 92ms
+ GET /api/auth/csrf 429 in 92ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/session 429 in 115ms
+ GET /api/auth/csrf 429 in 117ms
+ POST /api/auth/session 429 in 133ms
+ GET /api/auth/session 429 in 141ms
+ GET /api/auth/csrf 429 in 151ms
+ POST /api/auth/session 429 in 172ms
+ GET /api/auth/session 429 in 202ms
+ ○ Compiling /client/event-planner ...
+ POST /api/auth/session 429 in 188ms
+ GET /api/auth/csrf 429 in 196ms
+ GET /api/auth/session 429 in 171ms
+ GET /api/auth/csrf 429 in 163ms
+ POST /api/auth/session 429 in 180ms
+ GET /api/auth/session 429 in 157ms
+ GET /api/auth/csrf 429 in 188ms
+ POST /api/auth/session 429 in 184ms
+ GET /api/auth/session 429 in 140ms
+ POST /api/auth/session 429 in 150ms
+ GET /api/auth/csrf 429 in 175ms
+ GET /api/auth/session 429 in 223ms
+ POST /api/auth/session 429 in 189ms
+ GET /api/auth/csrf 429 in 203ms
+ GET /api/auth/session 429 in 149ms
+ GET /api/auth/csrf 429 in 142ms
+ POST /api/auth/session 429 in 140ms
+ GET /api/auth/session 429 in 136ms
+ GET /api/auth/csrf 429 in 129ms
+ POST /api/auth/session 429 in 134ms
+ GET /api/auth/session 429 in 129ms
+ GET /api/auth/csrf 429 in 134ms
+ POST /api/auth/session 429 in 135ms
+ GET /api/auth/session 429 in 148ms
+ POST /api/auth/session 429 in 124ms
+ GET /api/auth/csrf 429 in 140ms
+ GET /api/auth/session 429 in 144ms
+ GET /api/auth/csrf 429 in 104ms
+ POST /api/auth/session 429 in 103ms
+ GET /api/auth/session 429 in 104ms
+ GET /api/auth/csrf 429 in 96ms
+ POST /api/auth/session 429 in 119ms
+ GET /api/auth/session 429 in 115ms
+ GET /api/auth/csrf 429 in 111ms
+ POST /api/auth/session 429 in 114ms
+ ✓ Compiled /client/event-planner in 2.2s
+ GET /api/auth/session 429 in 121ms
+ GET /client/event-planner 200 in 2264ms
+ GET /api/auth/csrf 429 in 144ms
+ POST /api/auth/session 429 in 139ms
+ GET /api/auth/session 429 in 96ms
+ POST /api/auth/session 429 in 75ms
+ GET /api/auth/session 429 in 66ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 60ms
+ GET /api/auth/session 429 in 65ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 81ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 60ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 86ms
+ GET /api/auth/session 429 in 101ms
+ GET /api/auth/session 429 in 67ms
+ GET /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 57ms
+ ○ Compiling /client/bookings ...
+ ✓ Compiled /client/bookings in 1056ms
+ GET /client/bookings 200 in 1097ms
+ GET /api/auth/session 429 in 90ms
+ GET /api/auth/session 429 in 59ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 52ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /client/explore 200 in 76ms
+ GET /api/auth/session 429 in 84ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 67ms
+ GET /api/auth/session 429 in 72ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 86ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 88ms
+ GET /api/auth/session 429 in 115ms
+ GET /api/auth/session 429 in 77ms
+ GET /client/home 200 in 102ms
+ GET /api/auth/session 429 in 68ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 75ms
+ GET /api/auth/session 429 in 115ms
+ GET /api/auth/session 429 in 74ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/session 429 in 75ms
+ GET /api/auth/session 429 in 66ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 64ms
+ GET /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 79ms
+ GET /placeholder.png 404 in 118ms
+ GET /api/auth/session 429 in 87ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 71ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 66ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 67ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 82ms
+ GET /api/auth/session 429 in 59ms
+ GET /client/messages 200 in 69ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 70ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 81ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 66ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /client/explore 200 in 102ms
+ GET /api/auth/session 429 in 89ms
+ GET /api/auth/session 429 in 75ms
+ GET /api/auth/session 429 in 102ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/session 429 in 59ms
+ GET /api/auth/session 429 in 84ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 57ms
+ GET /client/home 200 in 94ms
+ GET /api/auth/session 429 in 80ms
+ GET /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 120ms
+ GET /api/auth/session 429 in 85ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 67ms
+ GET /api/auth/session 429 in 78ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 65ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 74ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 60ms
+ GET /api/auth/session 429 in 82ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 76ms
+ GET /api/auth/session 429 in 80ms
+ GET /api/auth/session 429 in 73ms
+ GET /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 60ms
+ GET /api/auth/session 429 in 80ms
+ GET /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 76ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 67ms
+ GET /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 66ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 59ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 68ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 64ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 102ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 59ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 60ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 68ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 67ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 73ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 59ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 81ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 70ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 64ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 73ms
+ GET /placeholder.png 404 in 102ms
+ GET /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/csrf 429 in 64ms
+ GET /api/auth/session 429 in 66ms
+ GET /api/auth/csrf 429 in 78ms
+ POST /api/auth/session 429 in 76ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/csrf 429 in 77ms
+ POST /api/auth/session 429 in 85ms
+ GET /api/auth/session 429 in 78ms
+ GET /api/auth/csrf 429 in 84ms
+ POST /api/auth/session 429 in 86ms
+ GET /api/auth/session 429 in 80ms
+ POST /api/auth/session 429 in 74ms
+ GET /api/auth/csrf 429 in 83ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/csrf 429 in 80ms
+ GET /api/auth/session 429 in 74ms
+ POST /api/auth/session 429 in 102ms
+ GET /api/auth/csrf 429 in 82ms
+ POST /api/auth/session 429 in 84ms
+ GET /api/auth/session 429 in 90ms
+ GET /api/auth/csrf 429 in 79ms
+ GET /api/auth/session 429 in 71ms
+ POST /api/auth/session 429 in 90ms
+ GET /api/auth/csrf 429 in 99ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/session 429 in 101ms
+ POST /api/auth/session 429 in 66ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 82ms
+ GET /api/auth/session 429 in 86ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/session 429 in 95ms
+ GET /api/auth/csrf 429 in 112ms
+ GET /api/auth/session 429 in 131ms
+ GET /api/auth/csrf 429 in 112ms
+ POST /api/auth/session 429 in 115ms
+ GET /api/auth/session 429 in 101ms
+ POST /api/auth/session 429 in 100ms
+ GET /api/auth/csrf 429 in 112ms
+ GET /api/auth/session 429 in 117ms
+ GET /api/auth/csrf 429 in 114ms
+ POST /api/auth/session 429 in 131ms
+ GET /api/auth/session 429 in 112ms
+ GET /api/auth/csrf 429 in 100ms
+ POST /api/auth/session 429 in 103ms
+ GET /api/auth/session 429 in 102ms
+ POST /api/auth/session 429 in 102ms
+ GET /api/auth/csrf 429 in 112ms
+ GET /api/auth/session 429 in 106ms
+ GET /api/auth/csrf 429 in 105ms
+ POST /api/auth/session 429 in 107ms
+ GET /api/auth/session 429 in 117ms
+ POST /api/auth/session 429 in 114ms
+ GET /api/auth/csrf 429 in 124ms
+ GET /api/auth/session 429 in 107ms
+ GET /api/auth/csrf 429 in 98ms
+ POST /api/auth/session 429 in 109ms
+ GET /api/auth/session 429 in 110ms
+ GET /api/auth/csrf 429 in 114ms
+ POST /api/auth/session 429 in 129ms
+ GET /api/auth/session 429 in 105ms
+ GET /api/auth/csrf 429 in 106ms
+ POST /api/auth/session 429 in 106ms
+ GET /api/auth/session 429 in 95ms
+ GET /api/auth/csrf 429 in 95ms
+ POST /api/auth/session 429 in 102ms
+ GET /api/auth/session 429 in 109ms
+ GET /api/auth/csrf 429 in 105ms
+ POST /api/auth/session 429 in 112ms
+ GET /api/auth/session 429 in 108ms
+ POST /api/auth/session 429 in 101ms
+ GET /api/auth/csrf 429 in 111ms
+ GET /api/auth/session 429 in 101ms
+ GET /api/auth/csrf 429 in 98ms
+ POST /api/auth/session 429 in 104ms
+ GET /api/auth/session 429 in 118ms
+ GET /api/auth/csrf 429 in 118ms
+ POST /api/auth/session 429 in 122ms
+ GET /api/auth/session 429 in 125ms
+ POST /api/auth/session 429 in 133ms
+ GET /api/auth/csrf 429 in 150ms
+ GET /api/auth/session 429 in 126ms
+ GET /api/auth/csrf 429 in 108ms
+ POST /api/auth/session 429 in 110ms
+ GET /api/auth/session 429 in 91ms
+ GET /api/auth/csrf 429 in 95ms
+ POST /api/auth/session 429 in 95ms
+ GET /api/auth/session 429 in 118ms
+ POST /api/auth/session 429 in 103ms
+ GET /api/auth/csrf 429 in 111ms
+ GET /api/auth/session 429 in 107ms
+ GET /api/auth/csrf 429 in 97ms
+ POST /api/auth/session 429 in 113ms
+ GET /api/auth/session 429 in 131ms
+ POST /api/auth/session 429 in 133ms
+ GET /api/auth/csrf 429 in 147ms
+ GET /api/auth/session 429 in 106ms
+ GET /api/auth/csrf 429 in 115ms
+ POST /api/auth/session 429 in 142ms
+ GET /api/auth/session 429 in 135ms
+ GET /api/auth/csrf 429 in 119ms
+ POST /api/auth/session 429 in 120ms
+ GET /api/auth/session 429 in 105ms
+ POST /api/auth/session 429 in 92ms
+ GET /api/auth/csrf 429 in 104ms
+ GET /api/auth/session 429 in 109ms
+ POST /api/auth/session 429 in 105ms
+ GET /api/auth/csrf 429 in 119ms
+ GET /api/auth/session 429 in 97ms
+ GET /api/auth/csrf 429 in 103ms
+ POST /api/auth/session 429 in 104ms
+ GET /api/auth/session 429 in 106ms
+ GET /api/auth/csrf 429 in 106ms
+ POST /api/auth/session 429 in 119ms
+ GET /api/auth/session 429 in 111ms
+ GET /api/auth/csrf 429 in 123ms
+ POST /api/auth/session 429 in 145ms
+ GET /api/auth/session 429 in 125ms
+ GET /api/auth/csrf 429 in 126ms
+ POST /api/auth/session 429 in 138ms
+ GET /api/auth/session 429 in 118ms
+ GET /api/auth/csrf 429 in 112ms
+ POST /api/auth/session 429 in 122ms
+ GET /api/auth/session 429 in 142ms
+ GET /api/auth/csrf 429 in 148ms
+ POST /api/auth/session 429 in 170ms
+ GET /api/auth/session 429 in 152ms
+ GET /api/auth/csrf 429 in 128ms
+ POST /api/auth/session 429 in 152ms
+ GET /api/auth/session 429 in 129ms
+ GET /api/auth/csrf 429 in 114ms
+ POST /api/auth/session 429 in 113ms
+ GET /api/auth/session 429 in 100ms
+ GET /api/auth/csrf 429 in 109ms
+ POST /api/auth/session 429 in 125ms
+ GET /api/auth/session 429 in 122ms
+ GET /api/auth/csrf 429 in 110ms
+ POST /api/auth/session 429 in 121ms
+ GET /api/auth/session 429 in 110ms
+ POST /api/auth/session 429 in 104ms
+ GET /api/auth/csrf 429 in 108ms
+ GET /api/auth/session 429 in 94ms
+ POST /api/auth/session 429 in 110ms
+ GET /api/auth/csrf 429 in 122ms
+ GET /api/auth/session 429 in 117ms
+ GET /api/auth/csrf 429 in 116ms
+ POST /api/auth/session 429 in 132ms
+ GET /api/auth/session 429 in 106ms
+ GET /api/auth/csrf 429 in 122ms
+ POST /api/auth/session 429 in 135ms
+ GET /api/auth/session 429 in 110ms
+ POST /api/auth/session 429 in 82ms
+ GET /api/auth/csrf 429 in 90ms
+ GET /api/auth/session 429 in 90ms
+ POST /api/auth/session 429 in 83ms
+ GET /api/auth/csrf 429 in 87ms
+ GET /api/auth/session 429 in 100ms
+ POST /api/auth/session 429 in 110ms
+ GET /api/auth/csrf 429 in 119ms
+ GET /api/auth/session 429 in 101ms
+ GET /api/auth/csrf 429 in 91ms
+ POST /api/auth/session 429 in 93ms
+ GET /api/auth/session 429 in 98ms
+ GET /api/auth/csrf 429 in 95ms
+ POST /api/auth/session 429 in 94ms
+ GET /api/auth/session 429 in 87ms
+ GET /api/auth/csrf 429 in 90ms
+ POST /api/auth/session 429 in 87ms
+ GET /api/auth/session 429 in 86ms
+ GET /api/auth/csrf 429 in 89ms
+ POST /api/auth/session 429 in 93ms
+ GET /api/auth/session 429 in 90ms
+ POST /api/auth/session 429 in 98ms
+ GET /api/auth/csrf 429 in 110ms
+ GET /api/auth/session 429 in 102ms
+ GET /api/auth/csrf 429 in 114ms
+ GET /api/auth/session 429 in 123ms
+ POST /api/auth/session 429 in 146ms
+ GET /api/auth/csrf 429 in 121ms
+ GET /api/auth/session 429 in 118ms
+ POST /api/auth/session 429 in 150ms
+ GET /api/auth/csrf 429 in 112ms
+ POST /api/auth/session 429 in 120ms
+ GET /api/auth/session 429 in 124ms
+ GET /api/auth/csrf 429 in 118ms
+ POST /api/auth/session 429 in 118ms
+ GET /api/auth/session 429 in 146ms
+ GET /api/auth/csrf 429 in 139ms
+ POST /api/auth/session 429 in 156ms
+ GET /api/auth/session 429 in 144ms
+ GET /api/auth/csrf 429 in 126ms
+ POST /api/auth/session 429 in 128ms
+ GET /api/auth/session 429 in 127ms
+ GET /api/auth/csrf 429 in 115ms
+ POST /api/auth/session 429 in 118ms
+ GET /api/auth/session 429 in 119ms
+ GET /api/auth/csrf 429 in 115ms
+ POST /api/auth/session 429 in 115ms
+ GET /api/auth/session 429 in 92ms
+ GET /api/auth/csrf 429 in 91ms
+ POST /api/auth/session 429 in 91ms
+ GET /api/auth/session 429 in 92ms
+ GET /api/auth/csrf 429 in 93ms
+ POST /api/auth/session 429 in 92ms
+ GET /api/auth/session 429 in 101ms
+ GET /api/auth/csrf 429 in 102ms
+ POST /api/auth/session 429 in 107ms
+ GET /api/auth/session 429 in 110ms
+ GET /api/auth/csrf 429 in 114ms
+ POST /api/auth/session 429 in 117ms
+ GET /api/auth/session 429 in 138ms
+ GET /api/auth/csrf 429 in 141ms
+ POST /api/auth/session 429 in 153ms
+ GET /api/auth/session 429 in 128ms
+ GET /api/auth/csrf 429 in 122ms
+ POST /api/auth/session 429 in 122ms
+ GET /api/auth/session 429 in 120ms
+ POST /api/auth/session 429 in 101ms
+ GET /api/auth/csrf 429 in 114ms
+ GET /api/auth/session 429 in 103ms
+ GET /api/auth/csrf 429 in 103ms
+ POST /api/auth/session 429 in 137ms
+ GET /api/auth/session 429 in 135ms
+ GET /api/auth/csrf 429 in 135ms
+ POST /api/auth/session 429 in 145ms
+ GET /api/auth/session 429 in 131ms
+ GET /api/auth/csrf 429 in 137ms
+ POST /api/auth/session 429 in 137ms
+ GET /api/auth/session 429 in 106ms
+ POST /api/auth/session 429 in 76ms
+ GET /api/auth/csrf 429 in 88ms
+ GET /api/auth/session 429 in 74ms
+ GET /api/auth/csrf 429 in 78ms
+ POST /api/auth/session 429 in 86ms
+ GET /api/auth/session 429 in 89ms
+ POST /api/auth/session 429 in 87ms
+ GET /api/auth/csrf 429 in 96ms
+ GET /api/auth/session 429 in 92ms
+ POST /api/auth/session 429 in 86ms
+ GET /api/auth/csrf 429 in 96ms
+ GET /api/auth/session 429 in 84ms
+ GET /api/auth/csrf 429 in 88ms
+ POST /api/auth/session 429 in 97ms
+ GET /api/auth/session 429 in 96ms
+ GET /api/auth/csrf 429 in 90ms
+ POST /api/auth/session 429 in 92ms
+ GET /api/auth/session 429 in 96ms
+ GET /api/auth/csrf 429 in 87ms
+ POST /api/auth/session 429 in 99ms
+ GET /api/auth/session 429 in 85ms
+ GET /api/auth/csrf 429 in 85ms
+ POST /api/auth/session 429 in 89ms
+ GET /api/auth/session 429 in 83ms
+ GET /api/auth/csrf 429 in 78ms
+ POST /api/auth/session 429 in 75ms
+ GET /api/auth/session 429 in 78ms
+ GET /api/auth/csrf 429 in 96ms
+ POST /api/auth/session 429 in 97ms
+ GET /api/auth/session 429 in 98ms
+ POST /api/auth/session 429 in 86ms
+ GET /api/auth/csrf 429 in 96ms
+ GET /api/auth/session 429 in 105ms
+ POST /api/auth/session 429 in 98ms
+ GET /api/auth/csrf 429 in 105ms
+ GET /api/auth/session 429 in 85ms
+ GET /api/auth/csrf 429 in 87ms
+ POST /api/auth/session 429 in 88ms
+ GET /api/auth/session 429 in 86ms
+ GET /api/auth/csrf 429 in 85ms
+ POST /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 91ms
+ POST /api/auth/session 429 in 88ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/csrf 429 in 75ms
+ POST /api/auth/session 429 in 76ms
+ GET /api/auth/session 429 in 74ms
+ POST /api/auth/session 429 in 72ms
+ GET /api/auth/csrf 429 in 84ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/csrf 429 in 84ms
+ POST /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 83ms
+ GET /api/auth/csrf 429 in 81ms
+ POST /api/auth/session 429 in 80ms
+ GET /api/auth/session 429 in 79ms
+ POST /api/auth/session 429 in 74ms
+ GET /api/auth/csrf 429 in 82ms
+ GET /api/auth/session 429 in 76ms
+ POST /api/auth/session 429 in 78ms
+ GET /api/auth/csrf 429 in 87ms
+ GET /api/auth/session 429 in 83ms
+ POST /api/auth/session 429 in 75ms
+ GET /api/auth/csrf 429 in 84ms
+ GET /api/auth/session 429 in 96ms
+ GET /api/auth/csrf 429 in 138ms
+ POST /api/auth/session 429 in 150ms
+ GET /api/auth/session 429 in 132ms
+ POST /api/auth/session 429 in 80ms
+ GET /api/auth/csrf 429 in 87ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/csrf 429 in 75ms
+ POST /api/auth/session 429 in 79ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/csrf 429 in 80ms
+ POST /api/auth/session 429 in 82ms
+ GET /api/auth/session 429 in 87ms
+ GET /api/auth/csrf 429 in 82ms
+ POST /api/auth/session 429 in 79ms
+ GET /api/auth/session 429 in 82ms
+ GET /api/auth/csrf 429 in 82ms
+ POST /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 80ms
+ POST /api/auth/session 429 in 76ms
+ GET /api/auth/csrf 429 in 86ms
+ GET /api/auth/session 429 in 74ms
+ POST /api/auth/session 429 in 67ms
+ GET /api/auth/csrf 429 in 75ms
+ GET /api/auth/session 429 in 71ms
+ GET /api/auth/csrf 429 in 77ms
+ POST /api/auth/session 429 in 80ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/csrf 429 in 82ms
+ GET /api/auth/session 429 in 75ms
+ POST /api/auth/session 429 in 82ms
+ POST /api/auth/session 429 in 77ms
+ GET /api/auth/csrf 429 in 86ms
+ GET /api/auth/session 429 in 86ms
+ POST /api/auth/session 429 in 74ms
+ GET /api/auth/csrf 429 in 83ms
+ GET /api/auth/session 429 in 74ms
+ GET /api/auth/csrf 429 in 74ms
+ GET /api/auth/session 429 in 85ms
+ POST /api/auth/session 429 in 88ms
+ GET /api/auth/csrf 429 in 81ms
+ POST /api/auth/session 429 in 83ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/csrf 429 in 89ms
+ POST /api/auth/session 429 in 86ms
+ GET /api/auth/session 429 in 92ms
+ GET /api/auth/csrf 429 in 81ms
+ POST /api/auth/session 429 in 80ms
+ GET /api/auth/session 429 in 79ms
+ GET /api/auth/csrf 429 in 74ms
+ GET /api/auth/session 429 in 74ms
+ POST /api/auth/session 429 in 86ms
+ POST /api/auth/session 429 in 83ms
+ GET /api/auth/csrf 429 in 91ms
+ GET /api/auth/session 429 in 81ms
+ GET /api/auth/csrf 429 in 85ms
+ POST /api/auth/session 429 in 96ms
+ GET /api/auth/session 429 in 101ms
+ POST /api/auth/session 429 in 77ms
+ GET /api/auth/csrf 429 in 86ms
+ GET /api/auth/session 429 in 74ms
+ GET /api/auth/session 429 in 74ms
+ POST /api/auth/session 429 in 75ms
+ GET /api/auth/csrf 429 in 87ms
+ GET /api/auth/session 429 in 106ms
+ GET /api/auth/csrf 429 in 107ms
+ POST /api/auth/session 429 in 120ms
+ GET /api/auth/session 429 in 92ms
+ GET /api/auth/csrf 429 in 92ms
+ POST /api/auth/session 429 in 93ms
+ GET /api/auth/session 429 in 62ms
+ POST /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 93ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 75ms
+ GET /api/auth/session 429 in 73ms
+ GET /api/auth/session 429 in 91ms
+ GET /api/auth/session 429 in 67ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/session 429 in 76ms
+ GET /api/auth/session 429 in 68ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 77ms
+ GET /api/auth/session 429 in 74ms
+ GET /api/auth/session 429 in 84ms
+ GET /api/auth/session 429 in 64ms
+ GET /api/auth/session 429 in 93ms
+ GET /api/auth/session 429 in 59ms
+ GET /api/auth/session 429 in 76ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 71ms
+ GET /api/auth/session 429 in 74ms
+ GET /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 80ms
+ GET /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 71ms
+Error: Route "/client/explore" used `searchParams.category`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:5:33)
+  3 |
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+> 5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+    |                                 ^
+  6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+Error: Route "/client/explore" used `searchParams.eventType`. `searchParams` should be awaited before using its properties. Learn more: https://nextjs.org/docs/messages/sync-dynamic-apis
+    at ExplorePage (src\app\client\explore\page.tsx:6:34)
+  4 | export default function ExplorePage({ searchParams }: { searchParams?: { [key: string]: string | string[] | undefined } }) {
+  5 |   const initialCategory = typeof searchParams?.category === 'string' ? searchParams?.category : undefined;
+> 6 |   const initialEventType = typeof searchParams?.eventType === 'string' ? searchParams?.eventType : undefined;
+    |                                  ^
+  7 |   return <ClientDashboard initialCategory={initialCategory} initialEventType={initialEventType} />;
+  8 | }
+  9 |
+ GET /client/explore 200 in 109ms
+ GET /api/auth/session 429 in 81ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 107ms
+ GET /api/auth/session 429 in 78ms
+ GET /api/auth/session 429 in 78ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 90ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 60ms
+ GET /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 66ms
+ GET /client/home 200 in 78ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 80ms
+ GET /api/auth/session 429 in 85ms
+ GET /api/auth/session 429 in 68ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 72ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 72ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 65ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 69ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 59ms
+ GET /api/auth/session 429 in 59ms
+ GET /api/auth/session 429 in 68ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 72ms
+ GET /api/auth/session 429 in 64ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 54ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 75ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 86ms
+ GET /api/auth/session 429 in 64ms
+ GET /api/auth/session 429 in 63ms
+ GET /api/auth/session 429 in 59ms
+ GET /api/auth/session 429 in 70ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 70ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 55ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 86ms
+ GET /client/messages 200 in 133ms
+ GET /api/auth/session 429 in 103ms
+ GET /api/auth/session 429 in 72ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 62ms
+ GET /api/auth/session 429 in 60ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 53ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 73ms
+ GET /api/auth/session 429 in 56ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 72ms
+ GET /api/auth/session 429 in 60ms
+ GET /api/auth/session 429 in 58ms
+ GET /api/auth/session 429 in 51ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 61ms
+ GET /api/auth/session 429 in 95ms
+ GET /api/auth/session 429 in 59ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 57ms
+ GET /api/auth/session 429 in 49ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 50ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 39ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 40ms
+ GET /api/auth/session 429 in 47ms
+ GET /api/auth/session 429 in 41ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 52ms
+ GET /api/auth/session 429 in 46ms
+ GET /api/auth/session 429 in 48ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 43ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 429 in 44ms
+ GET /api/auth/session 429 in 45ms
+ GET /api/auth/session 429 in 42ms
+ GET /api/auth/session 200 in 809ms
+ GET /api/auth/session 200 in 371ms
+^C^C

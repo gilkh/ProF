@@ -20,54 +20,56 @@ import { Switch } from '@/components/ui/switch';
 import { locations, eventTypes } from '@/lib/types';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/use-auth';
-import { updateUserSettings, getUserSettings } from '@/lib/services';
+import { updateUserSettings } from '@/lib/services';
+import { useServicesAndOffers, useUserSettings } from '@/hooks/use-user-data';
 
 
 
 const categories: (ServiceCategory | 'All Categories')[] = ['All Categories', 'Venues', 'Catering & Sweets', 'Entertainment', 'Lighting & Sound', 'Photography & Videography', 'Decoration', 'Beauty & Grooming', 'Transportation', 'Invitations & Printables', 'Rentals & Furniture', 'Security and Crowd Control'];
 
 const INCLUSIONS_MAP: Record<ServiceCategory, { key: keyof ServiceInclusions, label: string, icon: React.ElementType }[]> = {
-    'Venues': [
-        { key: 'hasParking', label: 'Parking Available', icon: X },
-        { key: 'hasValet', label: 'Valet Service', icon: X },
-        { key: 'hasOnSiteCatering', label: 'On-site Catering', icon: X },
-        { key: 'isOutdoors', label: 'Outdoor Space', icon: X },
-        { key: 'hasPool', label: 'Pool Area', icon: X },
-    ],
-    'Catering & Sweets': [
-        { key: 'offersTastings', label: 'Offers Tastings', icon: X },
-        { key: 'servesAlcohol', label: 'Serves Alcohol', icon: X },
-        { key: 'hasVeganOptions', label: 'Vegan Options', icon: X },
-        { key: 'hasGlutenFreeOptions', label: 'Gluten-Free Options', icon: X },
-    ],
-    'Entertainment': [
-        { key: 'providesOwnSoundSystem', label: 'Includes Sound System', icon: X },
-        { key: 'providesOwnLighting', label: 'Includes Lighting', icon: X },
-    ],
-    'Photography & Videography': [
-        { key: 'offersDroneFootage', label: 'Drone Footage', icon: X },
-        { key: 'offersSameDayEdit', label: 'Same-day Edit', icon: X },
-    ],
-    'Decoration': [
-        { key: 'providesSetup', label: 'Includes Setup', icon: X },
-        { key: 'providesCleanup', label: 'Includes Cleanup', icon: X },
-    ],
-    'Beauty & Grooming': [
-        { key: 'travelsToClient', label: 'Travels to Client', icon: X },
-        { key: 'offersTrials', label: 'Offers Trials', icon: X },
-    ],
-    'Lighting & Sound': [],
-    'Transportation': [],
-    'Invitations & Printables': [],
-    'Rentals & Furniture': [],
-    'Security and Crowd Control': [],
+  'Venues': [
+    { key: 'hasParking', label: 'Parking Available', icon: X },
+    { key: 'hasValet', label: 'Valet Service', icon: X },
+    { key: 'hasOnSiteCatering', label: 'On-site Catering', icon: X },
+    { key: 'isOutdoors', label: 'Outdoor Space', icon: X },
+    { key: 'hasPool', label: 'Pool Area', icon: X },
+  ],
+  'Catering & Sweets': [
+    { key: 'offersTastings', label: 'Offers Tastings', icon: X },
+    { key: 'servesAlcohol', label: 'Serves Alcohol', icon: X },
+    { key: 'hasVeganOptions', label: 'Vegan Options', icon: X },
+    { key: 'hasGlutenFreeOptions', label: 'Gluten-Free Options', icon: X },
+  ],
+  'Entertainment': [
+    { key: 'providesOwnSoundSystem', label: 'Includes Sound System', icon: X },
+    { key: 'providesOwnLighting', label: 'Includes Lighting', icon: X },
+  ],
+  'Photography & Videography': [
+    { key: 'offersDroneFootage', label: 'Drone Footage', icon: X },
+    { key: 'offersSameDayEdit', label: 'Same-day Edit', icon: X },
+  ],
+  'Decoration': [
+    { key: 'providesSetup', label: 'Includes Setup', icon: X },
+    { key: 'providesCleanup', label: 'Includes Cleanup', icon: X },
+  ],
+  'Beauty & Grooming': [
+    { key: 'travelsToClient', label: 'Travels to Client', icon: X },
+    { key: 'offersTrials', label: 'Offers Trials', icon: X },
+  ],
+  'Lighting & Sound': [],
+  'Transportation': [],
+  'Invitations & Printables': [],
+  'Rentals & Furniture': [],
+  'Security and Crowd Control': [],
 }
 
 
 export function ClientDashboard({ initialCategory, initialEventType }: { initialCategory?: string; initialEventType?: string }) {
   const { userId } = useAuth();
-  const [allItems, setAllItems] = useState<ServiceOrOffer[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: allItems = [], isLoading: isItemsLoading } = useServicesAndOffers();
+  const { data: settings } = useUserSettings();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory | 'All Categories'>('All Categories');
   const [selectedLocation, setSelectedLocation] = useState<LocationGeneral | 'All Locations'>('All Locations');
@@ -82,34 +84,11 @@ export function ClientDashboard({ initialCategory, initialEventType }: { initial
   const [savedSelection, setSavedSelection] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    async function loadItems() {
-        setIsLoading(true);
-        try {
-            // Only fetch approved items
-            const items = await getServicesAndOffers(undefined, { includePending: false });
-            setAllItems(items);
-        } catch (error) {
-            console.error("Failed to load services and offers", error);
-        } finally {
-            setIsLoading(false);
-        }
+    if (settings) {
+      const locs = (settings as any)?.savedLocations || [];
+      setSavedLocations(Array.isArray(locs) ? locs : []);
     }
-    loadItems();
-  }, [])
-
-  useEffect(() => {
-    async function loadSavedLocations() {
-      if (!userId) return;
-      try {
-        const settings = await getUserSettings(userId);
-        const locs = (settings as any)?.savedLocations || [];
-        setSavedLocations(Array.isArray(locs) ? locs : []);
-      } catch (e) {
-        // ignore
-      }
-    }
-    loadSavedLocations();
-  }, [userId]);
+  }, [settings]);
 
   const DISTRICTS_BY_REGION: Record<Location, string[]> = {
     Beirut: ['Beirut'],
@@ -157,10 +136,10 @@ export function ClientDashboard({ initialCategory, initialEventType }: { initial
       setSelectedEventType(initialEventType as EventType | 'All Event Types');
     }
   }, [initialCategory, initialEventType])
-  
+
   const filteredItems = useMemo(() => {
     return allItems
-      .filter(item => 
+      .filter(item =>
         selectedCategory === 'All Categories' || item.category === selectedCategory
       )
       .filter(item => {
@@ -192,7 +171,7 @@ export function ClientDashboard({ initialCategory, initialEventType }: { initial
         }
         return false;
       })
-      .filter(item => 
+      .filter(item =>
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.vendorName.toLowerCase().includes(searchTerm.toLowerCase())
@@ -213,7 +192,7 @@ export function ClientDashboard({ initialCategory, initialEventType }: { initial
     setActiveFilters({});
     setSelectedCategory(value as ServiceCategory | 'All Categories');
   };
-  
+
   const handleLocationChange = (value: string) => {
     setSelectedLocation(value as LocationGeneral | 'All Locations');
   };
@@ -323,13 +302,13 @@ export function ClientDashboard({ initialCategory, initialEventType }: { initial
     setActiveFilters(newFilters);
     setIsFilterDialogOpen(false);
   }
-  
+
   const activeFilterCount = Object.values(activeFilters).filter(Boolean).length;
 
 
   const renderSkeletons = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-96 w-full rounded-xl" />)}
+      {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-96 w-full rounded-xl" />)}
     </div>
   );
 
@@ -339,53 +318,53 @@ export function ClientDashboard({ initialCategory, initialEventType }: { initial
     const inclusionsForCategory = selectedCategory !== 'All Categories' ? INCLUSIONS_MAP[selectedCategory] : [];
 
     const handleToggle = (key: keyof ServiceInclusions, checked: boolean) => {
-        setLocalFilters(prev => ({...prev, [key]: checked}))
+      setLocalFilters(prev => ({ ...prev, [key]: checked }))
     }
 
     return (
-        <Dialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen}>
-            <DialogTrigger asChild>
-                <Button variant="outline" className="h-12 text-base shrink-0">
-                    <ListFilter className="mr-2 h-5 w-5" />
-                    Filters
-                    {activeFilterCount > 0 && (
-                        <Badge className="ml-2 bg-primary text-primary-foreground">{activeFilterCount}</Badge>
-                    )}
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Advanced Filters</DialogTitle>
-                </DialogHeader>
-                <div className="py-4">
-                    {selectedCategory === 'All Categories' ? (
-                        <p className="text-muted-foreground text-center">Please select a category first to see available filters.</p>
-                    ) : inclusionsForCategory.length > 0 ? (
-                        <div className="space-y-4 max-h-96 overflow-y-auto pr-4">
-                            {inclusionsForCategory.map(inclusion => (
-                                <div key={inclusion.key} className="flex items-center justify-between">
-                                    <Label htmlFor={inclusion.key} className="flex items-center gap-2 text-base">
-                                        <inclusion.icon className="h-5 w-5 text-muted-foreground" />
-                                        {inclusion.label}
-                                    </Label>
-                                    <Switch
-                                        id={inclusion.key}
-                                        checked={!!localFilters[inclusion.key as keyof ServiceInclusions]}
-                                        onCheckedChange={(checked) => handleToggle(inclusion.key as keyof ServiceInclusions, checked)}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <p className="text-muted-foreground text-center">No specific filters available for this category.</p>
-                    )}
-                </div>
-                <DialogFooter>
-                     <Button variant="ghost" onClick={() => { setLocalFilters({}); setActiveFilters({})}}>Clear All</Button>
-                     <Button onClick={() => handleApplyFilters(localFilters)}>Apply Filters</Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+      <Dialog open={isFilterDialogOpen} onOpenChange={setIsFilterDialogOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline" className="h-12 text-base shrink-0">
+            <ListFilter className="mr-2 h-5 w-5" />
+            Filters
+            {activeFilterCount > 0 && (
+              <Badge className="ml-2 bg-primary text-primary-foreground">{activeFilterCount}</Badge>
+            )}
+          </Button>
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Advanced Filters</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            {selectedCategory === 'All Categories' ? (
+              <p className="text-muted-foreground text-center">Please select a category first to see available filters.</p>
+            ) : inclusionsForCategory.length > 0 ? (
+              <div className="space-y-4 max-h-96 overflow-y-auto pr-4">
+                {inclusionsForCategory.map(inclusion => (
+                  <div key={inclusion.key} className="flex items-center justify-between">
+                    <Label htmlFor={String(inclusion.key)} className="flex items-center gap-2 text-base">
+                      <inclusion.icon className="h-5 w-5 text-muted-foreground" />
+                      {inclusion.label}
+                    </Label>
+                    <Switch
+                      id={String(inclusion.key)}
+                      checked={!!localFilters[inclusion.key as keyof ServiceInclusions]}
+                      onCheckedChange={(checked) => handleToggle(inclusion.key as keyof ServiceInclusions, checked)}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-muted-foreground text-center">No specific filters available for this category.</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => { setLocalFilters({}); setActiveFilters({}) }}>Clear All</Button>
+            <Button onClick={() => handleApplyFilters(localFilters)}>Apply Filters</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     )
   }
 
@@ -506,8 +485,8 @@ export function ClientDashboard({ initialCategory, initialEventType }: { initial
       </div>
       <Card className="glass-panel overflow-hidden">
         <CardHeader className="bg-gradient-to-br from-primary/10 to-transparent p-4 sm:p-6">
-            <CardTitle className="text-2xl sm:text-3xl font-bold">Explore Event Services</CardTitle>
-            <CardDescription>Find the perfect professional for your event.</CardDescription>
+          <CardTitle className="text-2xl sm:text-3xl font-bold">Explore Event Services</CardTitle>
+          <CardDescription>Find the perfect professional for your event.</CardDescription>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
           <div className="grid grid-cols-2 gap-3 items-center">
@@ -538,7 +517,7 @@ export function ClientDashboard({ initialCategory, initialEventType }: { initial
           </div>
         </CardContent>
       </Card>
-      
+
       <Tabs defaultValue="all">
         <TabsList>
           <TabsTrigger value="all">All ({filteredItems.length})</TabsTrigger>
@@ -546,57 +525,57 @@ export function ClientDashboard({ initialCategory, initialEventType }: { initial
           <TabsTrigger value="offers">Offers ({offers.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="all">
-            {isLoading ? renderSkeletons() : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredItems.map((item) =>
-                    item.type === 'service' ? (
-                        <ServiceCard key={item.id} service={item} role="client" />
-                    ) : (
-                        <OfferCard key={item.id} offer={item} role="client" />
-                    )
-                    )}
-                </div>
-            )}
+          {isItemsLoading ? renderSkeletons() : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredItems.map((item: ServiceOrOffer) =>
+                item.type === 'service' ? (
+                  <ServiceCard key={item.id} service={item as Service} role="client" />
+                ) : (
+                  <OfferCard key={item.id} offer={item as Offer} role="client" />
+                )
+              )}
+            </div>
+          )}
         </TabsContent>
-         <TabsContent value="services">
-             {isLoading ? renderSkeletons() : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {services.map((service) => (
-                        <ServiceCard key={service.id} service={service} role="client" />
-                    ))}
-                </div>
-            )}
+        <TabsContent value="services">
+          {isItemsLoading ? renderSkeletons() : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {services.map((service) => (
+                <ServiceCard key={service.id} service={service} role="client" />
+              ))}
+            </div>
+          )}
         </TabsContent>
         <TabsContent value="offers">
-            {isLoading ? renderSkeletons() : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {offers.map((offer) => (
-                        <OfferCard key={offer.id} offer={offer} role="client" />
-                    ))}
-                </div>
-            )}
+          {isItemsLoading ? renderSkeletons() : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {offers.map((offer) => (
+                <OfferCard key={offer.id} offer={offer} role="client" />
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>
   );
 }
-  async function getPlaceParts(lat: number, lon: number): Promise<{ state?: string; district?: string; city?: string }> {
-    try {
-      const res = await fetch(`/api/geo/reverse?lat=${lat}&lon=${lon}`);
-      const data = await res.json();
-      return data || {};
-    } catch {
-      return {};
-    }
+async function getPlaceParts(lat: number, lon: number): Promise<{ state?: string; district?: string; city?: string }> {
+  try {
+    const res = await fetch(`/api/geo/reverse?lat=${lat}&lon=${lon}`);
+    const data = await res.json();
+    return data || {};
+  } catch {
+    return {};
   }
-  const LOCATION_DETAILS: Record<Location | 'Lebanon', string[]> = {
-    Lebanon: [],
-    Beirut: ['Achrafieh', 'Hamra', 'Verdun', 'Downtown', 'Ain Mreisseh'],
-    'Mount Lebanon': ['Metn', 'Keserwan', 'Baabda', 'Chouf', 'Aley'],
-    'North Lebanon': ['Tripoli', 'Zgharta', 'Batroun', 'Koura', 'Bcharre'],
-    'South Lebanon': ['Sidon', 'Tyre', 'Jezzine'],
-    Nabatieh: ['Nabatieh', 'Bint Jbeil', 'Marjayoun', 'Hasbaya'],
-    Beqaa: ['Zahle', 'West Beqaa', 'Rashaya'],
-    'Baalbek-Hermel': ['Baalbek', 'Hermel'],
-    Akkar: ['Halba', 'Qoubaiyat', 'Tripoli North'],
-  };
+}
+const LOCATION_DETAILS: Record<Location | 'Lebanon', string[]> = {
+  Lebanon: [],
+  Beirut: ['Achrafieh', 'Hamra', 'Verdun', 'Downtown', 'Ain Mreisseh'],
+  'Mount Lebanon': ['Metn', 'Keserwan', 'Baabda', 'Chouf', 'Aley'],
+  'North Lebanon': ['Tripoli', 'Zgharta', 'Batroun', 'Koura', 'Bcharre'],
+  'South Lebanon': ['Sidon', 'Tyre', 'Jezzine'],
+  Nabatieh: ['Nabatieh', 'Bint Jbeil', 'Marjayoun', 'Hasbaya'],
+  Beqaa: ['Zahle', 'West Beqaa', 'Rashaya'],
+  'Baalbek-Hermel': ['Baalbek', 'Hermel'],
+  Akkar: ['Halba', 'Qoubaiyat', 'Tripoli North'],
+};

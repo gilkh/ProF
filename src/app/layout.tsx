@@ -9,10 +9,11 @@ import { useEffect } from 'react';
 import { LanguageProvider, useLanguage } from '@/hooks/use-language';
 import { initializeNotifications } from '@/lib/notifications';
 import { useAuth } from '@/hooks/use-auth';
+import QueryProvider from '@/components/query-provider';
 
 const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
+    subsets: ['latin'],
+    variable: '--font-inter',
 });
 
 function AppBody({ children }: { children: React.ReactNode }) {
@@ -59,14 +60,14 @@ function AppBody({ children }: { children: React.ReactNode }) {
                 inject('capacitor://localhost/capacitor.js');
                 inject('capacitor://localhost/capacitor-android-plugins.js');
             }
-        } catch {}
+        } catch { }
     }, []);
 
     useEffect(() => {
         document.title = translations.meta.title;
         document.querySelector('meta[name="description"]')?.setAttribute('content', translations.meta.description);
     }, [translations]);
-    
+
     useEffect(() => {
         if (userId) {
             initializeNotifications(userId);
@@ -77,13 +78,13 @@ function AppBody({ children }: { children: React.ReactNode }) {
     return (
         <html lang={language} dir={language === 'ar' ? 'rtl' : 'ltr'} className={theme} style={{ colorScheme: theme }}>
             <head>
-                 {/* Allow Capacitor bridge scripts to load when running inside native WebView */}
-                 <meta httpEquiv="Content-Security-Policy" content="default-src 'self' https: http: data: blob: capacitor://localhost; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: blob: capacitor://localhost; style-src 'self' 'unsafe-inline' https: http: capacitor://localhost; img-src 'self' https: http: data: blob: capacitor://localhost; connect-src * ws: wss: https: http: capacitor://localhost; font-src 'self' https: http: data: capacitor://localhost; media-src 'self' https: http: data: blob: capacitor://localhost" />
-                 <meta name="description" content={translations.meta.description} />
-                 <link rel="icon" href="/logo-web.png" type="image/png" />
-                 <link rel="icon" href="/logo-web.png" sizes="32x32" type="image/png" />
-                 <link rel="icon" href="/logo-web.png" sizes="16x16" type="image/png" />
-                 <link rel="apple-touch-icon" href="/logo-web.png" />
+                {/* Allow Capacitor bridge scripts to load when running inside native WebView */}
+                <meta httpEquiv="Content-Security-Policy" content="default-src 'self' https: http: data: blob: capacitor://localhost; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: blob: capacitor://localhost; style-src 'self' 'unsafe-inline' https: http: capacitor://localhost; img-src 'self' https: http: data: blob: capacitor://localhost; connect-src * ws: wss: https: http: capacitor://localhost; font-src 'self' https: http: data: capacitor://localhost; media-src 'self' https: http: data: blob: capacitor://localhost" />
+                <meta name="description" content={translations.meta.description} />
+                <link rel="icon" href="/logo-web.png" type="image/png" />
+                <link rel="icon" href="/logo-web.png" sizes="32x32" type="image/png" />
+                <link rel="icon" href="/logo-web.png" sizes="16x16" type="image/png" />
+                <link rel="apple-touch-icon" href="/logo-web.png" />
             </head>
             <body className={`${inter.variable} font-sans antialiased`}>
                 {children}
@@ -95,13 +96,15 @@ function AppBody({ children }: { children: React.ReactNode }) {
 
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <LanguageProvider>
-        <AppBody>{children}</AppBody>
-    </LanguageProvider>
-  );
+    return (
+        <LanguageProvider>
+            <QueryProvider>
+                <AppBody>{children}</AppBody>
+            </QueryProvider>
+        </LanguageProvider>
+    );
 }
