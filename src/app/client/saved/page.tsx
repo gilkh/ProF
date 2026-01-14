@@ -11,7 +11,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
-import { getSavedItems } from '@/lib/services';
+import { useSavedItems } from '@/hooks/use-user-data';
 import { useLanguage } from '@/hooks/use-language';
 
 export default function SavedItemsPage() {
@@ -19,29 +19,14 @@ export default function SavedItemsPage() {
     const { translations } = useLanguage();
     const t = translations.clientSaved;
 
-    const [savedItems, setSavedItems] = useState<ServiceOrOffer[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const { data: savedItems = [], isLoading: isSavedLoading } = useSavedItems();
 
-    useEffect(() => {
-        const fetchSavedItems = async () => {
-            if (!userId) {
-                if (!isAuthLoading) setIsLoading(false);
-                return;
-            }
-            setIsLoading(true);
-            const items = await getSavedItems(userId);
-            setSavedItems(items);
-            setIsLoading(false);
-        };
-
-        fetchSavedItems();
-    }, [userId, isAuthLoading]);
-
-    const pageIsLoading = isLoading || isAuthLoading;
+    // Derived loading state if critical, usually not blocking for 'saved items' but here we might prefer skeleton
+    const pageIsLoading = isSavedLoading && !savedItems.length;
 
     return (
         <div className="space-y-8">
-             <Card>
+            <Card>
                 <CardHeader>
                     <div className="flex items-center gap-4">
                         <Link href="/client/profile">
@@ -59,11 +44,11 @@ export default function SavedItemsPage() {
                 </CardHeader>
                 <CardContent>
                     {pageIsLoading ? (
-                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-96 w-full rounded-xl" />)}
-                         </div>
+                        </div>
                     ) : savedItems.length > 0 ? (
-                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             {savedItems.map((item) =>
                                 item.type === 'service' ? (
                                     <ServiceCard key={item.id} service={item} role="client" />
@@ -76,7 +61,8 @@ export default function SavedItemsPage() {
                         <p className="text-center text-muted-foreground py-8">{t.noItems}</p>
                     )}
                 </CardContent>
-             </Card>
+            </Card>
         </div>
     )
 }
+

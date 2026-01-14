@@ -34,7 +34,7 @@ function ForwardedItemBubble({ item, timestamp }: { item: ForwardedItem, timesta
         return null;
     }
     return (
-        <div className="bg-background border-2 border-primary/30 rounded-lg p-3 w-full max-w-[70.3125%] shadow-md overflow-hidden">
+        <div className="bg-background border-2 border-primary/30 rounded-lg p-3 w-full max-w-[70%] sm:max-w-[70.3125%] shadow-md overflow-hidden">
             <Link href={`/client/${item.itemType}/${item.itemId}`} className="block w-full max-w-full overflow-hidden">
                 <div className="relative aspect-video rounded-md overflow-hidden mb-2">
                     <Image src={item.image!} alt={item.title} layout="fill" className="object-cover" />
@@ -57,7 +57,7 @@ function ForwardedItemBubble({ item, timestamp }: { item: ForwardedItem, timesta
 
 function QuoteRequestBubble({ item, timestamp }: { item: ForwardedItem, timestamp?: Date }) {
     return (
-        <div className="bg-background border-2 border-primary/40 rounded-lg p-4 w-full max-w-[70.3125%] shadow-lg overflow-hidden">
+        <div className="bg-background border-2 border-primary/40 rounded-lg p-4 w-full max-w-[70%] sm:max-w-[70.3125%] shadow-lg overflow-hidden">
             <div className="flex items-center gap-3 mb-3 border-b pb-3">
                 <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary">
                     <PencilRuler className="h-5 w-5" />
@@ -123,7 +123,7 @@ function QuoteResponseBubble({ item, isOwnMessage, timestamp }: { item: Forwarde
     }
 
     return (
-        <div className="bg-background border-2 border-primary/30 rounded-lg p-4 w-full max-w-[70.3125%] shadow-lg overflow-hidden">
+        <div className="bg-background border-2 border-primary/30 rounded-lg p-4 w-full max-w-[70%] sm:max-w-[70.3125%] shadow-lg overflow-hidden">
             <div className="flex items-center gap-3 mb-3 border-b pb-3">
                 <div className="flex items-center justify-center h-10 w-10 rounded-full bg-green-600/10 text-green-700">
                     <Check className="h-5 w-5" />
@@ -300,7 +300,7 @@ function ChatBubble({ message, isOwnMessage, chat, role }: { message: ChatMessag
             <div className="flex-1 min-w-0 overflow-hidden">
                 <div
                     className={cn(
-                        "w-full max-w-[70.3125%] rounded-lg p-3 whitespace-pre-wrap break-words border relative",
+                        "w-full max-w-[70%] sm:max-w-[70.3125%] rounded-lg p-3 whitespace-pre-wrap break-words border relative",
                         isOwnMessage ? "bg-primary text-primary-foreground border-primary/40" : "bg-muted border-primary/10"
                     )}
                 >
@@ -627,7 +627,7 @@ export function MessagingPanel() {
                                                 {role === 'vendor' && (
                                                     <QuestionTemplateSelector
                                                         chatId={selectedChat.id}
-                                                        clientId={getOtherParticipant(selectedChat)?.id}
+                                                        clientId={(getOtherParticipant(selectedChat) as ChatParticipant | undefined)?.id}
                                                         onTemplateSent={() => {
                                                             // Messages update via real-time listener
                                                         }}

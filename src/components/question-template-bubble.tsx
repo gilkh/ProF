@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { FileQuestion, Clock, User, CheckCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import type { QuestionTemplateMessage, TemplateResponse } from '@/lib/types';
+import type { QuestionTemplateMessage, TemplateResponse, TemplateQuestion, QuestionResponse } from '@/lib/types';
 import { QuestionResponseForm } from './question-response-form';
 
 interface QuestionTemplateBubbleProps {
@@ -19,12 +19,12 @@ interface QuestionTemplateBubbleProps {
   onResponseSubmitted?: () => void;
 }
 
-export function QuestionTemplateBubble({ 
-  templateMessage, 
-  chatId, 
-  isOwnMessage, 
+export function QuestionTemplateBubble({
+  templateMessage,
+  chatId,
+  isOwnMessage,
   timestamp,
-  onResponseSubmitted 
+  onResponseSubmitted
 }: QuestionTemplateBubbleProps) {
   const [showResponseForm, setShowResponseForm] = useState(false);
 
@@ -35,7 +35,7 @@ export function QuestionTemplateBubble({
 
   return (
     <Card className={cn(
-      "max-w-[70.3125%] sm:max-w-md w-full shadow-lg",
+      "max-w-[70%] sm:max-w-md w-full shadow-lg",
       isOwnMessage ? "border-primary/30" : "border-muted"
     )}>
       <CardHeader className="pb-3">
@@ -54,7 +54,7 @@ export function QuestionTemplateBubble({
           </Badge>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-3">
         <div>
           <h3 className="font-semibold text-sm mb-1">{templateMessage.templateTitle}</h3>
@@ -120,16 +120,16 @@ interface TemplateResponseBubbleProps {
   timestamp?: Date;
 }
 
-export function TemplateResponseBubble({ 
-  responseData, 
-  isOwnMessage, 
-  timestamp 
+export function TemplateResponseBubble({
+  responseData,
+  isOwnMessage,
+  timestamp
 }: TemplateResponseBubbleProps) {
   const { templateTitle, clientName, responseCount, submittedAt, questions, responses } = responseData;
 
   return (
     <Card className={cn(
-      "max-w-[70.3125%] sm:max-w-md w-full shadow-lg border-green-200 bg-green-50",
+      "max-w-[70%] sm:max-w-md w-full shadow-lg border-green-200 bg-green-50",
       isOwnMessage && "border-primary/30"
     )}>
       <CardHeader className="pb-3">
@@ -148,7 +148,7 @@ export function TemplateResponseBubble({
           </Badge>
         </div>
       </CardHeader>
-      
+
       <CardContent className="space-y-3">
         <div>
           <h3 className="font-semibold text-sm mb-1">{templateTitle}</h3>

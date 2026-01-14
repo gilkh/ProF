@@ -10,7 +10,8 @@ import {
     getVendorQuoteRequests,
     getChatsForUser,
     getNotifications,
-    getUserSettings
+    getUserSettings,
+    getReviewsByClient
 } from '@/lib/services';
 import { useAuth } from './use-auth';
 import { doc, onSnapshot } from 'firebase/firestore';
@@ -31,6 +32,7 @@ export const QUERY_KEYS = {
     chats: (userId: string) => ['chats', userId],
     userSettings: (userId: string) => ['userSettings', userId],
     servicesAndOffers: ['servicesAndOffers'],
+    reviews: (clientId: string) => ['reviews', clientId],
 };
 
 export function useUserProfile() {
@@ -57,6 +59,7 @@ export function useUserSettings() {
         queryKey: QUERY_KEYS.userSettings(userId || ''),
         queryFn: () => getUserSettings(userId!),
         enabled: !!userId,
+        staleTime: 1000 * 60 * 5, // 5 minutes
     });
 }
 
@@ -77,6 +80,7 @@ export function useUserBookings() {
         queryKey: QUERY_KEYS.bookings(userId || ''),
         queryFn: () => getBookingsForUser(userId!),
         enabled: !!userId,
+        staleTime: 1000 * 60 * 5, // 5 minutes
     });
 }
 
@@ -89,8 +93,33 @@ export function useSavedItemsCount() {
             return Array.isArray(items) ? items.length : 0;
         },
         enabled: !!userId,
+        staleTime: 1000 * 60 * 5, // 5 minutes
     });
 }
+
+export function useSavedItems() {
+    const { userId } = useAuth();
+    return useQuery({
+        queryKey: ['savedItemsFull', userId],
+        queryFn: async () => {
+            const items = await getSavedItems(userId!);
+            return Array.isArray(items) ? items : [];
+        },
+        enabled: !!userId,
+        staleTime: 1000 * 60 * 5, // 5 minutes
+    });
+}
+
+export function useClientReviews() {
+    const { userId } = useAuth();
+    return useQuery({
+        queryKey: QUERY_KEYS.reviews(userId || ''),
+        queryFn: () => getReviewsByClient(userId!),
+        enabled: !!userId,
+        staleTime: 1000 * 60 * 5, // 5 minutes
+    });
+}
+
 
 export function useFeaturedItems() {
     return useQuery({

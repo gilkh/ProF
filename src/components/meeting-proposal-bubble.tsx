@@ -80,7 +80,7 @@ export function MeetingProposalBubble({ message, isOwnMessage }: { message: Chat
   };
 
   return (
-    <div className="bg-background border-2 border-primary/30 rounded-lg p-4 w-full max-w-[70.3125%] shadow-lg">
+    <div className="bg-background border-2 border-primary/30 rounded-lg p-4 w-full max-w-[70%] sm:max-w-[70.3125%] shadow-lg">
       <div className="flex items-center gap-3 mb-3 border-b pb-3">
         <div className="flex items-center justify-center h-10 w-10 rounded-full bg-primary/10 text-primary">
           <Clock className="h-5 w-5" />
@@ -115,9 +115,9 @@ export function MeetingProposalBubble({ message, isOwnMessage }: { message: Chat
             : (anyResponded ? 'Responded' : 'Pending');
           const variant: Parameters<typeof Badge>[0]['variant'] =
             effectiveStatus === 'declined' ? 'destructive'
-            : effectiveStatus === 'accepted' ? 'default'
-            : anyResponded ? 'default'
-            : 'secondary';
+              : effectiveStatus === 'accepted' ? 'default'
+                : anyResponded ? 'default'
+                  : 'secondary';
           return (
             <Badge variant={variant}>{label}</Badge>
           );
@@ -130,27 +130,27 @@ export function MeetingProposalBubble({ message, isOwnMessage }: { message: Chat
         const disableButtons = isSubmitting || hasResponded || notPending;
         if (!canAct) return null;
         return (
-        <div className="mt-4 space-y-3">
-          <div className="flex gap-2">
-            <Button onClick={() => handleRespond('accepted')} disabled={disableButtons} className="flex-1">
-              <Check className="h-4 w-4 mr-2" /> Accept
-            </Button>
-            <Button variant="outline" onClick={() => setShowDecline(v => !v)} disabled={disableButtons} className="flex-1">
-              <X className="h-4 w-4 mr-2" /> Decline
-            </Button>
-            <MeetingRequestDialog proposalToCounter={proposal} onSubmitted={refreshProposal}>
-              <Button variant="secondary" className="flex-1">
-                <ArrowRightLeft className="h-4 w-4 mr-2" /> Counter
+          <div className="mt-4 space-y-3">
+            <div className="flex gap-1 sm:gap-2">
+              <Button size="sm" onClick={() => handleRespond('accepted')} disabled={disableButtons} className="flex-1 text-xs sm:text-sm px-2 sm:px-3">
+                <Check className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" /><span className="hidden sm:inline">Accept</span>
               </Button>
-            </MeetingRequestDialog>
-          </div>
-          {showDecline && (
-            <div className="space-y-2">
-              <Textarea placeholder="Optional reason" value={declineReason} onChange={(e) => setDeclineReason(e.target.value)} rows={3} />
-              <Button variant="destructive" onClick={() => handleRespond('declined')} disabled={disableButtons}>Submit Decline</Button>
+              <Button size="sm" variant="outline" onClick={() => setShowDecline(v => !v)} disabled={disableButtons} className="flex-1 text-xs sm:text-sm px-2 sm:px-3">
+                <X className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" /><span className="hidden sm:inline">Decline</span>
+              </Button>
+              <MeetingRequestDialog proposalToCounter={proposal} onSubmitted={refreshProposal}>
+                <Button size="sm" variant="secondary" className="flex-1 text-xs sm:text-sm px-2 sm:px-3">
+                  <ArrowRightLeft className="h-3 w-3 sm:h-4 sm:w-4 sm:mr-2" /><span className="hidden sm:inline">Counter</span>
+                </Button>
+              </MeetingRequestDialog>
             </div>
-          )}
-        </div>
+            {showDecline && (
+              <div className="space-y-2">
+                <Textarea placeholder="Optional reason" value={declineReason} onChange={(e) => setDeclineReason(e.target.value)} rows={3} />
+                <Button variant="destructive" onClick={() => handleRespond('declined')} disabled={disableButtons}>Submit Decline</Button>
+              </div>
+            )}
+          </div>
         );
       })()}
       <Separator className="mt-4" />
@@ -189,7 +189,7 @@ export function MeetingStatusBubble({ message }: { message: ChatMessage }) {
   const formattedDate = proposal?.dateTime ? format(parseISO(proposal.dateTime), 'PPP p') : null;
 
   return (
-    <div className="bg-background border-2 border-primary/20 rounded-lg p-3 w-full max-w-[70.3125%] shadow-md">
+    <div className="bg-background border-2 border-primary/20 rounded-lg p-3 w-full max-w-[70%] sm:max-w-[70.3125%] shadow-md">
       <div className="flex items-center gap-2">
         {icon}
         <p className="text-sm">

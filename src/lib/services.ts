@@ -41,11 +41,11 @@ export async function createNewUser(data: {
     avatar?: string;
 }) {
     const { accountType, email, password, vendorCode, businessName } = data;
-    
+
     if (!password) {
         throw new Error("Password is required to create a new user.");
     }
-    
+
     // Step 1: Create user in Firebase Auth
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     const firebaseUser = userCredential.user;
@@ -53,7 +53,7 @@ export async function createNewUser(data: {
     if (!firebaseUser) {
         throw new Error("Could not create user account in Firebase Authentication.");
     }
-    
+
     // Step 2: Send verification email for non-admin accounts when enabled
     let verificationSent = false;
     const emailVerificationRequired = await getEmailVerificationSetting();
@@ -61,12 +61,12 @@ export async function createNewUser(data: {
         await sendCustomVerificationEmail(firebaseUser, data.firstName);
         verificationSent = true;
     }
-    
+
     // Step 3: For vendors, validate the code and mark it as "reserved" for this user
     // The full vendor profile will be created upon first login.
     if (accountType === 'vendor') {
         if (!vendorCode) {
-             throw new Error("A registration code is required for vendors.");
+            throw new Error("A registration code is required for vendors.");
         }
         const codeQuery = query(collection(db, 'vendorCodes'), where('code', '==', vendorCode), where('isUsed', '==', false));
         const codeSnapshot = await getDocs(codeQuery);
@@ -75,7 +75,7 @@ export async function createNewUser(data: {
         }
         const codeDoc = codeSnapshot.docs[0];
         await updateDoc(codeDoc.ref, { isUsed: true, usedBy: firebaseUser.uid, usedAt: serverTimestamp() });
-        
+
         // Store temporary vendor info needed for first login.
         const tempVendorData = {
             ...data,
@@ -87,7 +87,7 @@ export async function createNewUser(data: {
         // Store temporary client info
         if (emailVerificationRequired) {
             const tempClientData = {
-                 ...data,
+                ...data,
                 id: firebaseUser.uid,
                 isPendingVerification: true,
             };
@@ -109,7 +109,7 @@ export async function createNewUser(data: {
             await setDoc(doc(db, 'users', firebaseUser.uid), userProfile);
         }
     }
-    
+
     // Step 4: Set durable role claim via secure server route and refresh token
     try {
         const csrfRes = await fetch('/api/auth/csrf', { method: 'GET' });
@@ -134,7 +134,7 @@ export async function createNewUser(data: {
 
 
 export async function signInUser(email: string, password?: string): Promise<{ success: boolean, role?: 'client' | 'vendor' | 'admin'; userId?: string; idToken?: string; message?: string }> {
-    
+
     // Handle admin sign-in through Firebase Auth
     const adminEmails = [
         process.env.NEXT_PUBLIC_ADMIN_EMAIL,
@@ -156,10 +156,10 @@ export async function signInUser(email: string, password?: string): Promise<{ su
             if (e.code === 'auth/too-many-requests') {
                 return { success: false, message: 'Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.' };
             }
-            return { success: false, message: 'An unknown error occurred during admin sign-in.'};
+            return { success: false, message: 'An unknown error occurred during admin sign-in.' };
         }
     }
-    
+
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password!);
         const user = userCredential.user;
@@ -175,7 +175,7 @@ export async function signInUser(email: string, password?: string): Promise<{ su
         const pendingVendorSnap = await getDoc(doc(db, 'pendingVendors', user.uid));
         const vendorProfileSnap = await getDoc(doc(db, 'vendors', user.uid));
         const isVendor = pendingVendorSnap.exists() || vendorProfileSnap.exists();
-        
+
         // Check if user is in pending clients (awaiting email verification)
         const pendingClientDoc = await getDoc(doc(db, 'pendingClients', user.uid));
         if (pendingClientDoc.exists()) {
@@ -185,11 +185,11 @@ export async function signInUser(email: string, password?: string): Promise<{ su
                 await completeEmailVerification(user.uid);
             }
         }
-        
+
         // Defer email verification enforcement to the server-side session route
-        
+
         let userProfileDoc = await getDoc(doc(db, 'users', user.uid));
-        
+
         if (!userProfileDoc.exists()) {
             console.log(`First login for ${user.uid}. Creating profile...`);
 
@@ -234,9 +234,9 @@ export async function signInUser(email: string, password?: string): Promise<{ su
 
             } else {
                 const pendingClientSnap = await getDoc(doc(db, 'pendingClients', user.uid));
-                 if (pendingClientSnap.exists()) {
-                     const data = pendingClientSnap.data() as any;
-                     const userProfile: Omit<UserProfile, 'id'> = {
+                if (pendingClientSnap.exists()) {
+                    const data = pendingClientSnap.data() as any;
+                    const userProfile: Omit<UserProfile, 'id'> = {
                         firstName: data.firstName,
                         lastName: data.lastName,
                         email: data.email,
@@ -251,36 +251,36 @@ export async function signInUser(email: string, password?: string): Promise<{ su
                     await setDoc(doc(db, 'users', user.uid), userProfile);
                     await deleteDoc(pendingClientSnap.ref);
                 } else {
-                     return { success: false, message: 'Your account is verified, but we could not find your initial registration data. Please contact support.' };
+                    return { success: false, message: 'Your account is verified, but we could not find your initial registration data. Please contact support.' };
                 }
             }
             userProfileDoc = await getDoc(doc(db, 'users', user.uid));
         }
 
         if (userProfileDoc.data()?.status === 'disabled') {
-            return { success: false, message: 'Your account has been disabled. Please contact support.'};
+            return { success: false, message: 'Your account has been disabled. Please contact support.' };
         }
 
         if (isVendor) {
             if (vendorProfileSnap.exists() && vendorProfileSnap.data().status === 'disabled') {
-                 return { success: false, message: 'Your account has been disabled. Please contact support.'};
+                return { success: false, message: 'Your account has been disabled. Please contact support.' };
             }
             const idToken = await user.getIdToken();
             return { success: true, role: 'vendor', userId: user.uid, idToken };
         }
-        
+
         const idToken = await user.getIdToken();
         return { success: true, role: 'client', userId: user.uid, idToken };
 
     } catch (e: any) {
         console.error("Firebase Auth sign in error:", e);
         if (e.code === 'auth/user-not-found' || e.code === 'auth/wrong-password' || e.code === 'auth/invalid-credential') {
-             return { success: false, message: 'Invalid email or password.' };
+            return { success: false, message: 'Invalid email or password.' };
         }
-         if (e.code === 'auth/too-many-requests') {
-             return { success: false, message: 'Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.' };
+        if (e.code === 'auth/too-many-requests') {
+            return { success: false, message: 'Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.' };
         }
-        return { success: false, message: 'An unknown error occurred during sign-in.'};
+        return { success: false, message: 'An unknown error occurred during sign-in.' };
     }
 }
 
@@ -323,7 +323,7 @@ async function handleSocialSignIn(firebaseUser: FirebaseUser): Promise<{ success
     } else {
         const [firstName, ...lastNameParts] = (firebaseUser.displayName || 'New User').split(' ');
         const lastName = lastNameParts.join(' ');
-        
+
         const userProfile: Omit<UserProfile, 'id'> = {
             firstName,
             lastName,
@@ -370,7 +370,7 @@ export async function signInWithGoogle(): Promise<{ success: boolean; role?: 'cl
             return { success: false, message: "Google sign-in is not enabled. Please enable it in the Firebase console." };
         }
         if (error.code === 'auth/account-exists-with-different-credential') {
-             return { success: false, message: "An account already exists with this email address. Please sign in with your original method." };
+            return { success: false, message: "An account already exists with this email address. Please sign in with your original method." };
         }
         return { success: false, message: error.message };
     }
@@ -422,7 +422,7 @@ export async function getVendorProfile(vendorId: string): Promise<VendorProfile 
         }
     } catch (e) {
         console.warn("Firebase error getting vendor profile:", e);
-         if ((e as any).code === 'unavailable') {
+        if ((e as any).code === 'unavailable') {
             return null;
         }
     }
@@ -456,8 +456,8 @@ export async function getSavedTimelines(userId: string): Promise<SavedTimeline[]
             const d = doc.data() as DocumentData;
             return { id: doc.id, ...d } as SavedTimeline;
         });
-    } catch(e) {
-         console.warn(`Firebase error getting saved timelines:`, e);
+    } catch (e) {
+        console.warn(`Firebase error getting saved timelines:`, e);
         if ((e as any).code === 'unavailable') {
             return [];
         }
@@ -481,7 +481,7 @@ export async function deleteTimeline(userId: string, timelineId: string) {
     await deleteDoc(docRef);
 }
 
-async function fetchCollection<T extends {id: string}>(path: string, q?: any, transform?: (data: DocumentData) => T): Promise<T[]> {
+async function fetchCollection<T extends { id: string }>(path: string, q?: any, transform?: (data: DocumentData) => T): Promise<T[]> {
     try {
         const querySnapshot = await getDocs(q || collection(db, path));
         return querySnapshot.docs.map(doc => {
@@ -492,7 +492,7 @@ async function fetchCollection<T extends {id: string}>(path: string, q?: any, tr
     } catch (e) {
         console.warn(`Firebase error fetching collection ${path}:`, e);
         if ((e as any).code === 'unavailable') {
-            return []; 
+            return [];
         }
         throw e;
     }
@@ -517,7 +517,7 @@ export const getOffers = (vendorId?: string, count?: number) => {
 
 export const getServicesAndOffers = async (vendorId?: string, options?: { count?: number; includePending?: boolean }): Promise<ServiceOrOffer[]> => {
     const { count, includePending = false } = options || {};
-    
+
     let servicesQuery = query(collection(db, 'services'));
     let offersQuery = query(collection(db, 'offers'));
 
@@ -525,17 +525,17 @@ export const getServicesAndOffers = async (vendorId?: string, options?: { count?
         servicesQuery = query(servicesQuery, where('vendorId', '==', vendorId));
         offersQuery = query(offersQuery, where('vendorId', '==', vendorId));
     }
-    
+
     if (!includePending) {
         servicesQuery = query(servicesQuery, where('status', '==', 'approved'));
         offersQuery = query(offersQuery, where('status', '==', 'approved'));
     }
-    
+
     if (count) {
         servicesQuery = query(servicesQuery, limit(count));
         offersQuery = query(offersQuery, limit(count));
     }
-    
+
     try {
         const [servicesSnapshot, offersSnapshot, vendorsSnapshot] = await Promise.all([
             getDocs(servicesQuery),
@@ -548,9 +548,9 @@ export const getServicesAndOffers = async (vendorId?: string, options?: { count?
         const services = servicesSnapshot.docs.map(doc => {
             const data = toPlain(doc.data()) as DocumentData as Omit<Service, 'id'>;
             const vendor = vendorsData.get(data.vendorId);
-            return { 
-                id: doc.id, 
-                ...data, 
+            return {
+                id: doc.id,
+                ...data,
                 type: 'service',
                 vendorVerification: vendor?.verification || 'none',
                 vendorAvatar: vendor?.avatar || ''
@@ -559,22 +559,22 @@ export const getServicesAndOffers = async (vendorId?: string, options?: { count?
         const offers = offersSnapshot.docs.map(doc => {
             const data = toPlain(doc.data()) as DocumentData as Omit<Offer, 'id'>;
             const vendor = vendorsData.get(data.vendorId);
-            return { 
-                id: doc.id, 
-                ...data, 
+            return {
+                id: doc.id,
+                ...data,
                 type: 'offer',
                 vendorVerification: vendor?.verification || 'none',
                 vendorAvatar: vendor?.avatar || ''
             } as Offer;
         });
-        
+
         let combined = [...services, ...offers];
         if (count) {
             combined = combined.slice(0, count);
         }
         return combined;
-    } catch(e) {
-         console.warn(`Firebase error getting services/offers:`, e);
+    } catch (e) {
+        console.warn(`Firebase error getting services/offers:`, e);
         if ((e as any).code === 'unavailable') {
             return [];
         }
@@ -644,27 +644,27 @@ export async function getServiceOrOfferById(id: string): Promise<ServiceOrOffer 
         ]);
 
         let item: ServiceOrOffer | null = null;
-        
+
         if (serviceDoc.exists()) {
             item = { id: serviceDoc.id, ...toPlain(serviceDoc.data()), type: 'service' } as Service;
         } else if (offerDoc.exists()) {
             item = { id: offerDoc.id, ...toPlain(offerDoc.data()), type: 'offer' } as Offer;
         }
-        
+
         if (!item) {
             return null;
         }
-        
+
         // Fetch vendor data in parallel
         const vendorDoc = await getDoc(doc(db, 'vendors', item.vendorId));
-        
+
         // Enhance item with vendor data if available
         if (vendorDoc.exists()) {
             const vendorData = toPlain(vendorDoc.data());
             item.vendorVerification = vendorData.verification || 'none';
             item.vendorAvatar = vendorData.avatar || item.vendorAvatar;
         }
-        
+
         return item;
 
     } catch (e) {
@@ -713,9 +713,9 @@ export async function deleteServiceOrOffer(itemId: string, itemType: 'service' |
 
 
 // Quote Request Services
-export async function createQuoteRequest(request: Omit<QuoteRequest, 'id'| 'status' | 'createdAt'> & { item: ServiceOrOffer }) {
+export async function createQuoteRequest(request: Omit<QuoteRequest, 'id' | 'status' | 'createdAt'> & { item: ServiceOrOffer }) {
     const { message, item, ...restOfRequest } = request;
-    
+
     const formattedMessage = formatItemForMessage(item, message, true, request);
 
     const chatId = [request.clientId, request.vendorId].sort().join('_');
@@ -729,7 +729,7 @@ export async function createQuoteRequest(request: Omit<QuoteRequest, 'id'| 'stat
             if (!chatSnap.exists()) {
                 const clientProfile = await getUserProfile(request.clientId);
                 const vendorProfile = await getVendorProfile(request.vendorId);
-        
+
                 const newChat: Omit<Chat, 'id'> = {
                     participantIds: [request.clientId, request.vendorId],
                     participants: [
@@ -743,7 +743,7 @@ export async function createQuoteRequest(request: Omit<QuoteRequest, 'id'| 'stat
                 }
                 transaction.set(chatRef, newChat);
             } else {
-                 transaction.update(chatRef, { 
+                transaction.update(chatRef, {
                     lastMessage: formattedMessage,
                     lastMessageTimestamp: new Date(),
                     lastMessageSenderId: request.clientId,
@@ -777,8 +777,8 @@ export async function createQuoteRequest(request: Omit<QuoteRequest, 'id'| 'stat
 
 
 export async function getVendorQuoteRequests(vendorId: string): Promise<QuoteRequest[]> {
-     if (!vendorId) return [];
-     const q = query(collection(db, 'quoteRequests'), where('vendorId', '==', vendorId), orderBy('createdAt', 'desc'));
+    if (!vendorId) return [];
+    const q = query(collection(db, 'quoteRequests'), where('vendorId', '==', vendorId), orderBy('createdAt', 'desc'));
     try {
         const querySnapshot = await getDocs(q);
         return querySnapshot.docs.map(doc => {
@@ -790,7 +790,7 @@ export async function getVendorQuoteRequests(vendorId: string): Promise<QuoteReq
                 phone: data.phone || 'Not Provided',
             } as QuoteRequest
         });
-    } catch(e) {
+    } catch (e) {
         console.warn("Firebase error getting quote requests:", e);
         if ((e as any).code === 'unavailable') {
             return [];
@@ -814,7 +814,7 @@ export async function respondToQuote(requestId: string, vendorId: string, client
     const chatId = [clientId, vendorId].sort().join('_');
     const chatRef = doc(db, 'chats', chatId);
 
-    
+
     try {
         await runTransaction(db, async (transaction) => {
             const quoteSnap = await transaction.get(quoteRef);
@@ -931,13 +931,13 @@ export async function respondToQuote(requestId: string, vendorId: string, client
 
 export async function approveQuote(quoteRequestId: string) {
     const quoteRef = doc(db, 'quoteRequests', quoteRequestId);
-    
-    await runTransaction(db, async(transaction) => {
+
+    await runTransaction(db, async (transaction) => {
         const quoteSnap = await transaction.get(quoteRef);
         if (!quoteSnap.exists()) throw new Error("Quote request not found");
 
         const quote = quoteSnap.data() as QuoteRequest;
-        
+
         if (quote.status !== 'responded') throw new Error("This quote has already been actioned.");
 
         transaction.update(quoteRef, { status: 'approved' });
@@ -976,7 +976,7 @@ export async function createBooking(booking: Omit<Booking, 'id'>) {
     await addDoc(collection(db, 'bookings'), bookingWithDetails);
 }
 
-export const getBookingsForUser = async(userId: string) => {
+export const getBookingsForUser = async (userId: string) => {
     if (!userId) return [];
     const q = query(collection(db, "bookings"), where("clientId", "==", userId));
     try {
@@ -989,15 +989,15 @@ export const getBookingsForUser = async(userId: string) => {
                 date: toDate(data.date),
             } as Booking;
         });
-    } catch(e) {
+    } catch (e) {
         console.warn("Firebase error getting user bookings:", e);
-         if ((e as any).code === 'unavailable') {
+        if ((e as any).code === 'unavailable') {
             return [];
         }
         throw e;
     }
 }
-export const getBookingsForVendor = async(vendorId: string) => {
+export const getBookingsForVendor = async (vendorId: string) => {
     if (!vendorId) return [];
     const q = query(collection(db, "bookings"), where("vendorId", "==", vendorId));
     try {
@@ -1010,9 +1010,9 @@ export const getBookingsForVendor = async(vendorId: string) => {
                 date: toDate(data.date),
             } as Booking;
         });
-    } catch(e) {
+    } catch (e) {
         console.warn("Firebase error getting vendor bookings:", e);
-         if ((e as any).code === 'unavailable') {
+        if ((e as any).code === 'unavailable') {
             return [];
         }
         throw e;
@@ -1031,7 +1031,7 @@ export async function getSavedItems(userId: string, countOnly = false): Promise<
     if (countOnly) {
         return user.savedItemIds.length;
     }
-    
+
     const savedIds = user.savedItemIds.slice(0, 30);
 
     const allItems = await getServicesAndOffers();
@@ -1041,15 +1041,15 @@ export async function getSavedItems(userId: string, countOnly = false): Promise<
 export async function toggleSavedItem(userId: string, itemId: string) {
     if (!userId) return;
     const userRef = doc(db, 'users', userId);
-    
+
     try {
         const userProfile = await getDoc(userRef);
-    
+
         if (!userProfile.exists()) {
             await setDoc(userRef, { savedItemIds: [itemId] }, { merge: true });
             return;
         }
-        
+
         const currentSaved = userProfile.data()?.savedItemIds || [];
 
         if (currentSaved.includes(itemId)) {
@@ -1069,7 +1069,7 @@ export async function createReview(reviewData: Omit<Review, 'id' | 'createdAt'>)
 
     const reviewRef = collection(db, 'reviews');
     const vendorRef = doc(db, 'vendors', vendorId);
-    
+
     const serviceDocRef = doc(db, 'services', serviceId);
     const offerDocRef = doc(db, 'offers', serviceId);
 
@@ -1081,10 +1081,10 @@ export async function createReview(reviewData: Omit<Review, 'id' | 'createdAt'>)
             const offerDoc = await transaction.get(offerDocRef);
 
             if (!vendorDoc.exists()) throw new Error("Vendor not found!");
-            
+
             const listingDoc = serviceDoc.exists() ? serviceDoc : offerDoc.exists() ? offerDoc : null;
             if (!listingDoc) throw new Error("Service/Offer not found!");
-            
+
             const vendorData = vendorDoc.data() as VendorProfile;
             const listingData = listingDoc.data() as ServiceOrOffer;
 
@@ -1093,16 +1093,16 @@ export async function createReview(reviewData: Omit<Review, 'id' | 'createdAt'>)
 
             const newVendorReviewCount = (vendorData.reviewCount || 0) + 1;
             const newVendorRating = ((vendorData.rating || 0) * (vendorData.reviewCount || 0) + rating) / newVendorReviewCount;
-            transaction.update(vendorRef, { 
+            transaction.update(vendorRef, {
                 reviewCount: newVendorReviewCount,
-                rating: newVendorRating 
+                rating: newVendorRating
             });
 
             const newListingReviewCount = (listingData.reviewCount || 0) + 1;
             const newListingRating = ((listingData.rating || 0) * (listingData.reviewCount || 0) + rating) / newListingReviewCount;
-            transaction.update(listingDoc.ref, { 
-                reviewCount: newListingReviewCount, 
-                rating: newListingRating 
+            transaction.update(listingDoc.ref, {
+                reviewCount: newListingReviewCount,
+                rating: newListingRating
             });
         });
     } catch (e) {
@@ -1113,81 +1113,107 @@ export async function createReview(reviewData: Omit<Review, 'id' | 'createdAt'>)
 
 export async function getReviewsForVendor(vendorId: string): Promise<Review[]> {
     if (!vendorId) return [];
-    
+
     // Check cache first
     const cacheKey = cacheKeys.reviews(vendorId);
     const cachedReviews = dataCache.get<Review[]>(cacheKey);
-    
+
     if (cachedReviews) {
         return cachedReviews;
     }
-    
+
     const q = query(collection(db, 'reviews'), where('vendorId', '==', vendorId));
     const reviews = await fetchCollection<Review>('reviews', q, (data: DocumentData) => ({
         id: data.id,
         ...data,
         createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
     } as Review));
-    
+
     const sortedReviews = reviews.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-    
+
     // Cache reviews for 10 minutes (reviews don't change frequently)
     dataCache.set(cacheKey, sortedReviews, 10 * 60 * 1000);
-    
+
+    return sortedReviews;
+}
+
+export async function getReviewsByClient(clientId: string): Promise<Review[]> {
+    if (!clientId) return [];
+
+    // Check cache first
+    const cacheKey = `reviews_client_${clientId}`;
+    const cachedReviews = dataCache.get<Review[]>(cacheKey);
+
+    if (cachedReviews) {
+        return cachedReviews;
+    }
+
+    const q = query(collection(db, 'reviews'), where('clientId', '==', clientId));
+    const reviews = await fetchCollection<Review>('reviews', q, (data: DocumentData) => ({
+        id: data.id,
+        ...data,
+        createdAt: data.createdAt?.toDate ? data.createdAt.toDate() : new Date(),
+    } as Review));
+
+    const sortedReviews = reviews.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    // Cache reviews for 5 minutes
+    dataCache.set(cacheKey, sortedReviews, 5 * 60 * 1000);
+
     return sortedReviews;
 }
 
 // Optimized function to fetch service/offer with reviews in parallel with caching
 export async function getServiceOrOfferWithReviews(id: string): Promise<{ item: ServiceOrOffer | null; reviews: Review[] }> {
     if (!id) return { item: null, reviews: [] };
-    
+
     // Check cache first
     const cacheKey = cacheKeys.serviceOrOfferWithReviews(id);
     const cachedData = dataCache.get<{ item: ServiceOrOffer | null; reviews: Review[] }>(cacheKey);
-    
+
     if (cachedData) {
         return cachedData;
     }
-    
+
     try {
         // First, try to get the item from both collections in parallel
         const [serviceDoc, offerDoc] = await Promise.all([
             getDoc(doc(db, 'services', id)),
             getDoc(doc(db, 'offers', id))
         ]);
-        
+
         let item: ServiceOrOffer | null = null;
-        
+
         if (serviceDoc.exists()) {
             item = { id: serviceDoc.id, ...serviceDoc.data(), type: 'service' } as Service;
         } else if (offerDoc.exists()) {
             item = { id: offerDoc.id, ...offerDoc.data(), type: 'offer' } as Offer;
         }
-        
+
         if (!item) {
             return { item: null, reviews: [] };
         }
-        
+
         // Fetch reviews in parallel with vendor data
         const [reviews, vendorDoc] = await Promise.all([
             getReviewsForVendor(item.vendorId),
             getDoc(doc(db, 'vendors', item.vendorId))
         ]);
-        
+
         // Enhance item with vendor data if available
         if (vendorDoc.exists()) {
             const vendorData = vendorDoc.data();
             item.vendorVerification = vendorData.verification || 'none';
             item.vendorAvatar = vendorData.avatar || item.vendorAvatar;
         }
-        
+
         const result = { item, reviews };
-        
+
         // Cache the result for 3 minutes (shorter cache for dynamic data)
         dataCache.set(cacheKey, result, 3 * 60 * 1000);
-        
+
         return result;
-        
+
     } catch (e) {
         console.warn(`Firebase error getting item with reviews for ID ${id}:`, e);
         if ((e as any).code === 'unavailable') {
@@ -1233,16 +1259,16 @@ export async function getAllUsersAndVendors() {
     const usersSnapshot = await getDocs(collection(db, "users"));
     const vendorsSnapshot = await getDocs(collection(db, "vendors"));
 
-    const vendorsData = new Map(vendorsSnapshot.docs.map(doc => [doc.id, { id: doc.id, ...doc.data()} as VendorProfile]));
-    
-        const allUsers = usersSnapshot.docs.map(doc => {
+    const vendorsData = new Map(vendorsSnapshot.docs.map(doc => [doc.id, { id: doc.id, ...doc.data() } as VendorProfile]));
+
+    const allUsers = usersSnapshot.docs.map(doc => {
         const data = doc.data() as DocumentData;
-        const userData = { 
-            id: doc.id, 
+        const userData = {
+            id: doc.id,
             ...data,
             createdAt: data.createdAt ? toDate(data.createdAt) : new Date(),
         } as UserProfile;
-        
+
         const vendorData = vendorsData.get(doc.id);
 
         return {
@@ -1333,13 +1359,13 @@ export async function resetAllPasswords() {
     return { success: true, message: "Password reset simulation complete. In a real app, emails would be sent." };
 }
 
-export async function createUpgradeRequest(request: Omit<UpgradeRequest, 'id'| 'requestedAt' | 'status'>) {
-  const docRef = await addDoc(collection(db, 'upgradeRequests'), {
-    ...request,
-    requestedAt: serverTimestamp(),
-    status: 'pending',
-  });
-  return docRef.id;
+export async function createUpgradeRequest(request: Omit<UpgradeRequest, 'id' | 'requestedAt' | 'status'>) {
+    const docRef = await addDoc(collection(db, 'upgradeRequests'), {
+        ...request,
+        requestedAt: serverTimestamp(),
+        status: 'pending',
+    });
+    return docRef.id;
 }
 
 export async function getUpgradeRequests(): Promise<UpgradeRequest[]> {
@@ -1363,62 +1389,62 @@ export async function updateUpgradeRequestStatus(requestId: string, status: Upgr
 }
 
 export async function getVendorAnalytics(vendorId: string): Promise<VendorAnalyticsData[]> {
-  if (!vendorId) return [];
-  
-  try {
-    const [quotes, bookings] = await Promise.all([
-        getVendorQuoteRequests(vendorId),
-        getBookingsForVendor(vendorId)
-    ]);
-    
-    const sixMonthsAgo = startOfMonth(subMonths(new Date(), 5));
+    if (!vendorId) return [];
 
-    const quotesInDateRange = quotes.filter(q => {
-    const createdAtDate = q.createdAt instanceof Date ? q.createdAt : toDate(q.createdAt);
-        return createdAtDate >= sixMonthsAgo;
-    });
+    try {
+        const [quotes, bookings] = await Promise.all([
+            getVendorQuoteRequests(vendorId),
+            getBookingsForVendor(vendorId)
+        ]);
+
+        const sixMonthsAgo = startOfMonth(subMonths(new Date(), 5));
+
+        const quotesInDateRange = quotes.filter(q => {
+            const createdAtDate = q.createdAt instanceof Date ? q.createdAt : toDate(q.createdAt);
+            return createdAtDate >= sixMonthsAgo;
+        });
 
         const bookingsInDateRange = bookings.filter(b => {
-        const bookingDate = b.date instanceof Date ? b.date : toDate((b as any).date);
-        return bookingDate >= sixMonthsAgo;
-    });
-    
+            const bookingDate = b.date instanceof Date ? b.date : toDate((b as any).date);
+            return bookingDate >= sixMonthsAgo;
+        });
 
-    const monthlyData: { [key: string]: { quotes: number; bookings: number } } = {};
 
-    for (let i = 0; i < 6; i++) {
-      const monthDate = subMonths(new Date(), i);
-      const monthKey = format(monthDate, 'MMM');
-      monthlyData[monthKey] = { quotes: 0, bookings: 0 };
+        const monthlyData: { [key: string]: { quotes: number; bookings: number } } = {};
+
+        for (let i = 0; i < 6; i++) {
+            const monthDate = subMonths(new Date(), i);
+            const monthKey = format(monthDate, 'MMM');
+            monthlyData[monthKey] = { quotes: 0, bookings: 0 };
+        }
+
+        quotesInDateRange.forEach(q => {
+            const createdAtDate = q.createdAt instanceof Date ? q.createdAt : q.createdAt.toDate();
+            const monthKey = format(createdAtDate, 'MMM');
+            if (monthlyData[monthKey]) {
+                monthlyData[monthKey].quotes++;
+            }
+        });
+
+        bookingsInDateRange.forEach(b => {
+            const date = b.date instanceof Date ? b.date : toDate((b as any).date);
+            const monthKey = format(date, 'MMM');
+            if (monthlyData[monthKey]) {
+                monthlyData[monthKey].bookings++;
+            }
+        });
+
+        return Object.entries(monthlyData)
+            .map(([month, data]) => ({ month, ...data }))
+            .reverse();
+
+    } catch (e) {
+        console.warn("Firebase error getting vendor analytics:", e);
+        if ((e as any).code === 'unavailable') {
+            return [];
+        }
+        throw e;
     }
-
-    quotesInDateRange.forEach(q => {
-      const createdAtDate = q.createdAt instanceof Date ? q.createdAt : q.createdAt.toDate();
-      const monthKey = format(createdAtDate, 'MMM');
-      if (monthlyData[monthKey]) {
-        monthlyData[monthKey].quotes++;
-      }
-    });
-
-    bookingsInDateRange.forEach(b => {
-    const date = b.date instanceof Date ? b.date : toDate((b as any).date);
-      const monthKey = format(date, 'MMM');
-      if (monthlyData[monthKey]) {
-        monthlyData[monthKey].bookings++;
-      }
-    });
-
-    return Object.entries(monthlyData)
-      .map(([month, data]) => ({ month, ...data }))
-      .reverse();
-
-  } catch (e) {
-    console.warn("Firebase error getting vendor analytics:", e);
-    if ((e as any).code === 'unavailable') {
-      return [];
-    }
-    throw e;
-  }
 }
 
 
@@ -1451,7 +1477,7 @@ export async function getPlatformAnalytics(timePeriod: 'daily' | 'monthly' = 'mo
 
         const recentUsersQuery = query(collection(db, "users"), where("createdAt", ">=", startDate));
         const recentUsersSnapshot = await getDocs(recentUsersQuery);
-        
+
         const allVendorIds = new Set((await getDocs(collection(db, "vendors"))).docs.map(d => d.id));
 
         recentUsersSnapshot.forEach(doc => {
@@ -1471,7 +1497,7 @@ export async function getPlatformAnalytics(timePeriod: 'daily' | 'monthly' = 'mo
 
         const formattedSignups = Object.entries(userSignups)
             .map(([period, data]) => ({ period, ...data }));
-            
+
         return {
             totalUsers: usersSnapshot.data().count,
             totalVendors: vendorsSnapshot.data().count,
@@ -1522,17 +1548,17 @@ export async function getPendingMediaForModeration(): Promise<any[]> {
         const service = { id: doc.id, ...doc.data() } as Service;
         service.media?.forEach(media => {
             if (media.status === 'pending') {
-                allItems.push({ ...media, context: { ownerId: service.vendorId, ownerName: service.vendorName, listingId: service.id, listingTitle: service.title, listingType: 'service' }});
+                allItems.push({ ...media, context: { ownerId: service.vendorId, ownerName: service.vendorName, listingId: service.id, listingTitle: service.title, listingType: 'service' } });
             }
         });
     });
-    
+
     const offersSnapshot = await getDocs(collection(db, 'offers'));
     offersSnapshot.forEach(doc => {
         const offer = { id: doc.id, ...doc.data() } as Offer;
         offer.media?.forEach(media => {
             if (media.status === 'pending') {
-                allItems.push({ ...media, context: { ownerId: offer.vendorId, ownerName: offer.vendorName, listingId: offer.id, listingTitle: offer.title, listingType: 'offer' }});
+                allItems.push({ ...media, context: { ownerId: offer.vendorId, ownerName: offer.vendorName, listingId: offer.id, listingTitle: offer.title, listingType: 'offer' } });
             }
         });
     });
@@ -1562,7 +1588,7 @@ export async function getPendingMediaForModeration(): Promise<any[]> {
 
 
 export async function moderateMedia(ownerId: string, listingType: 'service' | 'offer' | 'profile', mediaUrl: string, decision: 'approved' | 'rejected', listingId?: string) {
-    
+
     if (listingType === 'profile') {
         const vendorRef = doc(db, 'vendors', ownerId);
         await runTransaction(db, async (transaction) => {
@@ -1586,7 +1612,7 @@ export async function moderateMedia(ownerId: string, listingType: 'service' | 'o
         if (!listingId) throw new Error("Listing ID is required for service/offer media moderation.");
         const collectionName = listingType === 'service' ? 'services' : 'offers';
         const listingRef = doc(db, collectionName, listingId);
-        
+
         await runTransaction(db, async (transaction) => {
             const listingDoc = await transaction.get(listingRef);
             if (!listingDoc.exists()) throw new Error("Listing not found");
@@ -1600,7 +1626,7 @@ export async function moderateMedia(ownerId: string, listingType: 'service' | 'o
                 }
                 return item;
             });
-            
+
             transaction.update(listingRef, { media: newMediaItems });
         });
     }
@@ -1612,7 +1638,7 @@ export async function moderateMedia(ownerId: string, listingType: 'service' | 'o
 export function getChatsForUser(userId: string | undefined, callback: (chats: Chat[]) => void): () => void {
     let q;
     q = query(collection(db, 'chats'), orderBy('lastMessageTimestamp', 'desc'));
-    
+
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
         let chats = querySnapshot.docs.map(doc => {
             const data = doc.data();
@@ -1644,7 +1670,7 @@ export function getChatsForUser(userId: string | undefined, callback: (chats: Ch
 
 export function getMessagesForChat(chatId: string, callback: (messages: ChatMessage[]) => void): () => void {
     const q = query(collection(db, `chats/${chatId}/messages`), orderBy('timestamp', 'asc'));
-    
+
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
         const messages = querySnapshot.docs.map(doc => {
             const data = doc.data();
@@ -1682,8 +1708,8 @@ export function subscribeToBlockStatus(
     });
 
     return () => {
-        try { unsubA(); } catch {}
-        try { unsubB(); } catch {}
+        try { unsubA(); } catch { }
+        try { unsubB(); } catch { }
     };
 }
 
@@ -1742,13 +1768,13 @@ export async function sendMessage(chatId: string, senderId: string, text: string
 
     const chatRef = doc(db, 'chats', chatId);
     const messagesRef = collection(db, `chats/${chatId}/messages`);
-    
+
     const newMessage: Omit<ChatMessage, 'id'> = {
         senderId,
         text,
         timestamp: new Date()
     };
-    
+
     try {
         await runTransaction(db, async (transaction) => {
             const chatSnap = await transaction.get(chatRef);
@@ -1774,9 +1800,9 @@ export async function sendMessage(chatId: string, senderId: string, text: string
             let lastMessageText = text;
 
             if (isForwarded?.isQuoteRequest) {
-                 lastMessageText = "You sent a quote request."
+                lastMessageText = "You sent a quote request."
             } else if (isForwarded) {
-                 lastMessageText = "You forwarded an item."
+                lastMessageText = "You forwarded an item."
             }
 
             transaction.set(doc(messagesRef), newMessage);
@@ -2045,13 +2071,13 @@ export async function sendCustomVerificationEmail(user: FirebaseUser, firstName:
 }
 
 // Get pending accounts awaiting email verification
-export async function getPendingVerificationAccounts(): Promise<Array<{id: string, email: string, firstName: string, lastName: string, createdAt: Date, accountType: 'client' | 'vendor'}>> {
+export async function getPendingVerificationAccounts(): Promise<Array<{ id: string, email: string, firstName: string, lastName: string, createdAt: Date, accountType: 'client' | 'vendor' }>> {
     try {
         const pendingClientsSnap = await getDocs(collection(db, 'pendingClients'));
         const pendingVendorsSnap = await getDocs(collection(db, 'pendingVendors'));
         const unverifiedUsersSnap = await getDocs(query(collection(db, 'users'), where('emailVerified', '==', false)));
 
-        const accounts: Array<{id: string, email: string, firstName: string, lastName: string, createdAt: Date, accountType: 'client' | 'vendor'}> = [];
+        const accounts: Array<{ id: string, email: string, firstName: string, lastName: string, createdAt: Date, accountType: 'client' | 'vendor' }> = [];
         const seen = new Set<string>();
 
         // Include pending clients awaiting email verification
@@ -2117,7 +2143,7 @@ export async function getEmailVerificationSetting(): Promise<boolean> {
     try {
         const settingsRef = doc(db, 'adminSettings', 'emailVerification');
         const settingsSnap = await getDoc(settingsRef);
-        
+
         if (settingsSnap.exists()) {
             return settingsSnap.data().required ?? true; // Default to true
         }
@@ -2135,12 +2161,12 @@ export async function updateEmailVerificationSetting(required: boolean): Promise
             required: required,
             updatedAt: serverTimestamp()
         }, { merge: true });
-        
+
         // If verification is being disabled, activate all pending clients
         if (!required) {
             const pendingClientsSnapshot = await getDocs(collection(db, 'pendingClients'));
             const batch = writeBatch(db);
-            
+
             pendingClientsSnapshot.docs.forEach(pendingDoc => {
                 const clientData = pendingDoc.data();
                 const userProfile: Omit<UserProfile, 'id'> = {
@@ -2155,11 +2181,11 @@ export async function updateEmailVerificationSetting(required: boolean): Promise
                     emailVerified: true, // Skip verification since it's disabled
                     provider: 'password',
                 };
-                
+
                 batch.set(doc(db, 'users', pendingDoc.id), userProfile);
                 batch.delete(doc(db, 'pendingClients', pendingDoc.id));
             });
-            
+
             if (pendingClientsSnapshot.docs.length > 0) {
                 await batch.commit();
                 console.log(`Activated ${pendingClientsSnapshot.docs.length} pending clients after disabling email verification`);
@@ -2176,10 +2202,10 @@ export async function completeEmailVerification(userId: string): Promise<void> {
     try {
         // Check if user is in pending clients
         const pendingClientDoc = await getDoc(doc(db, 'pendingClients', userId));
-        
+
         if (pendingClientDoc.exists()) {
             const clientData = pendingClientDoc.data();
-            
+
             // Create user profile
             const userProfile: Omit<UserProfile, 'id'> = {
                 firstName: clientData.firstName,
@@ -2193,13 +2219,13 @@ export async function completeEmailVerification(userId: string): Promise<void> {
                 emailVerified: true,
                 provider: 'password',
             };
-            
+
             // Use batch to ensure atomicity
             const batch = writeBatch(db);
             batch.set(doc(db, 'users', userId), userProfile);
             batch.delete(doc(db, 'pendingClients', userId));
             await batch.commit();
-            
+
             console.log('Successfully completed email verification for client:', userId);
         } else {
             // Check if user already exists (might have been manually verified)
@@ -2297,7 +2323,7 @@ export async function logPhoneNumberReveal(vendorId: string, clientId?: string) 
 
 export async function getPhoneNumberReveals(vendorId: string, timePeriod: 'all' | '30days'): Promise<number> {
     if (!vendorId) return 0;
-    
+
     if (timePeriod === 'all') {
         const vendor = await getVendorProfile(vendorId);
         return vendor?.totalPhoneReveals || 0;
@@ -2321,7 +2347,7 @@ export async function createNotification(data: Omit<AppNotification, 'id' | 'cre
         read: false,
         createdAt: serverTimestamp(),
     });
-    
+
     // Also set a flag on the user profile to show the red dot indicator
     const userRef = doc(db, 'users', userId);
     await updateDoc(userRef, { hasUnreadNotifications: true });
@@ -2347,29 +2373,29 @@ export function getNotifications(userId: string, callback: (notifications: AppNo
 
 export async function markNotificationsAsRead(userId: string) {
     if (!userId) return;
-    
+
     try {
         // Get all unread notifications for the user
         const notificationsRef = collection(db, `users/${userId}/notifications`);
         const unreadQuery = query(notificationsRef, where('read', '==', false));
         const unreadSnapshot = await getDocs(unreadQuery);
-        
+
         // Mark all unread notifications as read
         const batch = writeBatch(db);
         unreadSnapshot.docs.forEach(doc => {
             batch.update(doc.ref, { read: true });
         });
-        
+
         // Also update the user profile to remove the unread flag
         const userRef = doc(db, 'users', userId);
         batch.update(userRef, { hasUnreadNotifications: false });
-        
+
         await batch.commit();
     } catch (error) {
         console.error('Error marking notifications as read:', error);
     }
 }
-    
+
 export async function getPendingListings(): Promise<ServiceOrOffer[]> {
     const servicesQuery = query(collection(db, 'services'), where('status', '==', 'pending'));
     const offersQuery = query(collection(db, 'offers'), where('status', '==', 'pending'));
@@ -2381,24 +2407,24 @@ export async function getPendingListings(): Promise<ServiceOrOffer[]> {
 
     const services = servicesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'service' } as Service));
     const offers = offersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), type: 'offer' } as Offer));
-    
+
     return [...services, ...offers];
 }
 
 export async function updateListingStatus(listingId: string, type: 'service' | 'offer', status: 'approved' | 'rejected', rejectionReason?: string) {
     const collectionName = type === 'service' ? 'services' : 'offers';
     const docRef = doc(db, collectionName, listingId);
-    
+
     const batch = writeBatch(db);
 
     const updateData: { status: 'approved' | 'rejected', rejectionReason?: any } = { status: status };
-    
+
     if (status === 'rejected') {
         updateData.rejectionReason = rejectionReason;
     } else {
         updateData.rejectionReason = deleteField();
     }
-    
+
     batch.update(docRef, updateData);
 
     if (status === 'approved') {
@@ -2417,7 +2443,7 @@ export async function updateListingStatus(listingId: string, type: 'service' | '
 // New function to schedule listing approval
 export async function scheduleListingApproval(listingId: string, type: 'service' | 'offer', decision: 'approved' | 'rejected', delayHours: number, reason?: string) {
     const scheduledDate = new Date(Date.now() + (delayHours * 60 * 60 * 1000));
-    
+
     const scheduledAction = {
         listingId,
         type,
@@ -2427,7 +2453,7 @@ export async function scheduleListingApproval(listingId: string, type: 'service'
         createdAt: new Date(),
         status: 'pending'
     };
-    
+
     await addDoc(collection(db, 'scheduledActions'), scheduledAction);
 }
 
@@ -2498,7 +2524,7 @@ export async function getAutoApprovalSetting(): Promise<boolean> {
     try {
         const settingsRef = doc(db, 'adminSettings', 'moderation');
         const settingsSnap = await getDoc(settingsRef);
-        
+
         if (settingsSnap.exists()) {
             return settingsSnap.data().autoApprovalEnabled || false;
         }
@@ -2540,7 +2566,7 @@ export async function getLoginButtonSettings(): Promise<{ clientLoginEnabled: bo
     try {
         const settingsRef = doc(db, 'adminSettings', 'loginButtons');
         const settingsSnap = await getDoc(settingsRef);
-        
+
         if (settingsSnap.exists()) {
             const data = settingsSnap.data();
             return {
@@ -2570,12 +2596,12 @@ export async function getMobileIntroSetting(): Promise<boolean> {
     try {
         const settingsRef = doc(db, 'adminSettings', 'mobileIntro');
         const settingsSnap = await getDoc(settingsRef);
-        
+
         if (settingsSnap.exists()) {
             const data = settingsSnap.data();
             return data.enabled ?? true;
         }
-        
+
         return true; // Default to enabled
     } catch (error) {
         console.error('Error fetching mobile intro setting:', error);
@@ -2614,12 +2640,12 @@ export async function toggleAutoScrollImages(userId: string): Promise<boolean> {
     try {
         const currentSettings = await getUserSettings(userId);
         const newAutoScrollValue = !(currentSettings?.autoScrollImages ?? true);
-        
+
         await updateUserSettings(userId, {
             ...currentSettings,
             autoScrollImages: newAutoScrollValue
         });
-        
+
         return newAutoScrollValue;
     } catch (error) {
         console.error('Error toggling auto-scroll images:', error);
@@ -2636,7 +2662,7 @@ export async function createQuestionTemplate(template: Omit<QuestionTemplate, 'i
         updatedAt: serverTimestamp(),
         usageCount: 0,
     };
-    
+
     const docRef = await addDoc(collection(db, 'questionTemplates'), templateData);
     return docRef.id;
 }
@@ -2647,7 +2673,7 @@ export async function getQuestionTemplates(vendorId: string): Promise<QuestionTe
         where('vendorId', '==', vendorId),
         orderBy('updatedAt', 'desc')
     );
-    
+
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => ({
         id: doc.id,
@@ -2674,20 +2700,20 @@ export async function duplicateQuestionTemplate(templateId: string, newTitle: st
     if (!templateDoc.exists()) {
         throw new Error('Template not found');
     }
-    
+
     const templateData = templateDoc.data() as QuestionTemplate;
     const duplicatedTemplate = {
         ...templateData,
         title: newTitle,
         isActive: false, // New duplicated templates start as inactive
     };
-    
+
     // Remove fields that shouldn't be copied
     delete (duplicatedTemplate as any).id;
     delete (duplicatedTemplate as any).createdAt;
     delete (duplicatedTemplate as any).updatedAt;
     delete (duplicatedTemplate as any).usageCount;
-    
+
     return await createQuestionTemplate(duplicatedTemplate);
 }
 
@@ -2696,15 +2722,15 @@ export async function sendQuestionTemplate(templateId: string, chatId: string, v
     if (!templateDoc.exists()) {
         throw new Error('Template not found');
     }
-    
+
     const template = { id: templateId, ...templateDoc.data() } as QuestionTemplate;
-    
+
     // Get vendor profile for name
     const vendorProfile = await getVendorProfile(vendorId);
     if (!vendorProfile) {
         throw new Error('Vendor not found');
     }
-    
+
     const templateMessage: QuestionTemplateMessage = {
         type: 'question_template',
         templateId: templateId,
@@ -2715,19 +2741,19 @@ export async function sendQuestionTemplate(templateId: string, chatId: string, v
         sentAt: new Date(),
         isQuestionTemplate: true, // Add this flag for proper parsing
     };
-    
+
     await runTransaction(db, async (transaction) => {
         const chatRef = doc(db, 'chats', chatId);
         const messageRef = doc(collection(db, 'chats', chatId, 'messages'));
         const templateRef = doc(db, 'questionTemplates', templateId);
-        
+
         // Add message to chat
         transaction.set(messageRef, {
             senderId: vendorId,
             text: JSON.stringify(templateMessage),
             timestamp: serverTimestamp(),
         });
-        
+
         // Update chat last message
         transaction.update(chatRef, {
             lastMessage: `📋 Question Template: ${template.title}`,
@@ -2735,7 +2761,7 @@ export async function sendQuestionTemplate(templateId: string, chatId: string, v
             lastMessageTimestamp: serverTimestamp(),
             [`unreadCount.${clientId}`]: increment(1),
         });
-        
+
         // Increment template usage count
         transaction.update(templateRef, {
             usageCount: increment(1),
@@ -2751,22 +2777,22 @@ export async function submitTemplateResponse(responseData: {
     responses: Array<{ questionId: string; answer: any }>;
 }): Promise<void> {
     const { templateId, chatId, clientId, vendorId, responses } = responseData;
-    
+
     // Get template and client profile for response message
     const [templateDoc, clientProfile] = await Promise.all([
         getDoc(doc(db, 'questionTemplates', templateId)),
         getUserProfile(clientId),
     ]);
-    
+
     if (!templateDoc.exists()) {
         throw new Error('Template not found');
     }
     if (!clientProfile) {
         throw new Error('Client not found');
     }
-    
+
     const template = { id: templateId, ...templateDoc.data() } as QuestionTemplate;
-    
+
     const templateResponse: TemplateResponse = {
         templateId,
         templateTitle: template.title,
@@ -2776,18 +2802,18 @@ export async function submitTemplateResponse(responseData: {
         responses,
         submittedAt: new Date(),
     };
-    
+
     await runTransaction(db, async (transaction) => {
         const chatRef = doc(db, 'chats', chatId);
         const messageRef = doc(collection(db, 'chats', chatId, 'messages'));
         const responseRef = doc(collection(db, 'templateResponses'));
-        
+
         // Store the response
         transaction.set(responseRef, {
             ...templateResponse,
             submittedAt: serverTimestamp(),
         });
-        
+
         // Add response message to chat
         transaction.set(messageRef, {
             senderId: clientId,
@@ -2804,7 +2830,7 @@ export async function submitTemplateResponse(responseData: {
             }),
             timestamp: serverTimestamp(),
         });
-        
+
         // Update chat last message
         transaction.update(chatRef, {
             lastMessage: `✅ Completed: ${template.title}`,
@@ -2821,7 +2847,7 @@ export async function getTemplateResponses(vendorId: string): Promise<TemplateRe
         where('vendorId', '==', vendorId),
         orderBy('submittedAt', 'desc')
     );
-    
+
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => ({
         id: doc.id,
@@ -2835,7 +2861,7 @@ export async function getTemplateResponse(responseId: string): Promise<TemplateR
     if (!responseDoc.exists()) {
         return null;
     }
-    
+
     return {
         id: responseDoc.id,
         ...responseDoc.data(),
@@ -2865,7 +2891,7 @@ export async function getVendorAvailability(vendorId: string): Promise<VendorAva
     if (!availabilityDoc.exists()) {
         return null;
     }
-    
+
     const data = availabilityDoc.data();
     return {
         id: availabilityDoc.id,
@@ -3036,7 +3062,7 @@ export async function bookTimeSlot(vendorId: string, serviceId: string, date: st
         // Check if slot is still available
         const availableSlots = await getAvailableSlots(vendorId, serviceId, date);
         const slotAvailable = availableSlots.some(slot => slot.startTime === time);
-        
+
         if (!slotAvailable) {
             return false;
         }
@@ -3062,7 +3088,7 @@ export async function bookTimeSlot(vendorId: string, serviceId: string, date: st
 
 export function subscribeToVendorAvailability(vendorId: string, callback: (availability: VendorAvailability | null) => void): () => void {
     const availabilityRef = doc(db, 'vendorAvailability', vendorId);
-    
+
     return onSnapshot(availabilityRef, (doc) => {
         if (doc.exists()) {
             const data = doc.data();
@@ -3080,12 +3106,12 @@ export function subscribeToVendorAvailability(vendorId: string, callback: (avail
 
 export function subscribeToServiceAvailability(vendorId: string, serviceId: string, callback: (slots: AvailabilitySlot[]) => void): () => void {
     const availabilityRef = doc(db, 'vendorAvailability', vendorId);
-    
+
     return onSnapshot(availabilityRef, async (doc) => {
         if (doc.exists()) {
             const data = doc.data();
             const serviceAvailability = data.services?.[serviceId];
-            
+
             if (serviceAvailability && serviceAvailability.visible) {
                 // Get current date's availability
                 const today = format(new Date(), 'yyyy-MM-dd');

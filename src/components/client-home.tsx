@@ -63,10 +63,10 @@ QuickTile.displayName = 'QuickTile';
 
 
 export function ClientHome() {
-    const { userId, isLoading: isAuthLoading } = useAuth();
+    const { userId, isLoading: isAuthLoading, user: firebaseUser } = useAuth();
 
     // React Query Hooks
-    const { data: user, isLoading: isUserLoading } = useUserProfile();
+    const { data: userProfile, isLoading: isUserLoading } = useUserProfile();
     const { data: bookings, isLoading: isBookingsLoading } = useUserBookings();
     const { data: savedItemsCount, isLoading: isSavedLoading } = useSavedItemsCount();
     const { data: featuredItems, isLoading: isFeaturedLoading } = useFeaturedItems();
@@ -180,8 +180,6 @@ export function ClientHome() {
         featuredServices: featuredItems?.filter(i => i.type === 'service').slice(0, 2) || []
     }), [featuredItems]);
 
-    const pageIsLoading = isAuthLoading || isUserLoading || isBookingsLoading || isSavedLoading || isFeaturedLoading || isBannersLoading || isVendorsLoading;
-
     useEffect(() => {
         if (!vendorCarouselApi) return;
         const id = setInterval(() => {
@@ -205,9 +203,7 @@ export function ClientHome() {
     }, [picksCarouselApi]);
 
     return (
-        <div className="space-y-8">
-
-
+        <div className="space-y-3">
             <Card className="relative overflow-hidden border-0 shadow-none">
                 <CardHeader className="p-0">
                     <div className="relative rounded-xl px-4 pt-4 pb-2 md:px-6 md:pt-6 md:pb-3 bg-gradient-to-br from-primary/10 via-accent/20 to-transparent">
@@ -215,11 +211,11 @@ export function ClientHome() {
                         <div className="absolute -bottom-8 -left-8 h-32 w-32 rounded-full bg-primary/20 blur-xl" />
                         <div className="sparkle-overlay" />
                         <div className="flex flex-col gap-2">
-                            {pageIsLoading ? (
+                            {isAuthLoading ? (
                                 <Skeleton className="h-7 w-56" />
                             ) : (
                                 <div className="text-2xl md:text-3xl font-extrabold bg-gradient-to-r from-pink-500 via-red-500 to-yellow-500 bg-clip-text text-transparent">
-                                    {`Welcome back, ${user?.firstName || 'User'} 👋`}
+                                    {`Welcome back, ${userProfile?.firstName || firebaseUser?.displayName?.split(' ')[0] || 'there'} 👋`}
                                 </div>
                             )}
                             <div className="text-sm md:text-base text-muted-foreground">What event are you planning today?</div>
@@ -228,8 +224,8 @@ export function ClientHome() {
                 </CardHeader>
             </Card>
 
-            <div className="space-y-0 -mt-10">
-                {pageIsLoading ? (
+            <div className="space-y-0 -mt-16">
+                {isBannersLoading || isFeaturedLoading ? (
                     <Skeleton className="h-40 w-full rounded-xl" />
                 ) : (
                     <Card className="overflow-hidden">
@@ -276,7 +272,7 @@ export function ClientHome() {
                     icon={Calendar}
                     href="/client/bookings"
                     subtext="View your calendar"
-                    isLoading={pageIsLoading}
+                    isLoading={isBookingsLoading}
                 />
                 <QuickTile
                     title="Saved Items"
@@ -284,7 +280,7 @@ export function ClientHome() {
                     icon={Heart}
                     href="/client/saved"
                     subtext="View your favorites"
-                    isLoading={pageIsLoading}
+                    isLoading={isSavedLoading}
                 />
                 <QuickTile
                     title="Explore Services"
@@ -292,7 +288,7 @@ export function ClientHome() {
                     icon={Compass}
                     href="/client/explore"
                     subtext="Find vendors fast"
-                    isLoading={pageIsLoading}
+                    isLoading={false}
                 />
             </div>
 
@@ -423,7 +419,7 @@ export function ClientHome() {
                     <h2 className="text-lg font-semibold sm:text-xl">Featured Vendors</h2>
                     <Link href="/client/explore"><Button variant="link" size="sm" className="text-sm">View All</Button></Link>
                 </div>
-                {pageIsLoading ? (
+                {isVendorsLoading ? (
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {[...Array(8)].map((_, i) => <Skeleton key={i} className="h-40 w-full rounded-xl" />)}
                     </div>
@@ -437,7 +433,13 @@ export function ClientHome() {
                                             <Card className="w-full">
                                                 <CardContent className="p-3">
                                                     <div className="flex items-center gap-3">
-                                                        <img src={v.avatar || '/placeholder.png'} alt={v.businessName} className="h-10 w-10 rounded-full object-cover" />
+                                                        {v.avatar ? (
+                                                            <img src={v.avatar} alt={v.businessName} className="h-10 w-10 rounded-full object-cover" />
+                                                        ) : (
+                                                            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary/80 to-primary flex items-center justify-center text-primary-foreground font-semibold text-sm">
+                                                                {v.businessName?.charAt(0)?.toUpperCase() || 'V'}
+                                                            </div>
+                                                        )}
                                                         <div>
                                                             <div className="text-sm font-semibold">{v.businessName}</div>
                                                             <div className="text-xs text-muted-foreground">{v.category}</div>
@@ -462,7 +464,7 @@ export function ClientHome() {
                 <div>
                     <h2 className="text-lg font-semibold sm:text-xl">Editorial Picks</h2>
                 </div>
-                {pageIsLoading ? (
+                {isFeaturedLoading ? (
                     <div className="grid grid-cols-2 gap-3">
                         {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28 w-full rounded-xl" />)}
                     </div>
@@ -505,7 +507,7 @@ export function ClientHome() {
                 <div>
                     <h2 className="text-lg font-semibold sm:text-xl">Offers & Promotions</h2>
                 </div>
-                {pageIsLoading ? (
+                {isFeaturedLoading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Skeleton className="h-96 w-full rounded-xl" />
                         <Skeleton className="h-96 w-full rounded-xl" />
@@ -523,7 +525,7 @@ export function ClientHome() {
                 <div>
                     <h2 className="text-lg font-semibold sm:text-xl">Featured Services</h2>
                 </div>
-                {pageIsLoading ? (
+                {isFeaturedLoading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <Skeleton className="h-96 w-full rounded-xl" />
                         <Skeleton className="h-96 w-full rounded-xl" />
