@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_background">#FFFFFF</color>
+    <color name="notification_color">#2196F3</color>
     <string name="app_name">Farhetkoun</string>
     <string name="custom_url_scheme">com.tradecraft.app</string>
     <string name="default_notification_channel_id">general</string>

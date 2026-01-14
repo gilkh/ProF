@@ -424,6 +424,7 @@ color material_grey_800
 color material_grey_850
 color material_grey_900
 color notification_action_color_filter
+color notification_color
 color notification_icon_bg_color
 color primary_dark_material_dark
 color primary_dark_material_light
@@ -692,6 +693,7 @@ drawable ic_call_decline
 drawable ic_call_decline_low
 drawable ic_launcher_background
 drawable ic_launcher_foreground
+drawable ic_notification
 drawable icon_background
 drawable notification_action_background
 drawable notification_bg
@@ -973,6 +975,7 @@ layout select_dialog_singlechoice_material
 layout splash_screen_view
 layout support_simple_spinner_dropdown_item
 mipmap ic_launcher
+mipmap ic_launcher_background
 mipmap ic_launcher_foreground
 mipmap ic_launcher_round
 raw firebase_common_keep
