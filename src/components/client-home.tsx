@@ -365,70 +365,56 @@ export function ClientHome() {
                         </TabsContent>
 
                         <TabsContent value="event-types">
-                            <div className="space-y-2">
-                                <div className="grid grid-cols-2 gap-2 md:grid-cols-2">
-                                    {[
-                                        { label: 'Birthdays', emoji: '🎂', q: 'Birthday Party' },
-                                        { label: 'Newborn Celebrations', emoji: '👶', q: 'Baby Shower' },
-                                        { label: 'Engagements', emoji: '💍', q: 'Engagement' },
-                                        { label: 'Weddings', emoji: '💒', q: 'Wedding' },
-                                        { label: 'Private Parties', emoji: '🎉', q: 'Other' },
-                                        { label: 'Corporate Events', emoji: '🏢', q: 'Corporate Event' },
-                                        { label: 'Graduations', emoji: '🎓', q: 'Graduation' },
-                                        { label: 'Photoshoots', emoji: '📸', q: 'Other' },
-                                    ].map((e) => (
-                                        <Link key={e.label} href={`/client/explore?eventType=${encodeURIComponent(e.q)}`}>
-                                            <div className="relative h-20 px-3 liquid-glass-solid rounded-xl flex flex-col items-center justify-center text-center">
-                                                <div className="relative tilt-mini mb-1">
-                                                    <span className="text-2xl">{e.emoji}</span>
-                                                    {e.label === 'Birthdays' && (
-                                                        <span className="absolute -top-2 -right-2 flame-dot" />
-                                                    )}
-                                                    {e.label === 'Engagements' && (
-                                                        <span className="absolute -top-2 -right-2 spark-dot" />
-                                                    )}
-                                                    {e.label === 'Photoshoots' && (
-                                                        <span className="flash-overlay" style={{ right: '-6px', top: '-6px' }} />
-                                                    )}
-                                                </div>
-                                                <div className="glass-text text-sm font-semibold leading-tight">{e.label}</div>
+                            <div className="grid grid-cols-4 gap-2">
+                                {[
+                                    { label: 'Birthdays', emoji: '🎂', q: 'Birthday Party' },
+                                    { label: 'Newborn', emoji: '👶', q: 'Baby Shower' },
+                                    { label: 'Engagement', emoji: '💍', q: 'Engagement' },
+                                    { label: 'Weddings', emoji: '💒', q: 'Wedding' },
+                                    { label: 'Parties', emoji: '🎉', q: 'Other' },
+                                    { label: 'Corporate', emoji: '🏢', q: 'Corporate Event' },
+                                    { label: 'Graduation', emoji: '🎓', q: 'Graduation' },
+                                    { label: 'Photoshoot', emoji: '📸', q: 'Other' },
+                                ].map((e) => (
+                                    <Link key={e.label} href={`/client/explore?eventType=${encodeURIComponent(e.q)}`} className="group">
+                                        <div className="flex flex-col items-center gap-1.5 p-2 rounded-xl transition duration-200">
+                                            <div className="h-12 w-12 rounded-xl liquid-glass-solid flex items-center justify-center active:scale-95">
+                                                <span className="text-2xl">{e.emoji}</span>
                                             </div>
-                                        </Link>
-                                    ))}
-                                </div>
+                                            <div className="glass-text text-[11px] font-semibold leading-tight text-center">{e.label}</div>
+                                        </div>
+                                    </Link>
+                                ))}
                             </div>
                         </TabsContent>
                     </Tabs>
                 </div>
-                <div className={`w-11 sm:w-12 shrink-0 z-10 rounded-full liquid-glass p-2 ${selectedTab === 'categories' ? 'pt-3' : selectedTab === 'event-types' ? 'pb-3' : ''} flex flex-col gap-2 items-center`}>
-                    <div className="flex flex-col items-center">
-                        <button
-                            onClick={() => setSelectedTab('categories')}
-                            aria-label="Categories"
-                            className={`${selectedTab === 'categories' ? 'bg-primary text-primary-foreground h-16 -mt-3' : 'border border-primary text-primary h-10'} w-10 rounded-full flex items-center justify-center transition-all duration-300`}
-                        >
-                            <div className="flex flex-col items-center justify-center">
-                                {selectedTab === 'categories' && (
-                                    <span className="text-[7px] uppercase tracking-wide mb-0.5 animate-in fade-in zoom-in duration-300">Cats</span>
-                                )}
-                                <Grid className="h-4 w-4" />
-                            </div>
-                        </button>
-                    </div>
-                    <div className="flex flex-col items-center">
-                        <button
-                            onClick={() => setSelectedTab('event-types')}
-                            aria-label="Event Types"
-                            className={`${selectedTab === 'event-types' ? 'bg-primary text-primary-foreground h-16 -mb-3' : 'border border-primary text-primary h-10'} w-10 rounded-full flex items-center justify-center transition-all duration-300`}
-                        >
-                            <div className="flex flex-col items-center justify-center">
-                                <Calendar className="h-4 w-4" />
-                                {selectedTab === 'event-types' && (
-                                    <span className="text-[7px] uppercase tracking-wide mt-0.5 animate-in fade-in zoom-in duration-300">types</span>
-                                )}
-                            </div>
-                        </button>
-                    </div>
+                <div className="w-10 shrink-0 z-10 rounded-full bg-white/40 dark:bg-black/20 backdrop-blur-md border border-white/20 dark:border-white/10 p-1 flex flex-col gap-1 items-center shadow-sm">
+                    <button
+                        onClick={() => setSelectedTab('categories')}
+                        className={`relative flex flex-col items-center justify-center rounded-full transition-all duration-500 ease-spring ${selectedTab === 'categories'
+                            ? 'w-8 h-14 bg-gradient-to-b from-primary to-primary/90 text-primary-foreground shadow-lg ring-1 ring-black/5'
+                            : 'w-8 h-8 text-muted-foreground hover:bg-white/40 dark:hover:bg-white/10'
+                            }`}
+                    >
+                        <Grid className={`h-3.5 w-3.5 transition-transform duration-300 ${selectedTab === 'categories' ? 'scale-110' : ''}`} />
+                        {selectedTab === 'categories' && (
+                            <span className="text-[8px] font-bold uppercase tracking-wider mt-0.5 animate-in fade-in slide-in-from-top-1 duration-300">Cats</span>
+                        )}
+                    </button>
+
+                    <button
+                        onClick={() => setSelectedTab('event-types')}
+                        className={`relative flex flex-col items-center justify-center rounded-full transition-all duration-500 ease-spring ${selectedTab === 'event-types'
+                            ? 'w-8 h-14 bg-gradient-to-b from-primary to-primary/90 text-primary-foreground shadow-lg ring-1 ring-black/5'
+                            : 'w-8 h-8 text-muted-foreground hover:bg-white/40 dark:hover:bg-white/10'
+                            }`}
+                    >
+                        <Calendar className={`h-3.5 w-3.5 transition-transform duration-300 ${selectedTab === 'event-types' ? 'scale-110' : ''}`} />
+                        {selectedTab === 'event-types' && (
+                            <span className="text-[8px] font-bold uppercase tracking-wider mt-0.5 animate-in fade-in slide-in-from-bottom-1 duration-300">Types</span>
+                        )}
+                    </button>
                 </div>
             </div>
 
@@ -485,10 +471,10 @@ export function ClientHome() {
                         <Carousel setApi={setPicksCarouselApi} opts={{ loop: true, align: 'start' }}>
                             <CarouselContent>
                                 {[
-                                    { title: 'Best Photographers This Week', href: '/client/explore?category=Photography%20%26%20Videography', Icon: Camera, image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=800&auto=format&fit=crop' },
-                                    { title: 'Top Wedding Venues in Beirut', href: '/client/explore?category=Venues', Icon: Building2, image: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=800&auto=format&fit=crop' },
-                                    { title: 'Popular Cake Designers in 2025', href: '/client/explore?category=Catering%20%26%20Sweets', Icon: CakeIcon, image: 'https://images.unsplash.com/photo-1521302080371-727c5a1b3f5f?q=80&w=800&auto=format&fit=crop' },
-                                    { title: 'Budget-Friendly Catering Options', href: '/client/explore?category=Catering%20%26%20Sweets', Icon: UtensilsCrossed, image: 'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=800&auto=format&fit=crop' },
+                                    { title: 'Best Photographers This Week', href: '/client/explore?category=Photography%20%26%20Videography', Icon: Camera, image: '/editorial/photographer.png' },
+                                    { title: 'Top Wedding Venues in Beirut', href: '/client/explore?category=Venues', Icon: Building2, image: '/editorial/venue.png' },
+                                    { title: 'Popular Cake Designers in 2025', href: '/client/explore?category=Catering%20%26%20Sweets', Icon: CakeIcon, image: '/editorial/cake.png' },
+                                    { title: 'Budget-Friendly Catering Options', href: '/client/explore?category=Catering%20%26%20Sweets', Icon: UtensilsCrossed, image: '/editorial/catering.png' },
                                 ].map((p) => (
                                     <CarouselItem key={p.title} className="basis-full sm:basis-1/2 md:basis-1/2 lg:basis-1/3 p-2">
                                         <Link href={p.href}>
