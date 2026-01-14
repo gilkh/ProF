@@ -17,11 +17,11 @@ async function refreshSessionCookie(user: User): Promise<void> {
   try {
     // Get a fresh ID token from Firebase
     const idToken = await user.getIdToken(true); // force refresh
-    
+
     // Get CSRF token
     const csrfRes = await fetchWithCapacitorHeaders('/api/auth/csrf');
     const { token: csrfToken } = await csrfRes.json();
-    
+
     // Re-establish session cookie with fresh token
     await fetchWithCapacitorHeaders('/api/auth/session', {
       method: 'POST',
@@ -31,12 +31,12 @@ async function refreshSessionCookie(user: User): Promise<void> {
       },
       body: JSON.stringify({ idToken }),
     });
-    
+
     // Store the timestamp of last refresh
     if (typeof localStorage !== 'undefined') {
       localStorage.setItem('lastSessionRefresh', Date.now().toString());
     }
-    
+
     console.log('[useAuth] Session cookie refreshed successfully');
   } catch (error) {
     console.error('[useAuth] Failed to refresh session cookie:', error);
@@ -45,13 +45,13 @@ async function refreshSessionCookie(user: User): Promise<void> {
 
 function shouldRefreshSession(): boolean {
   if (typeof localStorage === 'undefined') return false;
-  
+
   const lastRefresh = localStorage.getItem('lastSessionRefresh');
   if (!lastRefresh) return true; // Never refreshed, should refresh
-  
+
   const lastRefreshTime = parseInt(lastRefresh, 10);
   const tenDaysInMs = 10 * 24 * 60 * 60 * 1000;
-  
+
   return Date.now() - lastRefreshTime > tenDaysInMs;
 }
 
@@ -62,27 +62,52 @@ export function useAuth(): AuthInfo {
     isLoading: true,
     user: null,
   });
-  
+
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const visibilityListenerRef = useRef<(() => void) | null>(null);
+  const visibilityDebounceRef = useRef<NodeJS.Timeout | null>(null);
+  const lastSessionCheckRef = useRef<number>(0);
+  const rateLimitBackoffRef = useRef<number>(0); // Exponential backoff for 429 errors
+
+  // Throttle time: 30 seconds to avoid hitting rate limits (server allows 60 per 5 min)
+  const SESSION_CHECK_THROTTLE_MS = 30000;
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       (window as typeof window & { firebaseAuth?: typeof auth }).firebaseAuth = auth;
     }
-    
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
           // Ask server for current role from session cookie
           const res = await fetchWithCapacitorHeaders('/api/auth/session', { method: 'GET' });
+          lastSessionCheckRef.current = Date.now();
+
+          // Handle rate limiting gracefully
+          if (res.status === 429) {
+            console.warn('[useAuth] Rate limited during initial auth check, will retry later');
+            setAuthInfo({
+              userId: user.uid,
+              role: null,
+              isLoading: false,
+              user,
+            });
+            return;
+          }
+
           const data = await res.json();
-          
+
           // If not logged in on server but user exists on client, refresh the session
           if (!data.loggedIn) {
             console.log('[useAuth] Session not found on server, refreshing...');
             await refreshSessionCookie(user);
             const retryRes = await fetchWithCapacitorHeaders('/api/auth/session', { method: 'GET' });
+            if (retryRes.status === 429) {
+              console.warn('[useAuth] Rate limited during retry, will retry later');
+              setAuthInfo({ userId: user.uid, role: null, isLoading: false, user });
+              return;
+            }
             const retryData = await retryRes.json();
             setAuthInfo({
               userId: user.uid,
@@ -96,7 +121,7 @@ export function useAuth(): AuthInfo {
               console.log('[useAuth] Session is older than 10 days, proactively refreshing...');
               await refreshSessionCookie(user);
             }
-            
+
             setAuthInfo({
               userId: user.uid,
               role: (data?.role as AuthInfo['role']) ?? null,
@@ -104,7 +129,7 @@ export function useAuth(): AuthInfo {
               user,
             });
           }
-          
+
           // Set up automatic token refresh every 10 days to keep session alive forever
           // Firebase session cookies max out at 14 days, so we refresh at 10 days to be safe
           if (refreshIntervalRef.current) {
@@ -114,54 +139,125 @@ export function useAuth(): AuthInfo {
             console.log('[useAuth] Auto-refreshing session to maintain indefinite login');
             await refreshSessionCookie(user);
           }, 10 * 24 * 60 * 60 * 1000); // 10 days
-          
+
           // Handle app resume/visibility change (important for mobile)
-          const handleVisibilityChange = async () => {
-            if (document.visibilityState === 'visible') {
-              console.log('[useAuth] App resumed, checking session validity');
-              const checkRes = await fetchWithCapacitorHeaders('/api/auth/session', { method: 'GET' });
-              const checkData = await checkRes.json();
-              
-              // If session expired or it's been >10 days, refresh
-              if (!checkData.loggedIn && auth.currentUser) {
-                console.log('[useAuth] Session expired, refreshing...');
-                await refreshSessionCookie(auth.currentUser);
-              } else if (shouldRefreshSession() && auth.currentUser) {
-                console.log('[useAuth] Session older than 10 days, refreshing...');
-                await refreshSessionCookie(auth.currentUser);
-              }
+          // Use debouncing to prevent rapid-fire requests during HMR or quick tab switches
+          const handleVisibilityChange = () => {
+            // Clear any pending debounce
+            if (visibilityDebounceRef.current) {
+              clearTimeout(visibilityDebounceRef.current);
             }
+
+            // Debounce the actual check by 500ms to batch rapid visibility changes
+            visibilityDebounceRef.current = setTimeout(async () => {
+              const now = Date.now();
+
+              // Check if we're in a rate limit backoff period
+              if (rateLimitBackoffRef.current > now) {
+                console.log('[useAuth] Still in rate limit backoff, skipping session check');
+                return;
+              }
+
+              // Throttle checks to every 30 seconds
+              if (now - lastSessionCheckRef.current < SESSION_CHECK_THROTTLE_MS) {
+                return;
+              }
+
+              if (document.visibilityState === 'visible') {
+                console.log('[useAuth] App resumed, checking session validity');
+                lastSessionCheckRef.current = now;
+
+                try {
+                  const checkRes = await fetchWithCapacitorHeaders('/api/auth/session', { method: 'GET' });
+
+                  // Handle 429 with exponential backoff
+                  if (checkRes.status === 429) {
+                    const backoffTime = Math.min(60000, 5000 * Math.pow(2, Math.floor(Math.random() * 3)));
+                    rateLimitBackoffRef.current = now + backoffTime;
+                    console.warn(`[useAuth] Rate limited, backing off for ${backoffTime}ms`);
+                    return;
+                  }
+
+                  // Reset backoff on successful request
+                  rateLimitBackoffRef.current = 0;
+
+                  const checkData = await checkRes.json();
+
+                  // If session expired or it's been >10 days, refresh
+                  if (!checkData.loggedIn && auth.currentUser) {
+                    console.log('[useAuth] Session expired, refreshing...');
+                    await refreshSessionCookie(auth.currentUser);
+                  } else if (shouldRefreshSession() && auth.currentUser) {
+                    console.log('[useAuth] Session older than 10 days, refreshing...');
+                    await refreshSessionCookie(auth.currentUser);
+                  }
+                } catch (error) {
+                  console.error('[useAuth] Error checking session:', error);
+                }
+              }
+            }, 500);
           };
-          
+
           if (visibilityListenerRef.current) {
             document.removeEventListener('visibilitychange', visibilityListenerRef.current);
           }
           visibilityListenerRef.current = handleVisibilityChange;
           document.addEventListener('visibilitychange', handleVisibilityChange);
-          
+
           // For Capacitor: listen to app state changes
           if (typeof window !== 'undefined' && (window as any).Capacitor) {
             const { App } = (window as any).Capacitor.Plugins || {};
             if (App) {
               App.addListener('appStateChange', async (state: { isActive: boolean }) => {
+                const now = Date.now();
+
+                // Check if we're in a rate limit backoff period
+                if (rateLimitBackoffRef.current > now) {
+                  console.log('[useAuth] Still in rate limit backoff, skipping session check');
+                  return;
+                }
+
+                // Throttle checks to every 30 seconds
+                if (now - lastSessionCheckRef.current < SESSION_CHECK_THROTTLE_MS) {
+                  return;
+                }
+
                 if (state.isActive && auth.currentUser) {
                   console.log('[useAuth] App became active, checking session');
-                  const checkRes = await fetchWithCapacitorHeaders('/api/auth/session', { method: 'GET' });
-                  const checkData = await checkRes.json();
-                  
-                  // If session expired or it's been >10 days, refresh
-                  if (!checkData.loggedIn) {
-                    console.log('[useAuth] Session expired, refreshing...');
-                    await refreshSessionCookie(auth.currentUser);
-                  } else if (shouldRefreshSession()) {
-                    console.log('[useAuth] Session older than 10 days, refreshing...');
-                    await refreshSessionCookie(auth.currentUser);
+                  lastSessionCheckRef.current = now;
+
+                  try {
+                    const checkRes = await fetchWithCapacitorHeaders('/api/auth/session', { method: 'GET' });
+
+                    // Handle 429 with exponential backoff
+                    if (checkRes.status === 429) {
+                      const backoffTime = Math.min(60000, 5000 * Math.pow(2, Math.floor(Math.random() * 3)));
+                      rateLimitBackoffRef.current = now + backoffTime;
+                      console.warn(`[useAuth] Rate limited, backing off for ${backoffTime}ms`);
+                      return;
+                    }
+
+                    // Reset backoff on successful request
+                    rateLimitBackoffRef.current = 0;
+
+                    const checkData = await checkRes.json();
+
+                    // If session expired or it's been >10 days, refresh
+                    if (!checkData.loggedIn) {
+                      console.log('[useAuth] Session expired, refreshing...');
+                      await refreshSessionCookie(auth.currentUser);
+                    } else if (shouldRefreshSession()) {
+                      console.log('[useAuth] Session older than 10 days, refreshing...');
+                      await refreshSessionCookie(auth.currentUser);
+                    }
+                  } catch (error) {
+                    console.error('[useAuth] Error checking session:', error);
                   }
                 }
               });
             }
           }
-          
+
         } catch (error) {
           console.error('[useAuth] Error during auth setup:', error);
           setAuthInfo({ userId: user.uid, role: null, isLoading: false, user });
@@ -169,7 +265,7 @@ export function useAuth(): AuthInfo {
       } else {
         // User logged out
         setAuthInfo({ userId: null, role: null, isLoading: false, user: null });
-        
+
         // Clean up intervals and listeners
         if (refreshIntervalRef.current) {
           clearInterval(refreshIntervalRef.current);
@@ -179,14 +275,18 @@ export function useAuth(): AuthInfo {
           document.removeEventListener('visibilitychange', visibilityListenerRef.current);
           visibilityListenerRef.current = null;
         }
-        
+        if (visibilityDebounceRef.current) {
+          clearTimeout(visibilityDebounceRef.current);
+          visibilityDebounceRef.current = null;
+        }
+
         // Clear refresh timestamp
         if (typeof localStorage !== 'undefined') {
           localStorage.removeItem('lastSessionRefresh');
         }
       }
     });
-    
+
     return () => {
       unsubscribe();
       if (refreshIntervalRef.current) {
@@ -194,6 +294,9 @@ export function useAuth(): AuthInfo {
       }
       if (visibilityListenerRef.current) {
         document.removeEventListener('visibilitychange', visibilityListenerRef.current);
+      }
+      if (visibilityDebounceRef.current) {
+        clearTimeout(visibilityDebounceRef.current);
       }
     };
   }, []);
@@ -210,7 +313,7 @@ export async function logout() {
       headers: { 'x-csrf-token': token },
     });
     await auth.signOut();
-    
+
     // Clear refresh timestamp on logout
     if (typeof localStorage !== 'undefined') {
       localStorage.removeItem('lastSessionRefresh');
