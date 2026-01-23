@@ -395,7 +395,7 @@ export function ClientHome() {
                     >
                         <Grid className={`h-3.5 w-3.5 transition-transform duration-300 ${selectedTab === 'categories' ? 'scale-110' : ''}`} />
                         {selectedTab === 'categories' && (
-                            <span className="text-[8px] font-bold uppercase tracking-wider mt-0.5 animate-in fade-in slide-in-from-top-1 duration-300">Cats</span>
+                            <span className="text-[8px] font-bold uppercase tracking-wider mt-0.5 animate-in fade-in slide-in-from-top-1 duration-300">Cat</span>
                         )}
                     </button>
 
